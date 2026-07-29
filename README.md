@@ -4,6 +4,17 @@
 
 首个专题：**安史之乱（755—763）**。
 
+## 当前执行基线
+
+当前第一可发布版本采用只读静态前端 MVP，聚焦“潼关防线、灵宝出战与长安失守”。本期暂不建设 Go、PostgreSQL/PostGIS、数据后台、RAG 和三维地形。
+
+- [MVP 范围](docs/plans/mvp-scope.md)
+- [MVP 开发任务](docs/plans/mvp-tasks.md)
+- [MVP 验收标准](docs/plans/mvp-acceptance.md)
+- [ADR-0001：静态前端 MVP 优先](docs/decisions/0001-静态前端MVP优先.md)
+
+发生实施冲突时，以 ADR 中记录的文档权威顺序为准。下方技术栈仍是长期演进目标。
+
 ## 项目目标
 
 本项目不只是展示“某场战争发生在哪里”，而是尝试回答：
@@ -20,7 +31,7 @@
 - 前端：Vue 3、TypeScript、Vite、MapLibre GL JS、Pinia、ECharts
 - 后端：Go、Gin、pgx、sqlc、goose
 - 数据库：PostgreSQL、PostGIS，后期加入 pgvector
-- 地图服务：第一期由 Go 输出 GeoJSON，后期加入 Martin 输出 MVT
+- 地图服务：静态 MVP 直接加载版本化 GeoJSON；后端化后由 Go 输出 GeoJSON，数据增长后加入 Martin 输出 MVT
 - 地图数据维护：QGIS、GDAL
 - 文件存储：第一期本地目录，后期 MinIO
 - 文档处理：第一期人工整理，后期增加 Python 文档处理任务
@@ -45,12 +56,22 @@ history-map/
 │   │   ├── 02-后端技术栈-Go.md
 │   │   ├── 03-开发阶段规划.md
 │   │   └── 04-本地环境检查.md
+│   ├── decisions/
+│   │   └── 0001-静态前端MVP优先.md
+│   ├── plans/
+│   │   ├── mvp-scope.md
+│   │   ├── mvp-tasks.md
+│   │   └── mvp-acceptance.md
+│   ├── reviews/
+│   │   └── anshi-mvp-content-review.md
 │   └── data/
 │       ├── 01-核心数据模型.md
 │       ├── 02-地图数据与图层.md
 │       └── 03-史料引用与数据可信度.md
 ├── frontend/       # 后续 Vue 项目
 ├── backend/        # 后续 Go 项目
+├── data/
+│   └── curated/     # 人工整理、待审核的结构化资料笔记
 ├── scripts/        # 数据导入、转换、校验脚本
 └── deploy/         # Docker Compose、部署配置
 ```
