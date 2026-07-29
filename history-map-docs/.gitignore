@@ -1,0 +1,13 @@
+.DS_Store
+.env
+.env.*
+.idea/
+.vscode/
+node_modules/
+dist/
+bin/
+tmp/
+data/books/
+data/private/
+*.pdf
+*.epub
