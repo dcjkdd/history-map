@@ -2,8 +2,9 @@
 
 - 状态：执行进度索引
 - 更新日期：2026-07-30
-- 当前远端基线：`master@0394d7e56d99897c58c27763280ac2d1361f9ea0`
-- 下一工程任务：`MVP-02`
+- 当前远端基线：`master@89473cd054f0fd8ff9c9709208e2d38ee9d2f9f4`
+- 当前工作树任务：`MVP-02` 已实现，等待用户审阅和提交
+- 下一工程任务：`MVP-04`（`MVP-03` 仍受内容门禁阻断）
 
 ## 1. 文档定位
 
@@ -21,9 +22,9 @@
 | `CONTENT-00` | `COMPLETED_WORKFLOW_ONLY` | `c813182`、`9ba3dea` | 资料模板、逐条 Claim/Citation 入口和人工审核门禁已建立；不代表历史内容获批 |
 | `MVP-00` | `COMPLETED` | `110c93a` | Vue 3、TypeScript、Vite 最小工程骨架已完成 |
 | `MVP-01` | `COMPLETED` | `d66f326` | 数据契约、运行时校验、selectors、静态 Repository 和技术空数据集已完成 |
-| `MVP-02` | `READY_NEXT` | — | 下一步建立数据完整性校验命令和构建门禁 |
+| `MVP-02` | `IMPLEMENTED_PENDING_REVIEW` | 待提交 | 数据完整性校验命令、构建门禁和损坏数据失败测试已实现 |
 | `MVP-03` | `BLOCKED_BY_CONTENT` | — | 等待人工提供并批准资料版本、页码或稳定定位、坐标/几何依据和许可证 |
-| `MVP-04` | `PENDING` | — | 完成 MVP-02 后可与 MVP-03 并行开发 MapLibre 地图壳 |
+| `MVP-04` | `READY_AFTER_MVP_02_REVIEW` | — | MVP-02 经用户审阅并形成提交后，可开发 MapLibre 地图壳 |
 | `MVP-05`—`MVP-11` | `PENDING` | — | 按任务依赖顺序推进 |
 
 提交 `0394d7e` 只删除旧版文档归档 `history-map-docs.zip`，不代表新的 MVP 阶段。
@@ -69,7 +70,43 @@ ChatGPT Pro 在限时静态审查中未发现 P0—P2，提出 3 个 P3：
 
 Codex 逐项核对后全部采纳，并增加回归测试；最终合格判断仍由 Codex 根据源码和本地门禁独立完成。
 
-## 4. 当前内容门禁
+## 4. MVP-02 当前工作树证据
+
+### 实现范围
+
+- `frontend/src/domain/mvpTypes.ts`
+  - 新增带 `severity`、稳定 `code`、`path` 和 `message` 的完整性问题类型。
+- `frontend/src/domain/mvpValidation.ts`
+  - 新增重复 ID、悬空引用、WGS84 坐标范围、Event/RouteSegment 连续序号、默认事件、Claim/Citation/Source 引用和低可信度地点坐标说明校验。
+  - 非法稳定枚举返回 `UNSUPPORTED_ENUM`；缺少 Claim Citation 返回 `MISSING_CITATION`。
+- `frontend/scripts/validate-data.ts`
+  - 默认读取正式 `public/data/anshi/mvp-v1.json`，先运行 MVP-01 结构校验，再运行同一套 MVP-02 完整性校验。
+  - 任一 `ERROR` 设置非零退出码；不联网查询或自动修复数据。
+- `frontend/package.json`
+  - 新增 `npm run validate:data`。
+  - `build` 和 `check` 均在生产构建前执行正式数据校验。
+- `frontend/tests/data/mvp-integrity.test.ts`
+  - 使用不代表历史事实的合成数据覆盖全部稳定错误码、技术空数据和实际 npm 门禁失败退出码。
+
+### 当前验证
+
+- 环境：Node.js `24.18.0`、npm `11.16.0`
+- `npm ci`：通过
+- `npm run validate:data`：技术空数据集通过，0 个警告
+- `npm run check`：通过
+- 自动测试：3 个测试文件、35 个测试全部通过
+- 生产构建：通过
+- 未增加依赖，未修改 `package-lock.json`
+
+### 限时静态复核
+
+ChatGPT Pro 在 8 分 28 秒的只读静态复核中未发现 P0、P1 或 P3，提出 1 个 P2：原实现仅以 `events.length === 0` 判断技术空数据集，可能让已有 Place/Geography 等内容但没有 Event 的部分数据绕过默认事件门禁。
+
+Codex 对照 MVP-02 边界和当前技术空数据形态后独立确认该问题成立，已改为只有 Places、Geography、RouteSegments、Events、Sources、Citations 全部为空时才允许 `defaultEventId=null`，并增加三个默认事件边界测试。修复后的最终合格判断仍由 Codex 根据源码和本地门禁独立完成，Pro 不直接判定是否验收通过。
+
+MVP-02 当前仍在工作树中，尚未形成实施提交；必须经用户审阅后再提交。
+
+## 5. 当前内容门禁
 
 - `data/curated/anshi-mvp-source-notes.md` 当前批准记录数为 0。
 - `docs/reviews/anshi-mvp-content-review.md` 尚未完成人工签字。
@@ -77,23 +114,9 @@ Codex 逐项核对后全部采纳，并增加回归测试；最终合格判断�
 - 当前 `mvp-v1.json` 只用于验证技术合同和加载边界。
 - 不得把工作标签、猜测坐标、示例页码、未经说明的精确日期或项目推断转换成正式历史数据。
 
-## 5. MVP-02 进入条件与目标
+## 6. 下一步边界
 
-进入 MVP-02 前必须：
-
-1. 从远端 `master` 最新提交开始。
-2. 执行 `nvm use`，确认 Node.js 为 `24.18.0`。
-3. 在 `frontend/` 执行 `npm ci` 和 `npm run check`，确认 MVP-01 门禁仍通过。
-4. 保持技术空数据集和内容审核边界，不录入正式历史内容。
-
-MVP-02 只实现：
-
-- 重复 ID、悬空引用和非法枚举检查。
-- WGS84 经纬度范围检查。
-- Event `sequence` 和 RouteSegment `segmentNo` 连续性检查。
-- `appearAtEventId`、默认事件、Claim/Citation/Source 引用完整性检查。
-- LOW、DISPUTED、UNKNOWN 地点的坐标说明要求。
-- `npm run validate:data`，并接入 `build` 与 `check`。
-- 故意损坏的数据集和门禁失败测试。
-
-MVP-02 不校验历史事实本身，不联网补全资料，不自动修复数据，也不引入后端、数据库或新的通用框架。
+1. 先由用户审阅 MVP-02 工作树；确认后再形成独立提交。
+2. `MVP-03` 继续等待人工批准的资料、坐标/几何依据和许可证，不得录入或猜测正式历史内容。
+3. MVP-02 经审阅后可进入 `MVP-04`，仅开发 MapLibre 地图容器、底图配置和本地降级方案。
+4. MVP-05 仍必须等待通过校验的正式或审核中数据。

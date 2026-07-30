@@ -9,8 +9,15 @@ import {
   SIDES,
   TIME_PRECISIONS,
   VIEWPOINT_TYPES,
-} from './mvpTypes'
-import type { MvpDataset, ValidationResult } from './mvpTypes'
+} from './mvpTypes.ts'
+import type {
+  MvpDataset,
+  MvpIntegrityCode,
+  MvpIntegrityIssue,
+  MvpIntegrityResult,
+  SourcedClaim,
+} from './mvpTypes.ts'
+import type { ValidationResult } from './mvpTypes.ts'
 
 interface ValidationContext {
   errors: MvpDataError[]
@@ -148,10 +155,17 @@ function isEnumValue(
     return true
   }
 
-  addError(context, path, `不支持的枚举值，应为：${values.join('、')}`, {
-    received: value,
-    allowed: values,
-  })
+  context.errors.push(
+    new MvpDataError({
+      code: 'UNSUPPORTED_ENUM',
+      path,
+      message: `不支持的枚举值，应为：${values.join('、')}`,
+      details: {
+        received: value,
+        allowed: values,
+      },
+    }),
+  )
   return false
 }
 
@@ -284,7 +298,17 @@ function isSourcedClaim(
   ) {
     valid = false
   }
-  if (!isStringArray(value.citationIds, `${path}.citationIds`, context, 1)) {
+  const citationIdsPath = `${path}.citationIds`
+  if (!isStringArray(value.citationIds, citationIdsPath, context)) {
+    valid = false
+  } else if (value.citationIds.length === 0) {
+    context.errors.push(
+      new MvpDataError({
+        code: 'MISSING_CITATION',
+        path: citationIdsPath,
+        message: '对外展示的 Claim 至少需要关联一个 Citation',
+      }),
+    )
     valid = false
   }
 
@@ -979,5 +1003,535 @@ export function validateMvpDataset(input: unknown): ValidationResult {
   return {
     ok: false,
     errors: context.errors,
+  }
+}
+
+interface ClaimReference {
+  claim: SourcedClaim
+  path: string
+}
+
+function addIntegrityIssue(
+  issues: MvpIntegrityIssue[],
+  code: MvpIntegrityCode,
+  path: string,
+  message: string,
+): void {
+  issues.push({
+    severity: 'ERROR',
+    code,
+    path,
+    message,
+  })
+}
+
+function validateUniqueIds(
+  entries: ReadonlyArray<{ id: string; path: string }>,
+  namespace: string,
+  issues: MvpIntegrityIssue[],
+): void {
+  const firstPathById = new Map<string, string>()
+
+  for (const entry of entries) {
+    const firstPath = firstPathById.get(entry.id)
+
+    if (firstPath) {
+      addIntegrityIssue(
+        issues,
+        'DUPLICATE_ID',
+        entry.path,
+        `${namespace} ID "${entry.id}" 重复，首次出现于 ${firstPath}`,
+      )
+      continue
+    }
+
+    firstPathById.set(entry.id, entry.path)
+  }
+}
+
+function validateReference(
+  referencedId: string,
+  knownIds: ReadonlySet<string>,
+  path: string,
+  targetName: string,
+  issues: MvpIntegrityIssue[],
+  code: MvpIntegrityCode = 'MISSING_REFERENCE',
+): void {
+  if (!knownIds.has(referencedId)) {
+    addIntegrityIssue(
+      issues,
+      code,
+      path,
+      `引用的 ${targetName} "${referencedId}" 不存在`,
+    )
+  }
+}
+
+function validateCitationIds(
+  citationIds: readonly string[],
+  path: string,
+  knownCitationIds: ReadonlySet<string>,
+  issues: MvpIntegrityIssue[],
+  requireCitation: boolean,
+): void {
+  if (requireCitation && citationIds.length === 0) {
+    addIntegrityIssue(
+      issues,
+      'MISSING_CITATION',
+      path,
+      '至少需要关联一个 Citation',
+    )
+  }
+
+  citationIds.forEach((citationId, index) => {
+    validateReference(
+      citationId,
+      knownCitationIds,
+      `${path}[${index}]`,
+      'Citation',
+      issues,
+      'MISSING_CITATION',
+    )
+  })
+}
+
+function validatePositionRange(
+  position: readonly [number, number],
+  path: string,
+  issues: MvpIntegrityIssue[],
+): void {
+  const [longitude, latitude] = position
+
+  if (longitude < -180 || longitude > 180) {
+    addIntegrityIssue(
+      issues,
+      'INVALID_COORDINATE',
+      `${path}[0]`,
+      `经度 ${longitude} 超出 WGS84 范围 [-180, 180]`,
+    )
+  }
+
+  if (latitude < -90 || latitude > 90) {
+    addIntegrityIssue(
+      issues,
+      'INVALID_COORDINATE',
+      `${path}[1]`,
+      `纬度 ${latitude} 超出 WGS84 范围 [-90, 90]`,
+    )
+  }
+}
+
+function validateBoundsRange(
+  bounds: readonly [
+    readonly [number, number],
+    readonly [number, number],
+  ],
+  path: string,
+  issues: MvpIntegrityIssue[],
+): void {
+  validatePositionRange(bounds[0], `${path}[0]`, issues)
+  validatePositionRange(bounds[1], `${path}[1]`, issues)
+}
+
+function collectClaims(dataset: MvpDataset): ClaimReference[] {
+  const claims: ClaimReference[] = []
+
+  dataset.places.features.forEach((place, index) => {
+    const basePath = `$.places.features[${index}].properties`
+    claims.push(
+      {
+        claim: place.properties.summary,
+        path: `${basePath}.summary`,
+      },
+      {
+        claim: place.properties.strategicRole,
+        path: `${basePath}.strategicRole`,
+      },
+    )
+
+    if (place.properties.coordinateNote) {
+      claims.push({
+        claim: place.properties.coordinateNote,
+        path: `${basePath}.coordinateNote`,
+      })
+    }
+  })
+
+  dataset.geography.features.forEach((geography, index) => {
+    claims.push({
+      claim: geography.properties.summary,
+      path: `$.geography.features[${index}].properties.summary`,
+    })
+  })
+
+  dataset.routeSegments.features.forEach((routeSegment, index) => {
+    claims.push({
+      claim: routeSegment.properties.summary,
+      path: `$.routeSegments.features[${index}].properties.summary`,
+    })
+  })
+
+  dataset.events.forEach((event, index) => {
+    const basePath = `$.events[${index}]`
+    claims.push(
+      {
+        claim: event.summary,
+        path: `${basePath}.summary`,
+      },
+      {
+        claim: event.whyItMatters,
+        path: `${basePath}.whyItMatters`,
+      },
+    )
+  })
+
+  return claims
+}
+
+function validateEventSequence(
+  dataset: MvpDataset,
+  issues: MvpIntegrityIssue[],
+): void {
+  dataset.events.forEach((event, index) => {
+    const expectedSequence = index + 1
+
+    if (event.sequence !== expectedSequence) {
+      addIntegrityIssue(
+        issues,
+        'INVALID_EVENT_SEQUENCE',
+        `$.events[${index}].sequence`,
+        `Event sequence 应按数组顺序从 1 连续递增；期望 ${expectedSequence}，实际 ${event.sequence}`,
+      )
+    }
+  })
+}
+
+function validateRouteSequence(
+  dataset: MvpDataset,
+  issues: MvpIntegrityIssue[],
+): void {
+  const segmentsByRouteId = new Map<
+    string,
+    Array<{ segmentNo: number; path: string }>
+  >()
+
+  dataset.routeSegments.features.forEach((routeSegment, index) => {
+    const { routeId, segmentNo } = routeSegment.properties
+    const entries = segmentsByRouteId.get(routeId) ?? []
+    entries.push({
+      segmentNo,
+      path: `$.routeSegments.features[${index}].properties.segmentNo`,
+    })
+    segmentsByRouteId.set(routeId, entries)
+  })
+
+  for (const [routeId, entries] of segmentsByRouteId) {
+    entries
+      .slice()
+      .sort((left, right) => left.segmentNo - right.segmentNo)
+      .forEach((entry, index) => {
+        const expectedSegmentNo = index + 1
+
+        if (entry.segmentNo !== expectedSegmentNo) {
+          addIntegrityIssue(
+            issues,
+            'INVALID_ROUTE_SEQUENCE',
+            entry.path,
+            `Route "${routeId}" 的 segmentNo 应从 1 连续递增；期望 ${expectedSegmentNo}，实际 ${entry.segmentNo}`,
+          )
+        }
+      })
+  }
+}
+
+function isTechnicalEmptyDataset(dataset: MvpDataset): boolean {
+  return (
+    dataset.places.features.length === 0 &&
+    dataset.geography.features.length === 0 &&
+    dataset.routeSegments.features.length === 0 &&
+    dataset.events.length === 0 &&
+    dataset.sources.length === 0 &&
+    dataset.citations.length === 0
+  )
+}
+
+export function validateMvpIntegrity(
+  dataset: MvpDataset,
+): MvpIntegrityResult {
+  const issues: MvpIntegrityIssue[] = []
+  const placeIds = new Set(
+    dataset.places.features.map((place) => place.properties.id),
+  )
+  const eventIds = new Set(dataset.events.map((event) => event.id))
+  const sourceIds = new Set(dataset.sources.map((source) => source.id))
+  const citationIds = new Set(
+    dataset.citations.map((citation) => citation.id),
+  )
+  const claims = collectClaims(dataset)
+
+  validateUniqueIds(
+    dataset.places.features.map((place, index) => ({
+      id: place.properties.id,
+      path: `$.places.features[${index}].properties.id`,
+    })),
+    'Place',
+    issues,
+  )
+  validateUniqueIds(
+    dataset.geography.features.map((geography, index) => ({
+      id: geography.properties.id,
+      path: `$.geography.features[${index}].properties.id`,
+    })),
+    'Geography',
+    issues,
+  )
+  validateUniqueIds(
+    dataset.routeSegments.features.map((routeSegment, index) => ({
+      id: routeSegment.properties.id,
+      path: `$.routeSegments.features[${index}].properties.id`,
+    })),
+    'RouteSegment',
+    issues,
+  )
+  validateUniqueIds(
+    dataset.events.map((event, index) => ({
+      id: event.id,
+      path: `$.events[${index}].id`,
+    })),
+    'Event',
+    issues,
+  )
+  validateUniqueIds(
+    dataset.sources.map((source, index) => ({
+      id: source.id,
+      path: `$.sources[${index}].id`,
+    })),
+    'Source',
+    issues,
+  )
+  validateUniqueIds(
+    dataset.citations.map((citation, index) => ({
+      id: citation.id,
+      path: `$.citations[${index}].id`,
+    })),
+    'Citation',
+    issues,
+  )
+  validateUniqueIds(
+    claims.map(({ claim, path }) => ({
+      id: claim.claimId,
+      path: `${path}.claimId`,
+    })),
+    'Claim',
+    issues,
+  )
+
+  validatePositionRange(
+    dataset.topic.initialView.center,
+    '$.topic.initialView.center',
+    issues,
+  )
+  if (dataset.topic.initialView.bounds) {
+    validateBoundsRange(
+      dataset.topic.initialView.bounds,
+      '$.topic.initialView.bounds',
+      issues,
+    )
+  }
+  if (dataset.topic.initialView.maxBounds) {
+    validateBoundsRange(
+      dataset.topic.initialView.maxBounds,
+      '$.topic.initialView.maxBounds',
+      issues,
+    )
+  }
+
+  if (isTechnicalEmptyDataset(dataset)) {
+    if (dataset.topic.defaultEventId !== null) {
+      addIntegrityIssue(
+        issues,
+        'MISSING_REFERENCE',
+        '$.topic.defaultEventId',
+        '技术空数据集没有 Event，defaultEventId 必须为 null',
+      )
+    }
+  } else if (dataset.events.length === 0) {
+    addIntegrityIssue(
+      issues,
+      'MISSING_REFERENCE',
+      '$.topic.defaultEventId',
+      '非空数据集至少需要一个 Event 和可解析的 defaultEventId',
+    )
+  } else if (dataset.topic.defaultEventId === null) {
+    addIntegrityIssue(
+      issues,
+      'MISSING_REFERENCE',
+      '$.topic.defaultEventId',
+      '存在 Event 时必须指定可解析的 defaultEventId',
+    )
+  } else {
+    validateReference(
+      dataset.topic.defaultEventId,
+      eventIds,
+      '$.topic.defaultEventId',
+      'Event',
+      issues,
+    )
+  }
+
+  dataset.places.features.forEach((place, index) => {
+    const basePath = `$.places.features[${index}]`
+    validatePositionRange(
+      place.geometry.coordinates,
+      `${basePath}.geometry.coordinates`,
+      issues,
+    )
+    validateCitationIds(
+      place.properties.citationIds,
+      `${basePath}.properties.citationIds`,
+      citationIds,
+      issues,
+      true,
+    )
+
+    if (
+      ['LOW', 'DISPUTED', 'UNKNOWN'].includes(place.properties.certainty) &&
+      place.properties.coordinateNote === null
+    ) {
+      addIntegrityIssue(
+        issues,
+        'MISSING_COORDINATE_NOTE',
+        `${basePath}.properties.coordinateNote`,
+        `${place.properties.certainty} 可信度的地点必须说明坐标依据或不确定性`,
+      )
+    }
+  })
+
+  dataset.geography.features.forEach((geography, index) => {
+    const basePath = `$.geography.features[${index}]`
+    const { geometry } = geography
+
+    if (geometry.type === 'LineString') {
+      geometry.coordinates.forEach((position, positionIndex) => {
+        validatePositionRange(
+          position,
+          `${basePath}.geometry.coordinates[${positionIndex}]`,
+          issues,
+        )
+      })
+    } else {
+      geometry.coordinates.forEach((ring, ringIndex) => {
+        ring.forEach((position, positionIndex) => {
+          validatePositionRange(
+            position,
+            `${basePath}.geometry.coordinates[${ringIndex}][${positionIndex}]`,
+            issues,
+          )
+        })
+      })
+    }
+
+    validateCitationIds(
+      geography.properties.citationIds,
+      `${basePath}.properties.citationIds`,
+      citationIds,
+      issues,
+      true,
+    )
+  })
+
+  dataset.routeSegments.features.forEach((routeSegment, index) => {
+    const basePath = `$.routeSegments.features[${index}]`
+    const propertiesPath = `${basePath}.properties`
+
+    routeSegment.geometry.coordinates.forEach((position, positionIndex) => {
+      validatePositionRange(
+        position,
+        `${basePath}.geometry.coordinates[${positionIndex}]`,
+        issues,
+      )
+    })
+    validateReference(
+      routeSegment.properties.appearAtEventId,
+      eventIds,
+      `${propertiesPath}.appearAtEventId`,
+      'Event',
+      issues,
+      'UNKNOWN_APPEAR_EVENT',
+    )
+    if (routeSegment.properties.fromPlaceId !== null) {
+      validateReference(
+        routeSegment.properties.fromPlaceId,
+        placeIds,
+        `${propertiesPath}.fromPlaceId`,
+        'Place',
+        issues,
+      )
+    }
+    if (routeSegment.properties.toPlaceId !== null) {
+      validateReference(
+        routeSegment.properties.toPlaceId,
+        placeIds,
+        `${propertiesPath}.toPlaceId`,
+        'Place',
+        issues,
+      )
+    }
+    validateCitationIds(
+      routeSegment.properties.citationIds,
+      `${propertiesPath}.citationIds`,
+      citationIds,
+      issues,
+      true,
+    )
+  })
+
+  dataset.events.forEach((event, index) => {
+    const basePath = `$.events[${index}]`
+
+    event.relatedPlaceIds.forEach((placeId, placeIndex) => {
+      validateReference(
+        placeId,
+        placeIds,
+        `${basePath}.relatedPlaceIds[${placeIndex}]`,
+        'Place',
+        issues,
+      )
+    })
+    validateCitationIds(
+      event.citationIds,
+      `${basePath}.citationIds`,
+      citationIds,
+      issues,
+      true,
+    )
+  })
+
+  dataset.citations.forEach((citation, index) => {
+    validateReference(
+      citation.sourceId,
+      sourceIds,
+      `$.citations[${index}].sourceId`,
+      'Source',
+      issues,
+    )
+  })
+
+  claims.forEach(({ claim, path }) => {
+    validateCitationIds(
+      claim.citationIds,
+      `${path}.citationIds`,
+      citationIds,
+      issues,
+      true,
+    )
+  })
+
+  validateEventSequence(dataset, issues)
+  validateRouteSequence(dataset, issues)
+
+  return {
+    ok: issues.every((issue) => issue.severity !== 'ERROR'),
+    issues,
   }
 }

@@ -64,7 +64,23 @@ export const MVP_DATA_ERROR_CODES = [
   'HTTP_ERROR',
   'INVALID_JSON',
   'UNSUPPORTED_SCHEMA_VERSION',
+  'UNSUPPORTED_ENUM',
+  'MISSING_CITATION',
   'INVALID_DATASET',
+] as const
+
+export const MVP_INTEGRITY_SEVERITIES = ['ERROR', 'WARNING'] as const
+
+export const MVP_INTEGRITY_CODES = [
+  'DUPLICATE_ID',
+  'MISSING_REFERENCE',
+  'INVALID_COORDINATE',
+  'INVALID_EVENT_SEQUENCE',
+  'INVALID_ROUTE_SEQUENCE',
+  'UNKNOWN_APPEAR_EVENT',
+  'MISSING_CITATION',
+  'MISSING_COORDINATE_NOTE',
+  'UNSUPPORTED_ENUM',
 ] as const
 
 export type PlaceType = (typeof PLACE_TYPES)[number]
@@ -76,6 +92,9 @@ export type Certainty = (typeof CERTAINTIES)[number]
 export type TimePrecision = (typeof TIME_PRECISIONS)[number]
 export type ViewpointType = (typeof VIEWPOINT_TYPES)[number]
 export type MvpDataErrorCode = (typeof MVP_DATA_ERROR_CODES)[number]
+export type MvpIntegritySeverity =
+  (typeof MVP_INTEGRITY_SEVERITIES)[number]
+export type MvpIntegrityCode = (typeof MVP_INTEGRITY_CODES)[number]
 
 export type Position = [longitude: number, latitude: number]
 export type Bounds = [southwest: Position, northeast: Position]
@@ -299,6 +318,18 @@ export type ValidationResult =
       ok: false
       errors: MvpDataError[]
     }
+
+export interface MvpIntegrityIssue {
+  severity: MvpIntegritySeverity
+  code: MvpIntegrityCode
+  path: string
+  message: string
+}
+
+export interface MvpIntegrityResult {
+  ok: boolean
+  issues: MvpIntegrityIssue[]
+}
 
 export interface CitationWithSource {
   citation: Citation
