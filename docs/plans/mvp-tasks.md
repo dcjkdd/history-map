@@ -11,9 +11,9 @@
 2. 不引入 Vue Router、ECharts、Element Plus、Naive UI、deck.gl、Turf、Cesium 或其他未在任务中明确允许的依赖。
 3. 地图组件不得直接读取静态 JSON，只能通过统一数据仓库模块加载。
 4. 不编造历史事实、页码、版本、精确日期和坐标。正式数据只能来自已审核的资料笔记。
-5. 每完成一个任务都必须保持 `npm run typecheck`、`npm run test` 和 `npm run build` 可通过；从数据校验任务开始，还必须通过 `npm run validate:data`。
+5. 自 `MVP-00` 创建 `frontend/package.json` 起，每个工程任务都必须保持 `npm run typecheck`、`npm run test` 和 `npm run build` 可通过；从 `MVP-02` 起还必须通过 `npm run validate:data`。`MVP-PRE-00` 和 `CONTENT-00` 不要求执行尚不存在的 npm 脚本。
 6. 任务之外的重构、目录扩张和“为以后预留”的抽象一律不做。
-7. 发现需求冲突时，以 `mvp-scope.md` 的 P0 范围和“不做什么”为准。
+7. 发现需求冲突时，按 ADR-0001 的文档权威顺序处理；不得用任务文本弱化 `mvp-acceptance.md` 的发布门禁，当前实现范围仍以 `mvp-scope.md` 的 P0 和明确暂缓项为准。
 
 ## MVP-PRE-00：仓库归位、Node 环境与文档权威
 
@@ -30,7 +30,7 @@
 
 ### 验收标准
 
-1. README、`docs/`、`frontend/`、`backend/`、`scripts/` 和 `deploy/` 直接位于项目根目录。
+1. README、`docs/`、`data/` 和根配置文件直接位于项目根目录；`frontend/`、`backend/`、`scripts/`、`deploy/` 在后续创建时也必须直接位于根目录。不得以 Git 无法保留的空目录作为提交验收条件。
 2. 旧 `history-map-docs/` 目录不存在。
 3. `nvm use` 后 Node 输出与 `.nvmrc` 一致，npm 可以运行。
 4. 当前 MVP 与长期 Go/PostGIS 架构的优先关系在 ADR 中明确。
@@ -73,12 +73,14 @@ docs/reviews/
 
 ### 验收标准
 
-1. 资料版本登记表存在，能够记录版本、章节、页码或稳定定位及使用权限。
-2. 每条内容可分别记录原文、项目归纳、项目推断、可信度和争议。
-3. 第一批核对对象全部进入内容审核表。
-4. 不包含示例页码、占位坐标或被伪装成已确认事实的推断。
-5. 当前尚未审核的条目明确标记为 `PENDING_SOURCE` 或 `PENDING_REVIEW`。
-6. 文档明确说明只有 `APPROVED` 记录才能进入正式数据。
+1. 资料版本登记表存在，能够记录版本、章节、页码或稳定定位、访问日期，以及许可证名称、链接和署名要求。
+2. 每条拟展示结论具有稳定 `claimId`，并逐条绑定一个或多个稳定 `citationId`；每个 Citation 能定位到具体 Source 和页码或稳定定位。
+3. 每条内容可分别记录原文、项目归纳、项目推断、可信度和争议。
+4. 第一批核对对象全部进入内容审核表；逻辑路线工作项标为 `RoutePlan`，不能冒充尚未生成的 `RouteSegment`。
+5. 不包含示例页码、占位坐标或被伪装成已确认事实的推断。
+6. 当前尚未审核的条目明确标记为 `PENDING_SOURCE` 或 `PENDING_REVIEW`。
+7. 文档明确说明：只有填写审核人、审核日期并完成人工签字的 `APPROVED` 记录及其关联 Source/Citation 才能进入正式数据。
+8. `MVP-01` 必须定义上述逐条引用关系在运行时 JSON 中的表达方式；CONTENT-00 不提前扩张数据契约。
 
 ### 完成边界
 
@@ -974,14 +976,17 @@ frontend/public/data/anshi/
 
 | 字段 | 说明 |
 |---|---|
-| `entityType` | Place / Event / RouteSegment / Citation |
-| `entityId` | 数据 ID |
-| `factReviewed` | 事实或路线是否核对 |
-| `coordinateReviewed` | 坐标是否核对，非地点可不适用 |
-| `citationReviewed` | 出处与页码是否核对 |
+| `entityType` | Place / Event / Geography / RoutePlan / RouteSegment / Claim / Citation / Source |
+| `entityId` | 数据 ID；RoutePlan 是内容准备项，不能替代实际 RouteSegment |
+| `factReviewed` | 事实、结论或路线是否核对 |
+| `coordinateReviewed` | 坐标/几何是否核对，非空间对象可不适用 |
+| `citationReviewed` | 出处与页码或稳定定位是否核对 |
+| `sourceVersionReviewed` | 资料版本或数据集版本是否核对 |
+| `licenseReviewed` | 使用权限、许可证链接和署名要求是否核对 |
 | `certaintyReviewed` | 可信度是否合理 |
-| `reviewer` | 审核人 |
-| `status` | `APPROVED`、`CHANGES_REQUIRED`、`NOT_APPLICABLE` |
+| `reviewer` | 人工审核人 |
+| `reviewDate` | 人工审核日期 |
+| `status` | `PENDING_SOURCE`、`PENDING_REVIEW`、`APPROVED`、`CHANGES_REQUIRED`、`REJECTED`、`NOT_APPLICABLE` |
 | `notes` | 问题和修改说明 |
 
 ### API
@@ -990,12 +995,13 @@ frontend/public/data/anshi/
 
 ### 验收标准
 
-1. 所有 Place、Event 和 RouteSegment 都出现在审核表中。
-2. 所有正式展示的 Citation 已核对来源、版本和定位信息。
-3. 不存在 `CHANGES_REQUIRED` 项。
-4. 不存在 `TODO_REVIEW`、示例页码、占位坐标和未经说明的推断。
-5. 内容负责人确认核心叙事在 5—10 次交互内连贯成立。
-6. 通过 `docs/plans/mvp-acceptance.md` 的全部阻断项。
+1. 所有 Place、Event、Geography 和实际 RouteSegment 都出现在审核表中；前置 RoutePlan 行不能替代分段审核。
+2. 所有正式展示的 Claim、Citation 和 Source 都出现在审核表中；每条 Claim 逐条绑定 Citation，Citation 已核对来源、版本和页码或稳定定位。
+3. 所有空间 Source 已核对数据版本、许可证链接、署名要求和处理过程。
+4. 所有拟发布数据的对应审核行必须为 `APPROVED`，并填写 reviewer 与 reviewDate；不存在 `PENDING_SOURCE`、`PENDING_REVIEW` 或 `CHANGES_REQUIRED`。
+5. 不存在 `TODO_REVIEW`、示例页码、占位坐标和未经说明的推断。
+6. 内容负责人确认核心叙事在 5—10 次交互内连贯成立并完成签字。
+7. 通过 `docs/plans/mvp-acceptance.md` 的全部阻断项。
 
 ### 不做什么
 

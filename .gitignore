@@ -7,8 +7,12 @@
 .vscode/
 node_modules/
 dist/
+coverage/
+.cache/
+.vite/
 bin/
 tmp/
+*.log
 data/books/
 data/private/
 *.pdf
