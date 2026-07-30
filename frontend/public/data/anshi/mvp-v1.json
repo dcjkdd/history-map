@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "1.0",
+  "topic": {
+    "id": "anshi-tongguan-mvp",
+    "title": "中国古代战争地形地图",
+    "subtitle": "MVP-01 技术空数据集",
+    "summary": "本文件仅用于验证数据契约、运行时校验和静态加载边界，不包含已审核的历史事件、地点、路线、坐标或引用。",
+    "initialView": {
+      "center": [105, 35],
+      "zoom": 4
+    },
+    "defaultEventId": null
+  },
+  "places": {
+    "type": "FeatureCollection",
+    "features": []
+  },
+  "geography": {
+    "type": "FeatureCollection",
+    "features": []
+  },
+  "routeSegments": {
+    "type": "FeatureCollection",
+    "features": []
+  },
+  "events": [],
+  "sources": [],
+  "citations": []
+}
