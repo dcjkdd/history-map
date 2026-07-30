@@ -130,6 +130,8 @@ GET /data/anshi/mvp-v1.json
 | `timePrecision` | `DAY`、`MONTH`、`YEAR`、`APPROXIMATE` |
 | `viewpointType` | `FACT`、`PRIMARY_RECORD`、`MODERN_RESEARCH`、`LATER_NARRATIVE`、`INFERENCE`、`DISPUTE` |
 
+`side` 中，`TANG` 表示前线唐军等军事行动主体，`COURT` 表示朝廷政治决策或转移主体；录入时按当前事件或路线的直接行动主体选择，不能把两者当作同义值混用。
+
 ### 2.4 核心对象最小字段
 
 #### Topic
@@ -196,7 +198,7 @@ GET /data/anshi/mvp-v1.json
 | `dateLabel` | 面向用户展示的历史时间文本 |
 | `normalizedDate` | 可确认时填写标准日期，否则为空 |
 | `timePrecision` | 时间精度 |
-| `certainty` | 时间或事件细节可信度 |
+| `certainty` | 事件存在性与时间定位的可信度；过程、因果和叙事解释的可信度归各自 `SourcedClaim` |
 | `summary` | 发生了什么 |
 | `whyItMatters` | 为什么影响潼关或长安局势 |
 | `relatedPlaceIds` | 相关地点 ID |
@@ -451,8 +453,9 @@ GET /data/anshi/mvp-v1.json
 4. 所有坐标、路线和时间文本在 `anshi-mvp-source-notes.md` 中能找到依据或明确的推断说明。
 5. 不能确认精确日期时，使用近似时间文本和 `APPROXIMATE`，不得为排序虚构某一天。
 6. 路线若只是解释性重建，必须标注 LOW/MEDIUM 和说明。
-7. `npm run validate:data` 全部通过。
-8. `mvp-content.test.ts` 检查最低数据量、核心地点存在和默认事件有效。
+7. `geography-guanzhong-corridor` 必须依据资料决定使用 `LineString` 示意线或 `Polygon` 宽度带；若采用解释性宽度带，其 `summary.viewpointType` 必须为 `INFERENCE`、几何 `certainty` 不高于 `MEDIUM`，并记录几何来源和处理过程，不得凭视觉印象手绘。
+8. `npm run validate:data` 全部通过。
+9. `mvp-content.test.ts` 检查最低数据量、核心地点存在和默认事件有效。
 
 ### 不做什么
 

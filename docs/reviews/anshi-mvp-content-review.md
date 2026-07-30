@@ -38,7 +38,7 @@ NOT_APPLICABLE   本项不适用
 | Geography | geography-yellow-river | 黄河 | 否 | 否 | 否 | 否 | 否 | 否 | 待定 | 待定 | PENDING_SOURCE | 需记录数据版本、许可证、署名和处理过程 |
 | Geography | geography-wei-river | 渭河 | 否 | 否 | 否 | 否 | 否 | 否 | 待定 | 待定 | PENDING_SOURCE | 需记录数据版本、许可证、署名和处理过程 |
 | Geography | geography-qinling | 秦岭 | 否 | 否 | 否 | 否 | 否 | 否 | 待定 | 待定 | PENDING_SOURCE | 不凭视觉印象手画 |
-| Geography | geography-guanzhong-corridor | 东入关中通道 | 否 | 否 | 否 | 否 | 否 | 否 | 待定 | 待定 | PENDING_SOURCE | 必须说明是资料结论还是项目推断 |
+| Geography | geography-guanzhong-corridor | 东入关中通道 | 否 | 否 | 否 | 否 | 否 | 否 | 待定 | 待定 | PENDING_SOURCE | 需审核示意线/宽度带选择；宽度带必须标为 INFERENCE、可信度不高于 MEDIUM，并记录来源与处理过程 |
 | Source | SRC-PRIMARY-01 | 正史或编年史资料 1 | 不适用 | 不适用 | 不适用 | 否 | 否 | 不适用 | 待定 | 待定 | PENDING_SOURCE | 需核对版本、稳定定位与使用边界 |
 | Source | SRC-PRIMARY-02 | 正史或编年史资料 2 | 不适用 | 不适用 | 不适用 | 否 | 否 | 不适用 | 待定 | 待定 | PENDING_SOURCE | 需核对版本、稳定定位与使用边界 |
 | Source | SRC-MODERN-01 | 现代研究资料 | 不适用 | 不适用 | 不适用 | 否 | 否 | 不适用 | 待定 | 待定 | PENDING_SOURCE | 需核对版本、稳定定位与引用边界 |

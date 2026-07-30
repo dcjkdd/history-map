@@ -114,7 +114,7 @@ REJECTED         不采用，保留原因
 | geography-yellow-river | 黄河 | 与陕州、灵宝、潼关空间关系相关的河段 | 记录数据来源、许可证、裁剪和简化过程 | PENDING_SOURCE |
 | geography-wei-river | 渭河 | 与关中和长安防御空间关系相关的河段 | 记录数据来源、许可证、裁剪和简化过程 | PENDING_SOURCE |
 | geography-qinling | 秦岭 | 只表达本叙事所需的地形约束 | 不凭视觉印象手画；记录来源和处理方法 | PENDING_SOURCE |
-| geography-guanzhong-corridor | 东入关中通道 | 解释性通道的范围和证据基础 | 明确标为项目归纳或推断，不伪装成精确古道 | PENDING_SOURCE |
+| geography-guanzhong-corridor | 东入关中通道 | 解释性通道的范围、证据基础，以及采用示意线还是宽度带 | 必须依据资料选择 `LineString` 或 `Polygon`；宽度带标为 `INFERENCE`、可信度不高于 `MEDIUM`，记录来源和处理过程，不凭视觉印象手绘 | PENDING_SOURCE |
 
 ## 8. CONTENT-00 完成边界
 

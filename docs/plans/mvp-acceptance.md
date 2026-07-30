@@ -374,6 +374,7 @@ npm run check
 预期：
 
 - 每条对外展示结论至少关联一个 Citation；不能只在实体级笼统挂一组来源。
+- 一条 Citation 可以支撑多条不同 Claim，但每条 Claim 都必须显式绑定该 Citation，且 Citation 的实际内容必须能够支持对应结论。
 - Event 的 `summary` / `whyItMatters`、Place 的 `summary` / `strategicRole`、Geography 与 RouteSegment 的解释性文本均可逐条追溯。
 - 关键 RouteSegment 至少一个 Citation；纯连接段若共用路线来源，应明确继承规则或直接关联。
 - Source 书目信息足够区分版本；没有页码时提供可复核的稳定定位。
