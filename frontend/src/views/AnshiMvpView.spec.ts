@@ -15,17 +15,21 @@ vi.mock('../data/mvpRepository', () => ({
 
 vi.mock('../components/map/HistoryMap.vue', () => ({
   default: {
-    props: ['geography', 'initialView', 'places'],
+    props: ['events', 'geography', 'initialView', 'places', 'routeSegments'],
     setup(props: {
+      events: unknown[]
       geography: { features: unknown[] }
       initialView: { center: [number, number] }
       places: { features: unknown[] }
+      routeSegments: { features: unknown[] }
     }) {
       return () =>
         h('div', {
           'data-center': JSON.stringify(props.initialView.center),
+          'data-event-count': props.events.length,
           'data-geography-count': props.geography.features.length,
           'data-place-count': props.places.features.length,
+          'data-route-count': props.routeSegments.features.length,
           'data-testid': 'history-map',
         })
     },
@@ -145,6 +149,16 @@ describe('AnshiMvpView', () => {
         .querySelector('[data-testid="history-map"]')
         ?.getAttribute('data-place-count'),
     ).toBe('0')
+    expect(
+      host
+        .querySelector('[data-testid="history-map"]')
+        ?.getAttribute('data-route-count'),
+    ).toBe('0')
+    expect(
+      host
+        .querySelector('[data-testid="history-map"]')
+        ?.getAttribute('data-event-count'),
+    ).toBe('2')
     expect(host.querySelector('[aria-current="step"]')?.textContent).toContain(
       '测试事件二',
     )

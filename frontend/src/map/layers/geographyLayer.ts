@@ -2,6 +2,7 @@ import type { Map as MapLibreMap } from 'maplibre-gl'
 
 import type { LayerGroup, MvpDataset } from '../../domain/mvpTypes'
 import { PLACE_LAYER_IDS } from './placeLayer'
+import { ROUTE_LAYER_IDS } from './routeLayer'
 
 export const GEOGRAPHY_SOURCE_ID = 'mvp-geography'
 
@@ -15,7 +16,7 @@ export const GEOGRAPHY_LAYER_IDS = [
 const LAYER_IDS_BY_GROUP: Record<LayerGroup, readonly string[]> = {
   geography: GEOGRAPHY_LAYER_IDS,
   places: PLACE_LAYER_IDS,
-  routes: [],
+  routes: ROUTE_LAYER_IDS,
 }
 
 export function addGeographyLayers(

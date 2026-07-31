@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { Map as MapLibreMap, MapMouseEvent } from 'maplibre-gl'
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import { useMapLibre } from '../../composables/useMapLibre'
+import { deriveMapState } from '../../domain/deriveMapState'
 import type { InitialView, LayerGroup, MvpDataset } from '../../domain/mvpTypes'
 import {
   addGeographyLayers,
@@ -10,17 +11,24 @@ import {
 } from '../../map/layers/geographyLayer'
 import {
   addPlaceLayers,
+  applyRelatedPlaceState,
   PLACE_INTERACTIVE_LAYER_IDS,
   setSelectedPlace,
 } from '../../map/layers/placeLayer'
+import {
+  addRouteLayers,
+  applyRouteState,
+} from '../../map/layers/routeLayer'
 import { useMvpStore } from '../../stores/mvpStore'
 import LayerControl from './LayerControl.vue'
 import MapLegend from './MapLegend.vue'
 
 const props = defineProps<{
   initialView: InitialView
+  events: MvpDataset['events']
   geography: MvpDataset['geography']
   places: MvpDataset['places']
+  routeSegments: MvpDataset['routeSegments']
 }>()
 
 const store = useMvpStore()
@@ -38,6 +46,17 @@ const {
   mapStyleWarning,
 } = useMapLibre()
 
+const derivedMapState = computed(() =>
+  deriveMapState(
+    {
+      events: props.events,
+      routeSegments: props.routeSegments,
+    },
+    store.selectedEventId,
+    store.selectedPlaceId,
+  ),
+)
+
 function applyLayerVisibility(map: MapLibreMap): void {
   for (const layerGroup of [
     'geography',
@@ -54,9 +73,12 @@ function applyLayerVisibility(map: MapLibreMap): void {
 
 function syncHistoryLayers(map: MapLibreMap): void {
   addGeographyLayers(map, props.geography)
+  addRouteLayers(map, props.routeSegments)
   addPlaceLayers(map, props.places)
   applyLayerVisibility(map)
-  setSelectedPlace(map, store.selectedPlaceId)
+  applyRouteState(map, derivedMapState.value)
+  applyRelatedPlaceState(map, derivedMapState.value)
+  setSelectedPlace(map, derivedMapState.value.selectedPlaceId)
 }
 
 function toggleLayer(layerGroup: LayerGroup): void {
@@ -76,14 +98,13 @@ watch(
   },
 )
 
-watch(
-  () => store.selectedPlaceId,
-  (placeId) => {
-    if (mapInstance) {
-      setSelectedPlace(mapInstance, placeId)
-    }
-  },
-)
+watch(derivedMapState, (nextDerivedMapState) => {
+  if (mapInstance) {
+    applyRouteState(mapInstance, nextDerivedMapState)
+    applyRelatedPlaceState(mapInstance, nextDerivedMapState)
+    setSelectedPlace(mapInstance, nextDerivedMapState.selectedPlaceId)
+  }
+})
 
 onMounted(() => {
   if (!mapContainer.value) {

@@ -1,5 +1,6 @@
 import type { Map as MapLibreMap } from 'maplibre-gl'
 
+import type { DerivedMapState } from '../../domain/deriveMapState'
 import type { MvpDataset } from '../../domain/mvpTypes'
 
 export const PLACE_SOURCE_ID = 'mvp-places'
@@ -10,6 +11,7 @@ export const PLACE_LAYER_IDS = [
   'mvp-places-city',
   'mvp-places-pass-outer',
   'mvp-places-pass-inner',
+  'mvp-places-related',
   'mvp-places-selected',
 ] as const
 
@@ -119,20 +121,57 @@ export function addPlaceLayers(
       source: PLACE_SOURCE_ID,
       filter: ['==', ['get', 'id'], ''],
       paint: {
-        'circle-radius': 13,
+        'circle-radius': 11,
         'circle-color': 'rgba(255, 253, 247, 0)',
-        'circle-stroke-color': '#17231d',
+        'circle-stroke-color': '#d08b2f',
+        'circle-stroke-opacity': 0.95,
         'circle-stroke-width': 3,
       },
     })
   }
+
+  if (!map.getLayer(PLACE_LAYER_IDS[6])) {
+    map.addLayer({
+      id: PLACE_LAYER_IDS[6],
+      type: 'circle',
+      source: PLACE_SOURCE_ID,
+      filter: ['==', ['get', 'id'], ''],
+      paint: {
+        'circle-radius': 14,
+        'circle-color': 'rgba(255, 253, 247, 0)',
+        'circle-stroke-color': '#17231d',
+        'circle-stroke-width': 4,
+      },
+    })
+  }
+}
+
+export function applyRelatedPlaceState(
+  map: MapLibreMap,
+  derivedState: DerivedMapState,
+): void {
+  const relatedLayerId = PLACE_LAYER_IDS[5]
+
+  if (!map.getLayer(relatedLayerId)) {
+    return
+  }
+
+  const relatedPlaceIds = derivedState.relatedPlaceIds.filter(
+    (placeId) => placeId !== derivedState.selectedPlaceId,
+  )
+
+  map.setFilter(relatedLayerId, [
+    'in',
+    ['get', 'id'],
+    ['literal', relatedPlaceIds],
+  ])
 }
 
 export function setSelectedPlace(
   map: MapLibreMap,
   placeId: string | undefined,
 ): void {
-  const selectedLayerId = PLACE_LAYER_IDS[5]
+  const selectedLayerId = PLACE_LAYER_IDS[6]
 
   if (!map.getLayer(selectedLayerId)) {
     return

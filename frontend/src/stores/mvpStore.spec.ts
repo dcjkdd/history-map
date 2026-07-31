@@ -124,6 +124,21 @@ describe('mvpStore', () => {
     expect(store.selectedEventId).toBe('event-second')
   })
 
+  it('路线图层关闭时事件状态仍可前进和后退', () => {
+    const store = useMvpStore()
+    const events = [makeEvent('event-first', 1), makeEvent('event-second', 2)]
+    store.initializeTimeline(events, 'event-first')
+    store.toggleLayer('routes')
+
+    store.selectNextEvent()
+    expect(store.layerVisibility.routes).toBe(false)
+    expect(store.selectedEventId).toBe('event-second')
+
+    store.selectPreviousEvent()
+    expect(store.layerVisibility.routes).toBe(false)
+    expect(store.selectedEventId).toBe('event-first')
+  })
+
   it('空事件或未知默认事件不会产生虚假的选择状态', () => {
     const store = useMvpStore()
 

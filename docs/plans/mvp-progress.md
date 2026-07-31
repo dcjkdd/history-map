@@ -2,9 +2,9 @@
 
 - 状态：执行进度索引
 - 更新日期：2026-07-31
-- 当前 Git 基线：`db785d4da5d842dd9629792c090d8178e1f8aea4`（已推送的 `MVP-05` 完成提交）
-- 最近完成任务：`MVP-06`
-- 下一工程任务：`MVP-07`
+- 当前 Git 基线：`9a266dfa372ecf5dd71d70838199642561d7620e`（已推送的 `MVP-06` 完成提交）
+- 最近完成任务：`MVP-07`
+- 下一工程任务：`MVP-08`
 
 ## 1. 文档定位
 
@@ -26,8 +26,9 @@
 | `MVP-03` | `COMPLETED` | `3ccdecc` | 缩小版正式数据、双表审核门禁和内容测试已完成；完整工程检查通过，用户已确认提交/推送 |
 | `MVP-04` | `COMPLETED` | `1fdfcf8` | MapLibre 地图壳、数据集初始视野、底图配置、本地降级、清理与浏览器验证已完成并推送 |
 | `MVP-05` | `COMPLETED` | `db785d4` | 地理要素、地点图层、三组图层状态、地点选择、图例与浏览器验证已完成并推送 |
-| `MVP-06` | `COMPLETED_PENDING_COMMIT` | 待用户确认 | 离散事件时间轴、默认事件、前后切换、节点直选、键盘操作、生产 worker 修复与浏览器验证已完成 |
-| `MVP-07`—`MVP-11` | `PENDING` | — | 按任务依赖顺序推进 |
+| `MVP-06` | `COMPLETED` | `9a266df` | 离散事件时间轴、默认事件、前后切换、节点直选、键盘操作、生产 worker 修复与浏览器验证已完成并推送 |
+| `MVP-07` | `COMPLETED_PENDING_COMMIT` | 待用户确认 | 路线逐段显隐、事件相关地点、手动地点优先级、路线开关和样式重载恢复已完成 |
+| `MVP-08`—`MVP-11` | `PENDING` | — | 按任务依赖顺序推进 |
 
 提交 `0394d7e` 只删除旧版文档归档 `history-map-docs.zip`，不代表新的 MVP 阶段。
 
@@ -319,10 +320,63 @@ Codex 逐项独立核实后全部采纳：真实浏览器复现了从第 5 个�
 - 经用户明确授权只额外修复 MVP-04 遗留的 MapLibre worker 生产打包缺口；没有改变地图数据契约、图层语义、外部底图策略或历史内容。
 - 没有实现自动播放、连续滑块、速度控制、动画队列或 ECharts；也没有提前实现 MVP-07 的路线图层/事件地图同步、MVP-08 的详情/引用或其他后续阶段能力。
 
-## 9. 下一步边界
+## 9. MVP-07 完成证据
 
-1. `MVP-05` 完成提交 `db785d4` 已推送；当前未提交 diff 只包含 MVP-06 实现、获授权的 MapLibre worker 生产修复、测试和本进度记录。
-2. `MVP-06` 实现与本地验证已完成；提交和推送仍须先经过用户确认。
-3. 下一工程任务为 `MVP-07`，仅实现路线逐段显隐和事件地图同步；本次不得提前开始。
-4. `MVP-07` 必须继续消费当前正式 RouteSegment 与 Event，不得自行补画路线、修改 `appearAtEventId` 或把 `INFERENCE / LOW` 示意方向表现为精确历史路线。
-5. 本轮发现的 MapLibre worker 共享模块缺失已按授权修复并完成根路径/非根路径生产重验；整体发布不再受该缺口阻塞。
+### 实现范围
+
+- `frontend/src/domain/deriveMapState.ts`
+  - 纯函数 `deriveMapState()` 只按正式 Event `sequence` 和 RouteSegment `appearAtEventId` 派生 `visibleRouteSegmentIds`、`activeRouteSegmentIds`、`relatedPlaceIds`、`selectedPlaceId` 与 `currentEventId`。
+  - 未知事件返回空路线/相关地点状态，不提前泄露未来路线；手动地点选择继续保留。
+- `frontend/src/map/layers/routeLayer.ts`
+  - 直接加载正式 RouteSegment GeoJSON，不修改坐标、端点或 `appearAtEventId`；基础层只显示截至当前事件已出现的路线，active 层只显示本事件首现路线。
+  - TANG、YAN、COURT、OTHER 使用不同颜色、虚线节奏和基础粗细；active 段使用更高不透明度和更宽线型，并统一置于全部历史路线层之上。
+  - 全部路线保持虚线和较弱历史段不透明度，图例明确标注 `INFERENCE / LOW`、宏观节点解释性示意和非精确行军轨迹边界。
+- `placeLayer.ts`、`HistoryMap.vue` 与现有单一 MVP store
+  - 事件相关地点使用独立金色外环；手动选择使用更粗深色外环、位于最上层，并从相关地点过滤中排除，保证手动选择优先。
+  - `HistoryMap` 在事件/地点状态变化和每次 `style.load` 后统一恢复 geography、route、place source/layer、三组可见性、路线过滤与地点状态；没有新增地图事件监听器。
+  - 路线开关关闭时仅改变 MapLibre layout visibility，时间轴仍正常前进/后退并继续计算当前派生状态；重新打开立即显示当前事件正确路线。
+- `LayerControl.vue`、`MapLegend.vue` 与地图样式
+  - 路线开关从“待后续阶段绘制”更新为“解释性示意”；图例增加唐军、燕军、朝廷转移和首现加粗的非单色语义，且不再使用与事件相关地点混淆的橙色路线样本。
+  - 真实浏览器首次测量发现新增图例进入 MapLibre 署名区域，地图桌面最小高度由 30rem 调整为 34rem；1024 与 1440 复测均不再重叠。
+
+### 自动验证
+
+- 环境：Node.js `24.18.0`、npm `11.16.0`；`npm ci` 通过，未增加依赖，未修改 `package.json` 或 `package-lock.json`。
+- `npm --prefix frontend run typecheck`：通过。
+- `npm --prefix frontend run validate:data`：通过，0 个警告。
+- `npm --prefix frontend run test`：13 个测试文件、86 个测试全部通过。
+- `npm --prefix frontend run build`、`npm --prefix frontend run check` 与根路径 `verify:worker-bundle`：通过；worker 仍为自包含 `maplibre-gl-worker-*.js`，主入口只保留既有 500 kB chunk 提示。
+- `npm --prefix frontend run build -- --base=/history-map/ --outDir dist-history-map` 与针对该目录的 `verify:worker-bundle`：通过。
+
+新增测试覆盖前进、后退、未知事件、首次出现边界、重复派生、事件相关地点去重、手动地点保留/优先、TANG/YAN/COURT 非单色路线语义、active 样式、路线开关关闭时的事件往返、重复 `style.load`、外部根样式失败后的完整恢复、监听器与 MapLibre 实例清理。既有 Repository、数据合同、内容审核链、时间轴、worker 和地图降级回归继续全部通过。
+
+### 浏览器现场验证
+
+- 未配置 `VITE_MAP_STYLE_URL`：第 1 事件没有路线；第 2 事件同时首现两段燕军方向；第 3 事件保留较弱燕军历史段并新增更醒目的唐军段；返回第 2 事件后唐军未来段立即消失。
+- 第 2 事件的洛阳、陕州、潼关显示事件相关金色外环；手动点击非相关长安后显示更粗深色外环，事件和相关地点状态不丢失。切到第 3 事件时手动长安选择继续保持，潼关相关地点单独高亮。
+- 关闭路线后从第 2 切到第 3 事件仍正常更新为 3/6，地图保持地点高亮且不显示路线；重新打开路线后恢复第 3 事件应有的燕军历史段和唐军 active 段。
+- 显式有效 `/map/empty-style.json`：无降级提示，第 2 事件路线正常；故意损坏 `/map/missing-style.json`：HTTP 404 后切换本地中性背景，`style.load` 后 geography、route、place 和第 3 事件状态全部恢复。
+- 1024×768：地图 934×544，页面无横向溢出，时间轴自身横向滚动；图层控件、图例、告警和 MapLibre 署名互不重叠。1440×900：地图 1238×544，时间轴完全展开，页面无横向溢出，图例与署名不重叠。
+- 全部交互过程中始终只有 1 个 MapLibre 容器和 1 个 Canvas；无配置、有效样式、损坏样式降级、根生产和非根生产浏览器 console 均为 0 warning/error。
+- 根路径裸静态生产部署：入口、CSS、根 `/data/anshi/mvp-v1.json`、`/assets/maplibre-gl-worker-*.js` 和 `/map/empty-style.json` 均为 HTTP 200，路线逐段交互正常。
+- `/history-map/` 裸静态生产部署：入口、CSS、worker 和空白样式来自 `/history-map/`，正式数据按既有契约来自根 `/data/`；全部请求 HTTP 200，第 3 事件路线和地点状态正常。
+
+### 限时静态复核
+
+ChatGPT Pro 在 8 分 37 秒的一次只读静态复核中未报告 P0 或 P1，提出 3 个 P2：不同主体的普通/active 图层交错添加会让较早主体的 active 段被后续普通层覆盖；“本事件首现”的橙色图例与实际保留主体颜色的 active 路线不一致，并与事件相关地点颜色混淆；线宽同时受主体、`actionType` 和 active 改变，却宣称可表达行动类型，无法稳定解码。复核没有安装依赖、修改代码或 lockfile，也没有直接判定 MVP-07 是否验收通过。
+
+Codex 逐项独立核实后全部采纳：改为先添加全部历史路线层、再添加全部 active 层；首现图例改用唐/燕/朝廷的现有主体颜色并明确为“首现加粗”；移除不可解码的 `actionType` 线宽增减和相关图例声明，主体继续由颜色、不同虚线节奏和基础粗细共同区分，active 只增加粗细与不透明度。当前正式 3 个 RouteSegment 的 `actionType` 均为 `ADVANCE`，因此这项语义收敛不改变已完成浏览器验证的正式路线宽度；新增断言精确覆盖主体/active 线宽和“全部 active 位于全部历史层之上”的添加顺序。最终工程判断仍只依据当前源码、本地门禁和浏览器证据。
+
+### 范围与内容边界
+
+- 没有修改 `frontend/public/data/anshi/mvp-v1.json`、资料笔记、内容审核表、历史事实、日期、坐标、路线几何、`appearAtEventId`、许可记录或审核签字。
+- 直接消费正式 3 个 RouteSegment 与 6 个 Event；地点继续为 DISPUTED，事件时间继续为 APPROXIMATE 且 `normalizedDate=null`，路线继续为 `INFERENCE / LOW`。
+- 没有选择生产外部底图供应商，没有填写未经核对的 Style URL、Token、许可或署名结论；本地中性背景完整可用。
+- 没有实现图标沿线移动、现代道路生成、路线插值/吸附、速度/兵力宽度/粒子、路线空间分析，也没有提前实现 MVP-08 详情/引用或后续阶段能力。
+
+## 10. 下一步边界
+
+1. `MVP-06` 完成提交 `9a266df` 已推送；当前未提交 diff 只包含 MVP-07 实现、测试、样式与本进度记录。
+2. `MVP-07` 实现与本地验证已完成；提交和推送仍须先经过用户明确确认。
+3. 下一工程任务为 `MVP-08`，仅在后续独立任务实现事件/地点详情、引用与可信度展示；本次不得提前开始。
+4. 后续工作必须继续保护当前正式数据、资料笔记与审核表，不得把 DISPUTED、APPROXIMATE 或 `INFERENCE / LOW` 内容升级为确定事实。

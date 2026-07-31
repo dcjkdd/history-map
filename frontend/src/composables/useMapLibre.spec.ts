@@ -3,8 +3,10 @@ import { createApp, nextTick } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import HistoryMap from '../components/map/HistoryMap.vue'
-import type { InitialView } from '../domain/mvpTypes'
+import type { Event, InitialView, MvpDataset } from '../domain/mvpTypes'
 import { GEOGRAPHY_LAYER_IDS } from '../map/layers/geographyLayer'
+import { PLACE_LAYER_IDS } from '../map/layers/placeLayer'
+import { ROUTE_LAYER_IDS } from '../map/layers/routeLayer'
 import { useMvpStore } from '../stores/mvpStore'
 import {
   EMPTY_MAP_STYLE_URL,
@@ -98,6 +100,91 @@ const centerView: InitialView = {
 
 const emptyGeography = { type: 'FeatureCollection' as const, features: [] }
 const emptyPlaces = { type: 'FeatureCollection' as const, features: [] }
+const emptyRouteSegments = { type: 'FeatureCollection' as const, features: [] }
+const emptyEvents: Event[] = []
+const emptyHistoryMapProps = {
+  events: emptyEvents,
+  geography: emptyGeography,
+  initialView: centerView,
+  places: emptyPlaces,
+  routeSegments: emptyRouteSegments,
+}
+const historySourceCount = 3
+const historyLayerCount =
+  GEOGRAPHY_LAYER_IDS.length + PLACE_LAYER_IDS.length + ROUTE_LAYER_IDS.length
+
+function makeEvent(
+  id: string,
+  sequence: number,
+  relatedPlaceIds: string[] = [],
+): Event {
+  return {
+    id,
+    sequence,
+    title: `测试事件 ${sequence}`,
+    eventType: 'OTHER',
+    dateLabel: `相对时间 ${sequence}`,
+    normalizedDate: null,
+    timePrecision: 'APPROXIMATE',
+    certainty: 'UNKNOWN',
+    summary: {
+      claimId: `claim-summary-${id}`,
+      text: '仅用于地图组件测试。',
+      viewpointType: 'INFERENCE',
+      certainty: 'UNKNOWN',
+      citationIds: ['citation-test'],
+    },
+    whyItMatters: {
+      claimId: `claim-importance-${id}`,
+      text: '仅用于地图组件测试。',
+      viewpointType: 'INFERENCE',
+      certainty: 'UNKNOWN',
+      citationIds: ['citation-test'],
+    },
+    relatedPlaceIds,
+    actorLabels: [],
+    citationIds: ['citation-test'],
+  }
+}
+
+const firstEvent = makeEvent('event-first', 1, ['place-tongguan'])
+const secondEvent = makeEvent('event-second', 2, ['place-lingbao'])
+const routeEvents = [firstEvent, secondEvent]
+const routeSegments: MvpDataset['routeSegments'] = {
+  type: 'FeatureCollection',
+  features: [
+    {
+      type: 'Feature',
+      geometry: {
+        type: 'LineString',
+        coordinates: [
+          [110, 34],
+          [111, 35],
+        ],
+      },
+      properties: {
+        id: 'route-tang-01',
+        routeId: 'route-tang',
+        routeName: '测试唐军示意方向',
+        segmentNo: 1,
+        side: 'TANG',
+        actionType: 'ADVANCE',
+        appearAtEventId: secondEvent.id,
+        fromPlaceId: 'place-tongguan',
+        toPlaceId: 'place-lingbao',
+        certainty: 'LOW',
+        summary: {
+          claimId: 'claim-route-tang-01',
+          text: '仅用于地图组件测试。',
+          viewpointType: 'INFERENCE',
+          certainty: 'LOW',
+          citationIds: ['citation-test'],
+        },
+        citationIds: ['citation-test'],
+      },
+    },
+  ],
+}
 
 describe('useMapLibre', () => {
   beforeEach(() => {
@@ -302,11 +389,7 @@ describe('useMapLibre', () => {
   it('HistoryMap 挂载时创建地图，样式就绪后移除加载提示，卸载时清理', async () => {
     const host = document.createElement('div')
     document.body.append(host)
-    const app = createApp(HistoryMap, {
-      geography: emptyGeography,
-      initialView: centerView,
-      places: emptyPlaces,
-    })
+    const app = createApp(HistoryMap, emptyHistoryMapProps)
 
     app.use(createPinia()).mount(host)
     await nextTick()
@@ -321,20 +404,20 @@ describe('useMapLibre', () => {
 
     expect(host.querySelector('[aria-busy="false"]')).not.toBeNull()
     expect(host.textContent).not.toContain('地图底图加载中')
-    expect(instance.addSource).toHaveBeenCalledTimes(2)
-    expect(instance.addLayer).toHaveBeenCalledTimes(10)
+    expect(instance.addSource).toHaveBeenCalledTimes(historySourceCount)
+    expect(instance.addLayer).toHaveBeenCalledTimes(historyLayerCount)
 
     instance.emit('style.load')
 
-    expect(instance.addSource).toHaveBeenCalledTimes(2)
-    expect(instance.addLayer).toHaveBeenCalledTimes(10)
+    expect(instance.addSource).toHaveBeenCalledTimes(historySourceCount)
+    expect(instance.addLayer).toHaveBeenCalledTimes(historyLayerCount)
 
     instance.sources.clear()
     instance.layers.clear()
     instance.emit('style.load')
 
-    expect(instance.addSource).toHaveBeenCalledTimes(4)
-    expect(instance.addLayer).toHaveBeenCalledTimes(20)
+    expect(instance.addSource).toHaveBeenCalledTimes(historySourceCount * 2)
+    expect(instance.addLayer).toHaveBeenCalledTimes(historyLayerCount * 2)
 
     app.unmount()
 
@@ -348,11 +431,7 @@ describe('useMapLibre', () => {
     const host = document.createElement('div')
     document.body.append(host)
     const pinia = createPinia()
-    const app = createApp(HistoryMap, {
-      geography: emptyGeography,
-      initialView: centerView,
-      places: emptyPlaces,
-    })
+    const app = createApp(HistoryMap, emptyHistoryMapProps)
 
     app.use(pinia).mount(host)
     await nextTick()
@@ -392,7 +471,7 @@ describe('useMapLibre', () => {
     instance.layers.clear()
     instance.emit('style.load')
 
-    expect(instance.setLayoutProperty).toHaveBeenLastCalledWith(
+    expect(instance.setLayoutProperty).toHaveBeenCalledWith(
       'mvp-places-selected',
       'visibility',
       'visible',
@@ -401,6 +480,72 @@ describe('useMapLibre', () => {
       'mvp-places-selected',
       ['==', ['get', 'id'], 'place-tongguan'],
     )
+
+    app.unmount()
+    host.remove()
+  })
+
+  it('HistoryMap 在路线关闭时仍随事件前进/后退更新派生过滤状态', async () => {
+    const host = document.createElement('div')
+    document.body.append(host)
+    const pinia = createPinia()
+    const store = useMvpStore(pinia)
+    store.initializeTimeline(routeEvents, firstEvent.id)
+    store.toggleLayer('routes')
+    const app = createApp(HistoryMap, {
+      ...emptyHistoryMapProps,
+      events: routeEvents,
+      routeSegments,
+    })
+
+    app.use(pinia).mount(host)
+    await nextTick()
+    const instance = maplibreMock.instances[0]
+    instance.emit('style.load')
+    await nextTick()
+
+    expect(instance.setLayoutProperty).toHaveBeenCalledWith(
+      'mvp-routes-tang',
+      'visibility',
+      'none',
+    )
+    expect(instance.setFilter).toHaveBeenCalledWith('mvp-routes-tang', [
+      'all',
+      ['==', ['get', 'side'], 'TANG'],
+      ['in', ['get', 'id'], ['literal', []]],
+    ])
+
+    store.selectNextEvent()
+    await nextTick()
+
+    expect(store.selectedEventId).toBe(secondEvent.id)
+    expect(instance.setFilter).toHaveBeenCalledWith(
+      'mvp-routes-tang-active',
+      [
+        'all',
+        ['==', ['get', 'side'], 'TANG'],
+        ['in', ['get', 'id'], ['literal', ['route-tang-01']]],
+      ],
+    )
+    expect(instance.setFilter).toHaveBeenCalledWith('mvp-places-related', [
+      'in',
+      ['get', 'id'],
+      ['literal', ['place-lingbao']],
+    ])
+
+    store.selectPreviousEvent()
+    await nextTick()
+
+    expect(store.selectedEventId).toBe(firstEvent.id)
+    expect(instance.setFilter).toHaveBeenLastCalledWith(
+      'mvp-places-selected',
+      ['==', ['get', 'id'], ''],
+    )
+    expect(instance.setFilter).toHaveBeenCalledWith('mvp-routes-tang', [
+      'all',
+      ['==', ['get', 'side'], 'TANG'],
+      ['in', ['get', 'id'], ['literal', []]],
+    ])
 
     app.unmount()
     host.remove()
@@ -416,11 +561,13 @@ describe('useMapLibre', () => {
     const pinia = createPinia()
     const store = useMvpStore(pinia)
     store.toggleLayer('geography')
+    store.toggleLayer('routes')
+    store.initializeTimeline(routeEvents, secondEvent.id)
     store.selectPlace('place-tongguan')
     const app = createApp(HistoryMap, {
-      geography: emptyGeography,
-      initialView: centerView,
-      places: emptyPlaces,
+      ...emptyHistoryMapProps,
+      events: routeEvents,
+      routeSegments,
     })
 
     app.use(pinia).mount(host)
@@ -444,8 +591,8 @@ describe('useMapLibre', () => {
     instance.emit('style.load')
     await nextTick()
 
-    expect(instance.addSource).toHaveBeenCalledTimes(2)
-    expect(instance.addLayer).toHaveBeenCalledTimes(10)
+    expect(instance.addSource).toHaveBeenCalledTimes(historySourceCount)
+    expect(instance.addLayer).toHaveBeenCalledTimes(historyLayerCount)
     for (const layerId of GEOGRAPHY_LAYER_IDS) {
       expect(instance.setLayoutProperty).toHaveBeenCalledWith(
         layerId,
@@ -458,11 +605,29 @@ describe('useMapLibre', () => {
       ['get', 'id'],
       'place-tongguan',
     ])
+    expect(instance.setLayoutProperty).toHaveBeenCalledWith(
+      'mvp-routes-tang',
+      'visibility',
+      'none',
+    )
+    expect(instance.setFilter).toHaveBeenCalledWith(
+      'mvp-routes-tang-active',
+      [
+        'all',
+        ['==', ['get', 'side'], 'TANG'],
+        ['in', ['get', 'id'], ['literal', ['route-tang-01']]],
+      ],
+    )
+    expect(instance.setFilter).toHaveBeenCalledWith('mvp-places-related', [
+      'in',
+      ['get', 'id'],
+      ['literal', ['place-lingbao']],
+    ])
 
     instance.emit('style.load')
 
-    expect(instance.addSource).toHaveBeenCalledTimes(2)
-    expect(instance.addLayer).toHaveBeenCalledTimes(10)
+    expect(instance.addSource).toHaveBeenCalledTimes(historySourceCount)
+    expect(instance.addLayer).toHaveBeenCalledTimes(historyLayerCount)
     expect(instance.listeners['style.load']).toHaveLength(2)
     expect(instance.listeners.error).toHaveLength(1)
     expect(instance.listeners.click).toHaveLength(1)
@@ -478,11 +643,7 @@ describe('useMapLibre', () => {
   it('HistoryMap 在本地样式失败后结束忙碌态并保留可读告警', async () => {
     const host = document.createElement('div')
     document.body.append(host)
-    const app = createApp(HistoryMap, {
-      geography: emptyGeography,
-      initialView: centerView,
-      places: emptyPlaces,
-    })
+    const app = createApp(HistoryMap, emptyHistoryMapProps)
 
     app.use(createPinia()).mount(host)
     await nextTick()

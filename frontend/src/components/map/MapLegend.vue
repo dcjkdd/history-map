@@ -19,9 +19,19 @@
       </ul>
     </div>
 
+    <div class="map-legend__section">
+      <p>行动路线（虚线与粗细区分主体）</p>
+      <ul>
+        <li><span class="legend-route legend-route--tang"></span>唐军</li>
+        <li><span class="legend-route legend-route--yan"></span>燕军</li>
+        <li><span class="legend-route legend-route--court"></span>朝廷转移</li>
+        <li><span class="legend-route legend-route--active"></span>首现加粗</li>
+      </ul>
+    </div>
+
     <p class="map-legend__uncertainty">
       <span class="legend-symbol legend-symbol--uncertain"></span>
-      外圈表示 LOW、DISPUTED 或 UNKNOWN：代表点或重建存在不确定性，不应理解为精确历史坐标。
+      外圈表示 LOW、DISPUTED 或 UNKNOWN；虚线路线保持 INFERENCE / LOW，只是宏观节点间的解释性示意，不应理解为精确历史坐标或行军轨迹。
     </p>
   </aside>
 </template>

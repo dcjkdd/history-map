@@ -26,7 +26,7 @@ describe('MVP-05 map controls', () => {
       host.querySelector('[data-layer-group="routes"]'),
     ).not.toBeNull()
     expect(host.textContent).toContain('行动路线')
-    expect(host.textContent).toContain('待后续阶段绘制')
+    expect(host.textContent).toContain('解释性示意')
 
     inputs[1]?.dispatchEvent(new Event('change'))
     await nextTick()
@@ -48,8 +48,14 @@ describe('MVP-05 map controls', () => {
     expect(host.textContent).toContain('关隘')
     expect(host.textContent).toContain('河流')
     expect(host.textContent).toContain('山地 / 通道')
+    expect(host.textContent).toContain('唐军')
+    expect(host.textContent).toContain('燕军')
+    expect(host.textContent).toContain('朝廷转移')
+    expect(host.textContent).toContain('虚线与粗细区分主体')
+    expect(host.textContent).toContain('首现加粗')
     expect(host.textContent).toContain('LOW、DISPUTED 或 UNKNOWN')
-    expect(host.textContent).toContain('不应理解为精确历史坐标')
+    expect(host.textContent).toContain('INFERENCE / LOW')
+    expect(host.textContent).toContain('不应理解为精确历史坐标或行军轨迹')
 
     app.unmount()
     host.remove()

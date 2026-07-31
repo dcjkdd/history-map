@@ -86,7 +86,7 @@ onBeforeUnmount(() => {
     <section class="map-panel" aria-labelledby="map-panel-title">
       <div class="map-panel__heading">
         <div>
-          <p class="section-label">MVP-06</p>
+          <p class="section-label">MVP-07</p>
           <h2 id="map-panel-title">二维交互地图</h2>
         </div>
         <p v-if="loadState === 'loading'" class="data-status" role="status">
@@ -96,9 +96,11 @@ onBeforeUnmount(() => {
 
       <HistoryMap
         v-if="loadState === 'ready' && dataset"
+        :events="dataset.events"
         :geography="dataset.geography"
         :initial-view="dataset.topic.initialView"
         :places="dataset.places"
+        :route-segments="dataset.routeSegments"
       />
       <p v-else-if="loadState === 'error'" class="data-error" role="alert">
         专题数据加载失败：{{ dataError }}

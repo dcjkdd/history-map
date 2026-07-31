@@ -16,7 +16,7 @@ const layers: ReadonlyArray<{
 }> = [
   { id: 'geography', label: '地理要素' },
   { id: 'places', label: '历史地点' },
-  { id: 'routes', label: '行动路线', note: '待后续阶段绘制' },
+  { id: 'routes', label: '行动路线', note: '解释性示意' },
 ]
 </script>
 
