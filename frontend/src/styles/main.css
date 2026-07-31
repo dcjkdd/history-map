@@ -29,9 +29,9 @@ select {
 }
 
 .app-shell {
-  width: min(72rem, calc(100% - 3rem));
+  width: min(80rem, calc(100% - 3rem));
   margin: 0 auto;
-  padding: clamp(4rem, 10vw, 8rem) 0;
+  padding: clamp(2.5rem, 6vw, 5rem) 0;
 }
 
 .hero {
@@ -55,10 +55,10 @@ p {
 }
 
 h1 {
-  max-width: 12ch;
+  max-width: 18ch;
   margin-bottom: 1.25rem;
   font-family: "Songti SC", "STSong", serif;
-  font-size: clamp(3rem, 7vw, 6.5rem);
+  font-size: clamp(2.75rem, 6vw, 5.5rem);
   font-weight: 600;
   letter-spacing: -0.04em;
   line-height: 0.98;
@@ -71,19 +71,24 @@ h1 {
   line-height: 1.75;
 }
 
-.status-panel {
+.map-panel {
+  margin-top: clamp(2.5rem, 6vw, 5rem);
+  padding: 1.25rem;
+  border: 1px solid rgb(32 35 31 / 16%);
+  border-radius: 1rem;
+  background: rgb(255 253 247 / 62%);
+  box-shadow: 0 1.5rem 4rem rgb(75 61 45 / 8%);
+}
+
+.map-panel__heading {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 2rem;
-  margin-top: clamp(4rem, 10vw, 8rem);
-  padding: 1.5rem;
-  border: 1px solid rgb(32 35 31 / 16%);
-  border-radius: 0.75rem;
-  background: rgb(255 253 247 / 62%);
+  margin-bottom: 1rem;
 }
 
-.status-panel h2 {
+.map-panel h2 {
   margin-bottom: 0;
   font-size: clamp(1.15rem, 2vw, 1.5rem);
 }
@@ -99,14 +104,51 @@ h1 {
   font-weight: 700;
 }
 
+.map-placeholder {
+  min-height: 30rem;
+  border: 1px solid rgb(39 46 40 / 12%);
+  border-radius: 0.75rem;
+  background:
+    linear-gradient(110deg, transparent 35%, rgb(255 255 255 / 35%), transparent 65%),
+    #e7e1d5;
+  background-size: 200% 100%;
+  animation: map-loading 1.6s ease-in-out infinite;
+}
+
+.data-error {
+  min-height: 12rem;
+  margin: 0;
+  padding: 1.25rem;
+  border: 1px solid rgb(140 47 37 / 22%);
+  border-radius: 0.75rem;
+  background: rgb(255 245 241 / 72%);
+  color: #8c2f25;
+  line-height: 1.6;
+}
+
+@keyframes map-loading {
+  from {
+    background-position: 100% 0;
+  }
+
+  to {
+    background-position: -100% 0;
+  }
+}
+
 @media (max-width: 44rem) {
   .app-shell {
     width: min(100% - 2rem, 72rem);
     padding: 3rem 0;
   }
 
-  .status-panel {
+  .map-panel__heading {
     align-items: flex-start;
     flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .map-placeholder {
+    min-height: 24rem;
   }
 }

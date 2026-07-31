@@ -2,9 +2,9 @@
 
 - 状态：执行进度索引
 - 更新日期：2026-07-31
-- 当前 Git 基线：`9fe5b3accfcd3eb368713d354281d274b707d56c`（`MVP-02@9012469ea5feafd17a055bf86a0e95e8ad4575e6` 的直接后继文档提交）
-- 最近完成任务：`MVP-03`
-- 下一工程任务：`MVP-04`
+- 当前 Git 基线：`3ccdecc88439c2f654174a7efaee6873542939c1`（已推送的 `MVP-03` 完成提交）
+- 最近完成任务：`MVP-04`
+- 下一工程任务：`MVP-05`
 
 ## 1. 文档定位
 
@@ -23,9 +23,10 @@
 | `MVP-00` | `COMPLETED` | `110c93a` | Vue 3、TypeScript、Vite 最小工程骨架已完成 |
 | `MVP-01` | `COMPLETED` | `d66f326` | 数据契约、运行时校验、selectors、静态 Repository 和技术空数据集已完成 |
 | `MVP-02` | `COMPLETED` | `9012469` | 数据完整性校验命令、构建门禁和损坏数据失败测试已完成并推送 |
-| `MVP-03` | `COMPLETED` | 本次提交 | 缩小版正式数据、双表审核门禁和内容测试已完成；完整工程检查通过，用户已确认提交/推送 |
-| `MVP-04` | `READY_NEXT` | — | 下一步开发 MapLibre 地图壳、底图配置与本地降级方案 |
-| `MVP-05`—`MVP-11` | `PENDING` | — | 按任务依赖顺序推进 |
+| `MVP-03` | `COMPLETED` | `3ccdecc` | 缩小版正式数据、双表审核门禁和内容测试已完成；完整工程检查通过，用户已确认提交/推送 |
+| `MVP-04` | `COMPLETED` | 本次提交 | MapLibre 地图壳、数据集初始视野、底图配置、本地降级、清理与浏览器验证已完成 |
+| `MVP-05` | `READY_NEXT` | — | 下一步实现地理要素、地点图层、图层开关和图例 |
+| `MVP-06`—`MVP-11` | `PENDING` | — | 按任务依赖顺序推进 |
 
 提交 `0394d7e` 只删除旧版文档归档 `history-map-docs.zip`，不代表新的 MVP 阶段。
 
@@ -147,9 +148,63 @@ MVP-02 已形成实施提交 `9012469`（`前端：完成 MVP-02 数据完整性
 - 当前 `mvp-v1.json` 是缩小版正式数据；技术空数据形态仅由合成测试夹具继续覆盖。
 - 不得把工作标签、猜测坐标、示例页码、未经说明的精确日期或项目推断转换成正式历史数据。
 
-## 6. 下一步边界
+## 6. MVP-04 完成证据
 
-1. `MVP-02` 已完成、审阅、提交并推送，不再保留待提交事项。
-2. `MVP-03` 缩小版内容与工程门禁已完成，用户已确认提交并推送。
-3. 下一工程任务为 `MVP-04`，仅开发 MapLibre 地图容器、底图配置和本地降级方案。
-4. `MVP-05` 使用的内容必须继续通过当前正式数据校验，不得从范围外候选绕过人工审核。
+### 实现范围
+
+- `frontend/src/views/AnshiMvpView.vue`
+  - 只通过既有 `loadMvpDataset()` 加载正式数据，并把 `topic.initialView` 交给地图组件。
+  - 提供数据加载中和加载失败状态；没有建立 MVP-09 的重试、页面整合或详情交互。
+- `frontend/src/components/map/HistoryMap.vue`
+  - 挂载时创建单一地图，显示样式加载/降级/初始化错误状态，卸载时销毁地图。
+  - 暴露 `fitToTopic()`，但没有加入地点、地理、路线、时间轴或事件定位 UI。
+- `frontend/src/composables/useMapLibre.ts`
+  - 支持 `center`、`zoom`、可选 `bounds` 与 `maxBounds`，重复初始化只复用当前实例。
+  - 有 `VITE_MAP_STYLE_URL` 时使用配置值；未配置或外部根样式初次加载失败时，按 Vite `BASE_URL` 使用本地 `map/empty-style.json`。
+  - 外部根样式失败切换使用完整样式替换，避免未加载样式的 diff 警告；加载期间或就绪后的局部资源错误只做非阻断提示，不误触发降级。
+  - 本地降级样式自身失败时进入明确的 `degraded` 终态，结束忙碌提示并保留可读告警。
+  - 显式配置 MapLibre 6 worker URL，避免 Vite 开发优化目录缺失 worker；生产构建会输出独立 worker 资源。
+- `frontend/public/map/empty-style.json`
+  - 只包含无外部请求的中性背景，不包含瓦片、历史图层或未经核对的许可/署名。
+- `frontend/src/styles/map.css` 与既有页面样式
+  - 引入 MapLibre 官方 CSS，提供稳定地图尺寸、状态提示和 1024px 桌面宽度下的可用布局。
+
+### 自动验证
+
+- 环境：Node.js `24.18.0`、npm `11.16.0`。
+- `npm ci`：通过；没有修改 `package.json` 或 `package-lock.json`。
+- `npm --prefix frontend run typecheck`：通过。
+- `npm --prefix frontend run validate:data`：通过，0 个警告。
+- `npm --prefix frontend run test`：6 个测试文件、53 个测试全部通过。
+- `npm --prefix frontend run build`：通过；构建产物包含独立 `maplibre-gl-worker-*.mjs`。MapLibre 主包使单一入口 chunk 超过 Vite 的 500 kB 提示阈值，但不是构建失败，也未引入额外依赖或提前拆分 MVP-05 代码。
+- `npm --prefix frontend run check`：通过；依次重复完成类型检查、正式数据校验、53 个测试和生产构建。
+- 使用 `--base=/history-map/` 的额外生产构建通过，入口、MapLibre worker 和本地空白样式均使用相同非根 base。
+
+新增测试覆盖数据加载成功/失败、初始视野、`bounds` / `maxBounds`、专题视野复位、未配置样式、外部根样式失败降级、加载中及加载后的局部资源错误、本地样式失败终态、非根 `BASE_URL`、重复初始化，以及监听器和地图实例清理。
+
+### 浏览器现场验证
+
+- 未设置 `VITE_MAP_STYLE_URL`：正式数据加载成功，本地中性背景就绪，拖动和滚轮缩放后仍只有 1 个 MapLibre 地图和 1 个 Canvas，浏览器与开发服务器均无 warning/error。
+- 设置有效的 `/map/empty-style.json`：按配置路径加载，样式就绪，无降级提示，浏览器无 warning/error。
+- 设置故意损坏的 `/map/missing-style.json`：收到 404 后自动切换本地中性背景，地图保持可用且实例不重复，浏览器无 warning/error。
+- 1024×768：地图区域为 934×480，无横向溢出，提示与地图容器可见。
+- 最终生产预览：正式标题与数据正常，底图就绪后 `aria-busy=false`，只有 1 个 MapLibre 实例和 1 个 Canvas，无横向溢出。
+
+### 限时静态复核
+
+ChatGPT Pro 在 10 分 05 秒的一次只读静态复核中未报告 P0、P1 或 P3，提出 3 个 P2：样式首次加载期间的任意 `error` 可能被误判为外部根样式失败；硬编码根路径会影响非根 Vite 部署；本地降级样式自身失败时会永久保持加载状态。复核没有安装依赖、修改代码或 lockfile，也没有直接判定 MVP-04 是否验收通过。
+
+Codex 逐项对照 MapLibre 6 本地源码和实际实现独立核实：采纳根样式与局部资源错误分类、`BASE_URL` 路径和 `degraded` 终态三项修复，并增加回归测试；没有采纳额外“样式代际令牌”建议，因为 MapLibre 在完整替换样式时会解除旧 Style 的事件父级并清理旧实例。最终工程判断仍只依据当前源码、本地门禁和浏览器证据。
+
+### 范围与内容边界
+
+- 没有修改 `mvp-v1.json`、资料笔记、内容审核表、历史事实、日期、坐标、路线、许可记录或审核签字。
+- 没有选择或批准生产外部底图供应商；`.env.example` 明确要求公开部署前核对 Style URL 的许可证、配额和署名。MVP-04 只提供可配置入口、有效 Style URL 路径验证和本地降级。
+- 没有实现 MVP-05 地理/地点/路线图层、图层控制与图例，也没有实现后续时间轴、详情、后端、3D 或其他暂缓能力。
+
+## 7. 下一步边界
+
+1. `MVP-03` 缩小版内容与工程门禁已完成，实施提交 `3ccdecc` 已推送。
+2. `MVP-04` 实现与本地验证已完成；提交和推送仍须先经过用户确认。
+3. 下一工程任务为 `MVP-05`，仅实现地理要素、地点图层、图层开关和图例。
+4. `MVP-05` 必须继续使用当前正式数据与审核门禁，不得从范围外候选绕过人工审核，也不得把低可信度地点或路线表现为确定事实。
