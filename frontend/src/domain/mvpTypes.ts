@@ -283,6 +283,19 @@ export interface MvpDataset {
   citations: Citation[]
 }
 
+export type LayerGroup = 'geography' | 'places' | 'routes'
+
+export interface LayerVisibility {
+  geography: boolean
+  places: boolean
+  routes: boolean
+}
+
+export interface SelectionState {
+  selectedEventId?: string
+  selectedPlaceId?: string
+}
+
 export type LoadState = 'idle' | 'loading' | 'ready' | 'error'
 
 export class MvpDataError extends Error {

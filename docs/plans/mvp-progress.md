@@ -2,9 +2,9 @@
 
 - 状态：执行进度索引
 - 更新日期：2026-07-31
-- 当前 Git 基线：`3ccdecc88439c2f654174a7efaee6873542939c1`（已推送的 `MVP-03` 完成提交）
-- 最近完成任务：`MVP-04`
-- 下一工程任务：`MVP-05`
+- 当前 Git 基线：`1fdfcf848beaa2df09feb12df5ba72dda4393880`（已推送的 `MVP-04` 完成提交）
+- 最近完成任务：`MVP-05`
+- 下一工程任务：`MVP-06`
 
 ## 1. 文档定位
 
@@ -24,8 +24,8 @@
 | `MVP-01` | `COMPLETED` | `d66f326` | 数据契约、运行时校验、selectors、静态 Repository 和技术空数据集已完成 |
 | `MVP-02` | `COMPLETED` | `9012469` | 数据完整性校验命令、构建门禁和损坏数据失败测试已完成并推送 |
 | `MVP-03` | `COMPLETED` | `3ccdecc` | 缩小版正式数据、双表审核门禁和内容测试已完成；完整工程检查通过，用户已确认提交/推送 |
-| `MVP-04` | `COMPLETED` | 本次提交 | MapLibre 地图壳、数据集初始视野、底图配置、本地降级、清理与浏览器验证已完成 |
-| `MVP-05` | `READY_NEXT` | — | 下一步实现地理要素、地点图层、图层开关和图例 |
+| `MVP-04` | `COMPLETED` | `1fdfcf8` | MapLibre 地图壳、数据集初始视野、底图配置、本地降级、清理与浏览器验证已完成并推送 |
+| `MVP-05` | `COMPLETED` | 待用户确认 | 地理要素、地点图层、三组图层状态、地点选择、图例与浏览器验证已完成 |
 | `MVP-06`—`MVP-11` | `PENDING` | — | 按任务依赖顺序推进 |
 
 提交 `0394d7e` 只删除旧版文档归档 `history-map-docs.zip`，不代表新的 MVP 阶段。
@@ -202,9 +202,63 @@ Codex 逐项对照 MapLibre 6 本地源码和实际实现独立核实：采纳�
 - 没有选择或批准生产外部底图供应商；`.env.example` 明确要求公开部署前核对 Style URL 的许可证、配额和署名。MVP-04 只提供可配置入口、有效 Style URL 路径验证和本地降级。
 - 没有实现 MVP-05 地理/地点/路线图层、图层控制与图例，也没有实现后续时间轴、详情、后端、3D 或其他暂缓能力。
 
-## 7. 下一步边界
+## 7. MVP-05 完成证据
 
-1. `MVP-03` 缩小版内容与工程门禁已完成，实施提交 `3ccdecc` 已推送。
-2. `MVP-04` 实现与本地验证已完成；提交和推送仍须先经过用户确认。
-3. 下一工程任务为 `MVP-05`，仅实现地理要素、地点图层、图层开关和图例。
-4. `MVP-05` 必须继续使用当前正式数据与审核门禁，不得从范围外候选绕过人工审核，也不得把低可信度地点或路线表现为确定事实。
+### 实现范围
+
+- `frontend/src/map/layers/geographyLayer.ts` 与 `placeLayer.ts`
+  - 分别以独立、带项目命名空间的 GeoJSON source/layer 组加载正式 Geography 和 Place。
+  - 河流使用连续蓝灰线，山地/通道使用低透明度面与虚线边界，不与后续行动路线混淆。
+  - CITY 使用实心圆，PASS 使用双层圆环，其他地点使用较小符号；LOW、DISPUTED、UNKNOWN 额外显示外圈，不只依赖颜色。
+  - `addGeographyLayers()`、`addPlaceLayers()`、`setLayerVisibility()` 和 `setSelectedPlace()` 均先检查 MapLibre 当前样式状态，重复调用不会重复添加 source/layer。
+- `frontend/src/stores/mvpStore.ts`
+  - 只建立一个 MVP store，管理 geography、places、routes 三组可见性和地点/事件选择槽位；routes 在本阶段只有状态，不绘制路线。
+- `frontend/src/components/map/HistoryMap.vue`
+  - 在每次 `style.load` 后幂等恢复正式图层、可见性和选中地点；地图点击只从现存地点层命中 `placeId` 并写入 store。
+  - 卸载时解除新增的 `style.load` 和 `click` 监听器，再沿用 MVP-04 的地图实例清理。
+- `LayerControl.vue` 与 `MapLegend.vue`
+  - 提供三个原生 checkbox 图层开关；路线明确标注“待后续阶段绘制”。
+  - 图例解释地点类型、现代地理背景和 LOW/DISPUTED/UNKNOWN 外圈语义，并明确代表点或重建不等于精确历史坐标。
+  - 图例位于图层控件下方的右上区域，为 MapLibre 及潜在外部底图署名保留右下角空间。
+
+### 自动验证
+
+- 环境：Node.js `24.18.0`、npm `11.16.0`；`npm ci` 通过，未增加依赖，未修改 `package.json` 或 `package-lock.json`。
+- `npm --prefix frontend run typecheck`：通过。
+- `npm --prefix frontend run validate:data`：通过，0 个警告。
+- `npm --prefix frontend run test`：9 个测试文件、62 个测试全部通过。
+- `npm --prefix frontend run build`：通过；MapLibre 主入口仍有既存的 500 kB chunk 提示，不是构建失败。
+- `npm --prefix frontend run check`：通过；依次重复完成类型检查、正式数据校验、62 个测试和生产构建。
+- 使用 `--base=/history-map/` 的额外生产构建通过。
+
+新增测试覆盖两个独立 source/layer 组、样式表达式、类型与不确定性样式、幂等添加、三组可见性、routes 空组、地点选中/清除、store 状态、原生 checkbox 和图例语义；组件测试覆盖重复 `style.load`、真实的外部根样式失败到降级 `style.load` 链、可见性/选中状态恢复、地图点击和监听器清理。
+
+### 浏览器现场验证
+
+- 未设置 `VITE_MAP_STYLE_URL`：本地中性背景上实际显示 3 个现代 Geography 和 5 个 Place；城池、关隘、其他地点及争议外圈可辨识。
+- 三个图层开关均可关闭和恢复；关闭 Geography 后只保留地点，关闭 Place 后只保留地理背景，routes 开关只改变预留状态且没有提前绘制路线。
+- 点击潼关代表点出现选择高亮，点击空白地图可清除；拖动和滚轮缩放后仍只有 1 个 MapLibre 地图和 1 个 Canvas。
+- 1024×768 下地图区域为 934×480，图层控件和图例可见，无横向溢出；图例、降级提示、MapLibre attribution/info 控件的矩形边界均不相交，署名按钮可点击且展开后 MapLibre 链接可见。
+- 1440×900 宽屏下再次测量，图例、降级提示与 attribution 仍无交叠，页面无横向溢出。
+- 配置有效的 `/map/empty-style.json` 时历史图层正常、无降级提示；配置故意损坏的 `/map/missing-style.json` 后收到 404 并切换本地中性背景，历史图层在降级 `style.load` 后仍存在。
+- 最终生产预览中正式标题、三开关、图例和历史图层正常，`aria-busy=false`；上述路径浏览器控制台均为 0 warning/error。
+
+### 限时静态复核
+
+ChatGPT Pro 的一次只读静态复核报告 1 个 P1 和 1 个 P3：右下角图例可能遮挡 MapLibre/外部供应商署名，以及自动测试没有在同一组件用例中串起 `error → setStyle → style.load`。复核未安装依赖、修改代码或 lockfile，也未直接判定 MVP-05 是否验收通过。
+
+Codex 独立对照源码、现场截图和测试核实后采纳两项：把图例移至右上并为署名保留右下区域；新增外部根样式失败的完整组件回归，断言降级后 source/layer 只建立一次，并恢复隐藏 Geography 与选中地点。修复后类型检查、62 个测试、构建和完整 `check` 均通过；没有剩余 P0—P2 静态问题。
+
+### 范围与内容边界
+
+- 没有修改 `frontend/public/data/anshi/mvp-v1.json`、资料笔记、内容审核表、历史事实、日期、坐标、路线、许可记录或审核签字。
+- 直接消费 MVP-03 正式 JSON；全部地点仍为 DISPUTED，现代 Geography 仍为 UNKNOWN，图例和外圈没有把它们表现为确定事实。
+- 没有选择生产外部底图供应商，也没有填写未经核对的 Style URL、Token、许可或署名结论。
+- routes 只有 store 和开关状态，没有实现路线图层；没有实现 MVP-06 的事件时间轴、默认事件状态、详情交互或后续阶段功能。
+
+## 8. 下一步边界
+
+1. `MVP-04` 完成提交 `1fdfcf8` 已推送，当前未提交 diff 只包含 MVP-05 实现、测试和本进度记录。
+2. `MVP-05` 实现与本地验证已完成；提交和推送仍须先经过用户确认。
+3. 下一工程任务为 `MVP-06`，仅实现离散事件时间轴和状态引擎；本次不得提前开始。
+4. `MVP-06` 必须继续消费当前正式数据并保护审核门禁；现有 routes 开关不授权提前绘制或推断路线。

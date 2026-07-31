@@ -14,11 +14,17 @@ vi.mock('../data/mvpRepository', () => ({
 
 vi.mock('../components/map/HistoryMap.vue', () => ({
   default: {
-    props: ['initialView'],
-    setup(props: { initialView: { center: [number, number] } }) {
+    props: ['geography', 'initialView', 'places'],
+    setup(props: {
+      geography: { features: unknown[] }
+      initialView: { center: [number, number] }
+      places: { features: unknown[] }
+    }) {
       return () =>
         h('div', {
           'data-center': JSON.stringify(props.initialView.center),
+          'data-geography-count': props.geography.features.length,
+          'data-place-count': props.places.features.length,
           'data-testid': 'history-map',
         })
     },
@@ -73,6 +79,16 @@ describe('AnshiMvpView', () => {
     expect(
       host.querySelector('[data-testid="history-map"]')?.getAttribute('data-center'),
     ).toBe('[110.7,34.6]')
+    expect(
+      host
+        .querySelector('[data-testid="history-map"]')
+        ?.getAttribute('data-geography-count'),
+    ).toBe('0')
+    expect(
+      host
+        .querySelector('[data-testid="history-map"]')
+        ?.getAttribute('data-place-count'),
+    ).toBe('0')
 
     app.unmount()
     host.remove()

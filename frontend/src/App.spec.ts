@@ -8,7 +8,7 @@ vi.mock('./data/mvpRepository', () => ({
 }))
 
 describe('App', () => {
-  it('显示 MVP-04 页面壳和数据加载状态', async () => {
+  it('显示 MVP-05 页面壳和数据加载状态', async () => {
     const host = document.createElement('div')
     document.body.append(host)
     const app = createApp(App)

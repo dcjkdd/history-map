@@ -1,8 +1,11 @@
+import { createPinia } from 'pinia'
 import { createApp, nextTick } from 'vue'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import HistoryMap from '../components/map/HistoryMap.vue'
 import type { InitialView } from '../domain/mvpTypes'
+import { GEOGRAPHY_LAYER_IDS } from '../map/layers/geographyLayer'
+import { useMvpStore } from '../stores/mvpStore'
 import {
   EMPTY_MAP_STYLE_URL,
   resolveEmptyMapStyleUrl,
@@ -15,10 +18,23 @@ const maplibreMock = vi.hoisted(() => {
   class MockMap {
     readonly options: Record<string, unknown>
     readonly listeners: Record<string, Array<(event: any) => void>> = {}
+    readonly sources = new Map<string, unknown>()
+    readonly layers = new Map<string, unknown>()
     readonly fitBounds = vi.fn()
     readonly jumpTo = vi.fn()
     readonly remove = vi.fn()
-    readonly setStyle = vi.fn()
+    readonly setFilter = vi.fn()
+    readonly setLayoutProperty = vi.fn()
+    readonly queryRenderedFeatures = vi.fn(
+      (): Array<{ properties: Record<string, unknown> }> => [],
+    )
+    readonly addSource = vi.fn((id: string, source: unknown) => {
+      this.sources.set(id, source)
+    })
+    readonly addLayer = vi.fn((layer: { id: string }) => {
+      this.layers.set(layer.id, layer)
+    })
+    private styleLoaded = false
 
     constructor(options: Record<string, unknown>) {
       this.options = options
@@ -39,10 +55,32 @@ const maplibreMock = vi.hoisted(() => {
     }
 
     emit(type: string, event: Record<string, unknown> = {}): void {
+      if (type === 'style.load') {
+        this.styleLoaded = true
+      }
+
       for (const listener of this.listeners[type] ?? []) {
         listener(event)
       }
     }
+
+    getSource(id: string): unknown {
+      return this.sources.get(id)
+    }
+
+    getLayer(id: string): unknown {
+      return this.layers.get(id)
+    }
+
+    isStyleLoaded(): boolean {
+      return this.styleLoaded
+    }
+
+    setStyle = vi.fn(() => {
+      this.styleLoaded = false
+      this.sources.clear()
+      this.layers.clear()
+    })
   }
 
   return { instances, MockMap }
@@ -58,9 +96,16 @@ const centerView: InitialView = {
   zoom: 6.5,
 }
 
+const emptyGeography = { type: 'FeatureCollection' as const, features: [] }
+const emptyPlaces = { type: 'FeatureCollection' as const, features: [] }
+
 describe('useMapLibre', () => {
   beforeEach(() => {
     maplibreMock.instances.length = 0
+  })
+
+  afterEach(() => {
+    vi.unstubAllEnvs()
   })
 
   it('使用数据集视野创建单一地图实例并可复位专题视野', () => {
@@ -257,9 +302,13 @@ describe('useMapLibre', () => {
   it('HistoryMap 挂载时创建地图，样式就绪后移除加载提示，卸载时清理', async () => {
     const host = document.createElement('div')
     document.body.append(host)
-    const app = createApp(HistoryMap, { initialView: centerView })
+    const app = createApp(HistoryMap, {
+      geography: emptyGeography,
+      initialView: centerView,
+      places: emptyPlaces,
+    })
 
-    app.mount(host)
+    app.use(createPinia()).mount(host)
     await nextTick()
     const instance = maplibreMock.instances[0]
 
@@ -272,19 +321,170 @@ describe('useMapLibre', () => {
 
     expect(host.querySelector('[aria-busy="false"]')).not.toBeNull()
     expect(host.textContent).not.toContain('地图底图加载中')
+    expect(instance.addSource).toHaveBeenCalledTimes(2)
+    expect(instance.addLayer).toHaveBeenCalledTimes(10)
+
+    instance.emit('style.load')
+
+    expect(instance.addSource).toHaveBeenCalledTimes(2)
+    expect(instance.addLayer).toHaveBeenCalledTimes(10)
+
+    instance.sources.clear()
+    instance.layers.clear()
+    instance.emit('style.load')
+
+    expect(instance.addSource).toHaveBeenCalledTimes(4)
+    expect(instance.addLayer).toHaveBeenCalledTimes(20)
 
     app.unmount()
 
     expect(instance.remove).toHaveBeenCalledTimes(1)
+    expect(instance.listeners['style.load']).toHaveLength(0)
+    expect(instance.listeners.click).toHaveLength(0)
+    host.remove()
+  })
+
+  it('HistoryMap 将图层开关和地点点击同步到地图与 store', async () => {
+    const host = document.createElement('div')
+    document.body.append(host)
+    const pinia = createPinia()
+    const app = createApp(HistoryMap, {
+      geography: emptyGeography,
+      initialView: centerView,
+      places: emptyPlaces,
+    })
+
+    app.use(pinia).mount(host)
+    await nextTick()
+    const instance = maplibreMock.instances[0]
+    const store = useMvpStore(pinia)
+
+    instance.emit('style.load')
+    await nextTick()
+
+    const geographyToggle = host.querySelector<HTMLInputElement>(
+      '.layer-control input',
+    )
+    geographyToggle?.dispatchEvent(new Event('change'))
+    await nextTick()
+
+    expect(store.layerVisibility.geography).toBe(false)
+    expect(instance.setLayoutProperty).toHaveBeenCalledWith(
+      'mvp-geography-river',
+      'visibility',
+      'none',
+    )
+
+    instance.queryRenderedFeatures.mockReturnValue([
+      { properties: { id: 'place-tongguan' } },
+    ])
+    instance.emit('click', { point: { x: 10, y: 10 } })
+    await nextTick()
+
+    expect(store.selectedPlaceId).toBe('place-tongguan')
+    expect(instance.setFilter).toHaveBeenCalledWith('mvp-places-selected', [
+      '==',
+      ['get', 'id'],
+      'place-tongguan',
+    ])
+
+    instance.sources.clear()
+    instance.layers.clear()
+    instance.emit('style.load')
+
+    expect(instance.setLayoutProperty).toHaveBeenLastCalledWith(
+      'mvp-places-selected',
+      'visibility',
+      'visible',
+    )
+    expect(instance.setFilter).toHaveBeenLastCalledWith(
+      'mvp-places-selected',
+      ['==', ['get', 'id'], 'place-tongguan'],
+    )
+
+    app.unmount()
+    host.remove()
+  })
+
+  it('HistoryMap 在外部根样式失败后的 style.load 恢复图层、可见性和选择', async () => {
+    vi.stubEnv(
+      'VITE_MAP_STYLE_URL',
+      'https://maps.example.test/broken-style.json',
+    )
+    const host = document.createElement('div')
+    document.body.append(host)
+    const pinia = createPinia()
+    const store = useMvpStore(pinia)
+    store.toggleLayer('geography')
+    store.selectPlace('place-tongguan')
+    const app = createApp(HistoryMap, {
+      geography: emptyGeography,
+      initialView: centerView,
+      places: emptyPlaces,
+    })
+
+    app.use(pinia).mount(host)
+    await nextTick()
+    const instance = maplibreMock.instances[0]
+
+    expect(instance.listeners['style.load']).toHaveLength(2)
+    expect(instance.listeners.error).toHaveLength(1)
+    expect(instance.listeners.click).toHaveLength(1)
+
+    instance.emit('error', {
+      error: {
+        message: 'HTTP 503',
+        url: 'https://maps.example.test/broken-style.json',
+      },
+    })
+
+    expect(instance.setStyle).toHaveBeenCalledTimes(1)
+    expect(instance.addSource).not.toHaveBeenCalled()
+
+    instance.emit('style.load')
+    await nextTick()
+
+    expect(instance.addSource).toHaveBeenCalledTimes(2)
+    expect(instance.addLayer).toHaveBeenCalledTimes(10)
+    for (const layerId of GEOGRAPHY_LAYER_IDS) {
+      expect(instance.setLayoutProperty).toHaveBeenCalledWith(
+        layerId,
+        'visibility',
+        'none',
+      )
+    }
+    expect(instance.setFilter).toHaveBeenCalledWith('mvp-places-selected', [
+      '==',
+      ['get', 'id'],
+      'place-tongguan',
+    ])
+
+    instance.emit('style.load')
+
+    expect(instance.addSource).toHaveBeenCalledTimes(2)
+    expect(instance.addLayer).toHaveBeenCalledTimes(10)
+    expect(instance.listeners['style.load']).toHaveLength(2)
+    expect(instance.listeners.error).toHaveLength(1)
+    expect(instance.listeners.click).toHaveLength(1)
+
+    app.unmount()
+
+    expect(instance.listeners['style.load']).toHaveLength(0)
+    expect(instance.listeners.error).toHaveLength(0)
+    expect(instance.listeners.click).toHaveLength(0)
     host.remove()
   })
 
   it('HistoryMap 在本地样式失败后结束忙碌态并保留可读告警', async () => {
     const host = document.createElement('div')
     document.body.append(host)
-    const app = createApp(HistoryMap, { initialView: centerView })
+    const app = createApp(HistoryMap, {
+      geography: emptyGeography,
+      initialView: centerView,
+      places: emptyPlaces,
+    })
 
-    app.mount(host)
+    app.use(createPinia()).mount(host)
     await nextTick()
     const instance = maplibreMock.instances[0]
 
