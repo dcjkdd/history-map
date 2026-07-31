@@ -49,7 +49,44 @@ const dataset: MvpDataset = {
     },
     defaultEventId: 'event-second',
   },
-  places: { type: 'FeatureCollection', features: [] },
+  places: {
+    type: 'FeatureCollection',
+    features: [
+      {
+        type: 'Feature',
+        geometry: { type: 'Point', coordinates: [0, 0] },
+        properties: {
+          id: 'place-test',
+          name: '测试地点',
+          modernName: null,
+          placeType: 'OTHER',
+          summary: {
+            claimId: 'claim-place-summary',
+            text: '仅用于组件测试。',
+            viewpointType: 'INFERENCE',
+            certainty: 'DISPUTED',
+            citationIds: ['citation-test'],
+          },
+          strategicRole: {
+            claimId: 'claim-place-role',
+            text: '仅用于组件测试。',
+            viewpointType: 'INFERENCE',
+            certainty: 'UNKNOWN',
+            citationIds: ['citation-test'],
+          },
+          certainty: 'DISPUTED',
+          coordinateNote: {
+            claimId: 'claim-place-coordinate',
+            text: '测试坐标不是精确历史坐标。',
+            viewpointType: 'INFERENCE',
+            certainty: 'DISPUTED',
+            citationIds: ['citation-test'],
+          },
+          citationIds: ['citation-test'],
+        },
+      },
+    ],
+  },
   geography: { type: 'FeatureCollection', features: [] },
   routeSegments: { type: 'FeatureCollection', features: [] },
   events: [
@@ -76,8 +113,8 @@ const dataset: MvpDataset = {
         certainty: 'UNKNOWN',
         citationIds: ['citation-test'],
       },
-      relatedPlaceIds: [],
-      actorLabels: [],
+      relatedPlaceIds: ['place-test'],
+      actorLabels: ['测试参与者'],
       citationIds: ['citation-test'],
     },
     {
@@ -108,8 +145,32 @@ const dataset: MvpDataset = {
       citationIds: ['citation-test'],
     },
   ],
-  sources: [],
-  citations: [],
+  sources: [
+    {
+      id: 'source-test',
+      title: '《测试资料》',
+      author: '测试作者',
+      edition: '测试版本',
+      publisher: null,
+      publishYear: null,
+      sourceType: '合成资料',
+      provenance: null,
+    },
+  ],
+  citations: [
+    {
+      id: 'citation-test',
+      sourceId: 'source-test',
+      chapter: '测试章节',
+      locator: 'test-anchor',
+      pageStart: null,
+      pageEnd: null,
+      quote: null,
+      summary: '仅用于组件测试的项目归纳。',
+      viewpointType: 'INFERENCE',
+      certainty: 'UNKNOWN',
+    },
+  ],
 }
 
 async function settleView(): Promise<void> {
@@ -148,7 +209,7 @@ describe('AnshiMvpView', () => {
       host
         .querySelector('[data-testid="history-map"]')
         ?.getAttribute('data-place-count'),
-    ).toBe('0')
+    ).toBe('1')
     expect(
       host
         .querySelector('[data-testid="history-map"]')
@@ -212,6 +273,55 @@ describe('AnshiMvpView', () => {
     await nextTick()
 
     expect(host.querySelector('[aria-current="step"]')?.textContent).toContain(
+      '测试事件二',
+    )
+
+    app.unmount()
+    host.remove()
+  })
+
+  it('事件详情可进入地点详情并关闭返回，时间轴和图层状态保持', async () => {
+    repositoryMock.loadMvpDataset.mockResolvedValue(dataset)
+    const host = document.createElement('div')
+    document.body.append(host)
+    const pinia = createPinia()
+    const app = createApp(AnshiMvpView)
+
+    app.use(pinia).mount(host)
+    await settleView()
+
+    const { useMvpStore } = await import('../stores/mvpStore')
+    const store = useMvpStore(pinia)
+    store.toggleLayer('routes')
+    expect(host.querySelector('.detail-panel')?.getAttribute('data-detail-mode')).toBe(
+      'EVENT',
+    )
+    expect(host.querySelector('.event-detail')?.textContent).toContain(
+      '测试事件二',
+    )
+
+    host
+      .querySelector<HTMLButtonElement>('[data-related-place-id="place-test"]')
+      ?.click()
+    await nextTick()
+
+    expect(store.selectedPlaceId).toBe('place-test')
+    expect(host.querySelector('.detail-panel')?.getAttribute('data-detail-mode')).toBe(
+      'PLACE',
+    )
+    expect(host.querySelector('.place-detail')?.textContent).toContain('测试地点')
+
+    host.querySelector<HTMLButtonElement>('.detail-close')?.click()
+    await nextTick()
+
+    expect(store.selectedPlaceId).toBeUndefined()
+    expect(store.selectedEventId).toBe('event-second')
+    expect(store.selectedSequence).toBe(2)
+    expect(store.layerVisibility.routes).toBe(false)
+    expect(host.querySelector('.detail-panel')?.getAttribute('data-detail-mode')).toBe(
+      'EVENT',
+    )
+    expect(host.querySelector('.event-detail')?.textContent).toContain(
       '测试事件二',
     )
 

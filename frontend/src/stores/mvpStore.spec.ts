@@ -65,9 +65,26 @@ describe('mvpStore', () => {
     expect(store.selectedPlaceId).toBe('place-tongguan')
     expect(store.selectedEventId).toBe('event-01')
 
-    store.selectPlace(undefined)
+    store.clearSelectedPlace()
     expect(store.selectedPlaceId).toBeUndefined()
     expect(store.selectedEventId).toBe('event-01')
+  })
+
+  it('重复选择和重复关闭地点详情保持幂等且不改变时间轴或图层状态', () => {
+    const store = useMvpStore()
+    const events = [makeEvent('event-first', 1), makeEvent('event-second', 2)]
+    store.initializeTimeline(events, 'event-second')
+    store.toggleLayer('routes')
+
+    store.selectPlace('place-tongguan')
+    store.selectPlace('place-tongguan')
+    store.clearSelectedPlace()
+    store.clearSelectedPlace()
+
+    expect(store.selectedPlaceId).toBeUndefined()
+    expect(store.selectedEventId).toBe('event-second')
+    expect(store.selectedSequence).toBe(2)
+    expect(store.layerVisibility.routes).toBe(false)
   })
 
   it('按顺序初始化并选中数据集默认事件', () => {

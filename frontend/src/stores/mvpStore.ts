@@ -92,5 +92,8 @@ export const useMvpStore = defineStore('mvp', {
     selectPlace(placeId: string | undefined): void {
       this.selectedPlaceId = placeId
     },
+    clearSelectedPlace(): void {
+      this.selectedPlaceId = undefined
+    },
   },
 })

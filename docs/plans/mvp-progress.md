@@ -2,9 +2,9 @@
 
 - 状态：执行进度索引
 - 更新日期：2026-07-31
-- 当前 Git 基线：`9a266dfa372ecf5dd71d70838199642561d7620e`（已推送的 `MVP-06` 完成提交）
-- 最近完成任务：`MVP-07`
-- 下一工程任务：`MVP-08`
+- 当前 Git 基线：`bc24322b251661d92dbd601fc3dff4240f18a521`（已推送的 `MVP-07` 完成提交）
+- 最近完成任务：`MVP-08`（实现与验证完成，待用户确认提交）
+- 下一工程任务：`MVP-09`
 
 ## 1. 文档定位
 
@@ -27,8 +27,9 @@
 | `MVP-04` | `COMPLETED` | `1fdfcf8` | MapLibre 地图壳、数据集初始视野、底图配置、本地降级、清理与浏览器验证已完成并推送 |
 | `MVP-05` | `COMPLETED` | `db785d4` | 地理要素、地点图层、三组图层状态、地点选择、图例与浏览器验证已完成并推送 |
 | `MVP-06` | `COMPLETED` | `9a266df` | 离散事件时间轴、默认事件、前后切换、节点直选、键盘操作、生产 worker 修复与浏览器验证已完成并推送 |
-| `MVP-07` | `COMPLETED_PENDING_COMMIT` | 待用户确认 | 路线逐段显隐、事件相关地点、手动地点优先级、路线开关和样式重载恢复已完成 |
-| `MVP-08`—`MVP-11` | `PENDING` | — | 按任务依赖顺序推进 |
+| `MVP-07` | `COMPLETED` | `bc24322` | 路线逐段显隐、事件相关地点、手动地点优先级、路线开关和样式重载恢复已完成并推送 |
+| `MVP-08` | `COMPLETED_PENDING_COMMIT` | 待用户确认 | 事件/地点/空详情、逐条引用、观点与可信度文字、关闭地点返回事件和浏览器验证已完成 |
+| `MVP-09`—`MVP-11` | `PENDING` | — | 按任务依赖顺序推进 |
 
 提交 `0394d7e` 只删除旧版文档归档 `history-map-docs.zip`，不代表新的 MVP 阶段。
 
@@ -374,9 +375,60 @@ Codex 逐项独立核实后全部采纳：改为先添加全部历史路线层�
 - 没有选择生产外部底图供应商，没有填写未经核对的 Style URL、Token、许可或署名结论；本地中性背景完整可用。
 - 没有实现图标沿线移动、现代道路生成、路线插值/吸附、速度/兵力宽度/粒子、路线空间分析，也没有提前实现 MVP-08 详情/引用或后续阶段能力。
 
-## 10. 下一步边界
+## 10. MVP-08 完成证据
 
-1. `MVP-06` 完成提交 `9a266df` 已推送；当前未提交 diff 只包含 MVP-07 实现、测试、样式与本进度记录。
-2. `MVP-07` 实现与本地验证已完成；提交和推送仍须先经过用户明确确认。
-3. 下一工程任务为 `MVP-08`，仅在后续独立任务实现事件/地点详情、引用与可信度展示；本次不得提前开始。
+### 实现范围
+
+- `frontend/src/components/detail/`
+  - `DetailPanel.vue` 按已解析对象执行 `Place > Event > Empty` 优先级；未知选择 ID 不制造伪详情。
+  - `EventDetail.vue` 展示正式 `dateLabel`、时间精度、事件摘要、重要性、相关地点、参与者、结论观点类型、可信度与各 Claim 的逐条引用；`normalizedDate=null` 时不渲染标准化日期标签。
+  - `PlaceDetail.vue` 展示历史名、非空现代对应、地点类型、地点说明、战略作用、坐标说明、结论观点类型、可信度和逐条引用；关闭按钮只清除地点选择。
+  - `CitationList.vue` 展示资料标题、作者/版本或出版信息、章节/页码/稳定定位、资料观点、可信度和项目归纳；短原文使用独立文案与视觉容器，空字段不渲染无意义标签。
+  - `ConfidenceBadge.vue` 对 `HIGH / MEDIUM / LOW / DISPUTED / UNKNOWN` 全部提供文字解释；`ViewpointBadge.vue` 明确区分“结论类型”和“资料观点”。
+- `frontend/src/domain/mvpSelectors.ts` 与既有单一 `mvpStore`
+  - 完成 `getSelectedEvent()`、`getSelectedPlace()` 和 `getCitationBundle()`；Citation 或 Source 缺失时抛出包含 ID 和字段路径的 `MvpDataError`。
+  - 新增 `clearSelectedPlace()`；重复选择/关闭保持幂等，不改变当前事件、时间轴序号或图层状态。
+- `AnshiMvpView.vue`
+  - 在 Repository 加载和时间轴初始化后接入同一个详情面板；相关地点可进入地点详情，关闭后返回当前事件。
+  - 没有增加第二个 store、路由、人物/战役独立详情页或 MVP-09 的事件定位、地图飞行、加载重试与页面重排。
+
+### 自动验证
+
+- 环境：Node.js `24.18.0`、npm `11.16.0`；`npm ci` 通过，未增加依赖，未修改 `package.json` 或 `package-lock.json`。
+- `npm --prefix frontend run typecheck`：通过。
+- `npm --prefix frontend run validate:data`：通过，0 个警告。
+- `npm --prefix frontend run test`：14 个测试文件、94 个测试全部通过。
+- `npm --prefix frontend run build` 与 `npm --prefix frontend run check`：通过；仅保留既有的 500 kB chunk 提示。
+- 根路径 `verify:worker-bundle`：通过；worker 为自包含 `maplibre-gl-worker-*.js`。
+- `--base=/history-map/` 构建输出到临时验收目录并通过对应 worker 校验；没有把额外构建产物留在工作树。
+
+新增或扩充测试覆盖 Event/Place/Empty 优先级、关闭地点回到原事件、时间轴和路线开关保持、重复选择/关闭、未知 ID、相关地点/参与者、`normalizedDate=null`、空现代名/原文、多个 Citation、Citation/Source 缺失错误、Claim 与 Citation 观点类型同时展示、原文与项目归纳分离、DISPUTED/UNKNOWN 文字、`style.load` 后事件/地点状态保持，以及既有监听器和 MapLibre 清理回归。
+
+### 浏览器现场验证
+
+- 未配置 `VITE_MAP_STYLE_URL`：正式默认 Event 详情显示时间精度、两条 Claim、相关地点、参与者、逐条引用与 UNKNOWN 文字；页面不出现 `null` 或伪造标准日期。
+- 第 2 个事件中直接点击地图上的非相关长安代表点后切换到 Place 详情，继续显示 `DISPUTED`、`UNKNOWN` 和“不是精确历史坐标”等明确文字；关闭后返回同一第 2 个 Event。地点打开期间关闭路线，返回 Event 后路线仍关闭，时间轴、相关地点状态不丢失。
+- 显式有效 `/map/empty-style.json`：无降级提示，第 3 个事件详情和引用正常；故意损坏 `/map/missing-style.json`：HTTP 404 后自动恢复本地中性背景，第 4 个事件与 7 条引用继续可用。
+- 1024×768 下地图为 934×544，页面无横向溢出；1440×900 下地图为 1238×544，时间轴无需横向滚动。两种尺寸均只有 1 个 MapLibre 地图和 1 个 Canvas。
+- 根路径与 `/history-map/` 裸静态生产部署均取得入口、CSS、正式数据、MapLibre worker 和本地空白样式 HTTP 200；Event → Place → 关闭返回 Event 正常，最终 Claim/资料观点与实体级 h3 引用标题可见。
+- 无外部配置、有效样式、损坏样式降级、根生产和非根生产的浏览器 console 均为 0 warning/error。
+
+### 限时静态复核
+
+ChatGPT Pro 在 3 分 26 秒的一次只读静态复核中未报告 P0 或 P1，提出 2 个 P2 和 1 个 P3：Claim 自身的 `viewpointType` 未展示；工作树中的非根构建输出未被忽略，可能误入提交；实体级 Citation 标题固定为 h4，形成 h2→h4 跳级。复核没有安装依赖、运行测试、修改文件或 lockfile，也没有直接判定 MVP-08 是否验收通过。
+
+Codex 独立核实后全部采纳：新增明确区分“结论类型”和“资料观点”的展示及差异化测试；把非根构建产物移至临时验收目录；让实体级引用使用 h3、Claim 内引用继续使用 h4。修复后 94 个测试、完整 `check`、双 base 构建和双 worker 校验全部通过，根/非根生产浏览器复查保持单一 MapLibre/Canvas 且 console 0 warning/error。
+
+### 范围与内容边界
+
+- 没有修改 `frontend/public/data/anshi/mvp-v1.json`、资料笔记、内容审核表、历史事实、日期、坐标、路线几何、来源、许可记录或审核签字。
+- 直接消费正式 5 个 Place、6 个 Event、19 个 Source、36 个 Citation 和关联 `SourcedClaim`；地点继续为 DISPUTED，事件时间继续为 APPROXIMATE 且 `normalizedDate=null`，路线继续为 `INFERENCE / LOW`。
+- 没有展示完整书籍，没有生成 AI 总结/问答、用户笔记、评论或编辑入口；没有选择生产外部底图供应商或填写未经核对的 Style URL、Token、许可与署名结论。
+- 没有实现 A-017 定位当前事件、地图自动飞行、MVP-09 页面布局/加载重试或其他后续阶段能力。
+
+## 11. 下一步边界
+
+1. `MVP-07` 完成提交 `bc24322` 已推送，现场核对的 `HEAD`、本地 `origin/master` 和 GitHub 远端 `master` 一致。
+2. `MVP-08` 实现、完整门禁、真实浏览器验证和限时只读复核均已完成；提交和推送仍须先经过用户明确确认。
+3. 下一工程任务为 `MVP-09`，只能在后续独立任务实现 A-017“定位当前事件”、页面整合、加载重试和桌面体验；本次没有提前开始。
 4. 后续工作必须继续保护当前正式数据、资料笔记与审核表，不得把 DISPUTED、APPROXIMATE 或 `INFERENCE / LOW` 内容升级为确定事实。

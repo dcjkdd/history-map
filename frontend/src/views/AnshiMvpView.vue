@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
+import DetailPanel from '../components/detail/DetailPanel.vue'
 import HistoryMap from '../components/map/HistoryMap.vue'
 import EventTimeline from '../components/timeline/EventTimeline.vue'
 import TimelineControls from '../components/timeline/TimelineControls.vue'
@@ -86,7 +87,7 @@ onBeforeUnmount(() => {
     <section class="map-panel" aria-labelledby="map-panel-title">
       <div class="map-panel__heading">
         <div>
-          <p class="section-label">MVP-07</p>
+          <p class="section-label">MVP-08</p>
           <h2 id="map-panel-title">二维交互地图</h2>
         </div>
         <p v-if="loadState === 'loading'" class="data-status" role="status">
@@ -134,6 +135,17 @@ onBeforeUnmount(() => {
           @select="store.selectEvent"
         />
       </section>
+
+      <DetailPanel
+        v-if="loadState === 'ready' && dataset"
+        :dataset="dataset"
+        :selection="{
+          selectedEventId: store.selectedEventId,
+          selectedPlaceId: store.selectedPlaceId,
+        }"
+        @clear-place="store.clearSelectedPlace()"
+        @select-place="store.selectPlace"
+      />
     </section>
   </main>
 </template>

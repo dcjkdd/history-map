@@ -623,6 +623,8 @@ describe('useMapLibre', () => {
       ['get', 'id'],
       ['literal', ['place-lingbao']],
     ])
+    expect(store.selectedEventId).toBe(secondEvent.id)
+    expect(store.selectedPlaceId).toBe('place-tongguan')
 
     instance.emit('style.load')
 

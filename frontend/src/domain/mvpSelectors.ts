@@ -4,6 +4,7 @@ import type {
   Event,
   MvpDataset,
   PlaceFeature,
+  SelectionState,
 } from './mvpTypes'
 
 export function getEventById(
@@ -22,6 +23,24 @@ export function getPlaceById(
   )
 }
 
+export function getSelectedEvent(
+  dataset: MvpDataset,
+  state: SelectionState,
+): Event | undefined {
+  return state.selectedEventId
+    ? getEventById(dataset, state.selectedEventId)
+    : undefined
+}
+
+export function getSelectedPlace(
+  dataset: MvpDataset,
+  state: SelectionState,
+): PlaceFeature | undefined {
+  return state.selectedPlaceId
+    ? getPlaceById(dataset, state.selectedPlaceId)
+    : undefined
+}
+
 export function getCitationBundle(
   dataset: MvpDataset,
   citationIds: readonly string[],
@@ -33,13 +52,13 @@ export function getCitationBundle(
     dataset.sources.map((source) => [source.id, source]),
   )
 
-  return citationIds.flatMap((citationId) => {
+  return citationIds.flatMap((citationId, citationIndex) => {
     const citation = citationsById.get(citationId)
     if (!citation) {
       throw new MvpDataError({
         code: 'INVALID_DATASET',
         message: `无法解析 Citation：${citationId}`,
-        path: '$.citations',
+        path: `$.citationIds[${citationIndex}]`,
         details: {
           citationId,
         },

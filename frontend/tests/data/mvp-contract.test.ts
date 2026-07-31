@@ -5,6 +5,8 @@ import {
   getCitationBundle,
   getEventById,
   getPlaceById,
+  getSelectedEvent,
+  getSelectedPlace,
 } from '../../src/domain/mvpSelectors'
 import {
   MVP_SCHEMA_VERSION,
@@ -504,6 +506,26 @@ describe('MVP selectors', () => {
     expect(getPlaceById(dataset, 'missing')).toBeUndefined()
   })
 
+  it('按单一选择状态查询当前 Event 和 Place，未知 ID 返回 undefined', () => {
+    const dataset = createValidDataset()
+
+    expect(
+      getSelectedEvent(dataset, { selectedEventId: SYNTHETIC_EVENT_ID })?.id,
+    ).toBe(SYNTHETIC_EVENT_ID)
+    expect(
+      getSelectedPlace(dataset, { selectedPlaceId: SYNTHETIC_PLACE_ID })
+        ?.properties.id,
+    ).toBe(SYNTHETIC_PLACE_ID)
+    expect(
+      getSelectedEvent(dataset, { selectedEventId: 'event-unknown' }),
+    ).toBeUndefined()
+    expect(
+      getSelectedPlace(dataset, { selectedPlaceId: 'place-unknown' }),
+    ).toBeUndefined()
+    expect(getSelectedEvent(dataset, {})).toBeUndefined()
+    expect(getSelectedPlace(dataset, {})).toBeUndefined()
+  })
+
   it('按请求顺序组合 Citation 与 Source 并保留重复项', () => {
     const dataset = createValidDataset()
 
@@ -531,7 +553,7 @@ describe('MVP selectors', () => {
     } catch (error) {
       expect(error).toMatchObject({
         code: 'INVALID_DATASET',
-        path: '$.citations',
+        path: '$.citationIds[0]',
         details: {
           citationId: 'missing',
         },
