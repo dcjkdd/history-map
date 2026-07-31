@@ -12,9 +12,10 @@
     "dev": "vite",
     "typecheck": "vue-tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.node.json",
     "validate:data": "node scripts/validate-data.ts",
+    "verify:worker-bundle": "node scripts/verify-worker-bundle.ts",
     "test": "vitest run",
     "build": "npm run typecheck && npm run validate:data && vite build",
-    "check": "npm run typecheck && npm run validate:data && npm run test && npm run build"
+    "check": "npm run typecheck && npm run validate:data && npm run test && npm run build && npm run verify:worker-bundle"
   },
   "dependencies": {
     "maplibre-gl": "6.0.0",

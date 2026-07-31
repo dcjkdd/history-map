@@ -2,9 +2,9 @@
 
 - 状态：执行进度索引
 - 更新日期：2026-07-31
-- 当前 Git 基线：`1fdfcf848beaa2df09feb12df5ba72dda4393880`（已推送的 `MVP-04` 完成提交）
-- 最近完成任务：`MVP-05`
-- 下一工程任务：`MVP-06`
+- 当前 Git 基线：`db785d4da5d842dd9629792c090d8178e1f8aea4`（已推送的 `MVP-05` 完成提交）
+- 最近完成任务：`MVP-06`
+- 下一工程任务：`MVP-07`
 
 ## 1. 文档定位
 
@@ -25,8 +25,9 @@
 | `MVP-02` | `COMPLETED` | `9012469` | 数据完整性校验命令、构建门禁和损坏数据失败测试已完成并推送 |
 | `MVP-03` | `COMPLETED` | `3ccdecc` | 缩小版正式数据、双表审核门禁和内容测试已完成；完整工程检查通过，用户已确认提交/推送 |
 | `MVP-04` | `COMPLETED` | `1fdfcf8` | MapLibre 地图壳、数据集初始视野、底图配置、本地降级、清理与浏览器验证已完成并推送 |
-| `MVP-05` | `COMPLETED` | 待用户确认 | 地理要素、地点图层、三组图层状态、地点选择、图例与浏览器验证已完成 |
-| `MVP-06`—`MVP-11` | `PENDING` | — | 按任务依赖顺序推进 |
+| `MVP-05` | `COMPLETED` | `db785d4` | 地理要素、地点图层、三组图层状态、地点选择、图例与浏览器验证已完成并推送 |
+| `MVP-06` | `COMPLETED_PENDING_COMMIT` | 待用户确认 | 离散事件时间轴、默认事件、前后切换、节点直选、键盘操作、生产 worker 修复与浏览器验证已完成 |
+| `MVP-07`—`MVP-11` | `PENDING` | — | 按任务依赖顺序推进 |
 
 提交 `0394d7e` 只删除旧版文档归档 `history-map-docs.zip`，不代表新的 MVP 阶段。
 
@@ -256,9 +257,72 @@ Codex 独立对照源码、现场截图和测试核实后采纳两项：把图�
 - 没有选择生产外部底图供应商，也没有填写未经核对的 Style URL、Token、许可或署名结论。
 - routes 只有 store 和开关状态，没有实现路线图层；没有实现 MVP-06 的事件时间轴、默认事件状态、详情交互或后续阶段功能。
 
-## 8. 下一步边界
+## 8. MVP-06 完成证据
 
-1. `MVP-04` 完成提交 `1fdfcf8` 已推送，当前未提交 diff 只包含 MVP-05 实现、测试和本进度记录。
-2. `MVP-05` 实现与本地验证已完成；提交和推送仍须先经过用户确认。
-3. 下一工程任务为 `MVP-06`，仅实现离散事件时间轴和状态引擎；本次不得提前开始。
-4. `MVP-06` 必须继续消费当前正式数据并保护审核门禁；现有 routes 开关不授权提前绘制或推断路线。
+### 实现范围
+
+- `frontend/src/domain/timeline.ts`
+  - 提供不修改输入数组的 `sortEvents()`，只按 `Event.sequence` 驱动离散顺序；`dateLabel` 仅用于展示。
+  - 提供 `getPreviousEventId()` 与 `getNextEventId()`，首尾、未知 ID 和空集合均安全返回 `undefined`。
+- `frontend/src/stores/mvpStore.ts`
+  - 在既有单一 MVP store 中增加 `orderedEventIds`、默认事件、`selectedSequence`、`hasPrevious` 和 `hasNext`。
+  - `initializeTimeline()` 从正式数据建立顺序并选择 `topic.defaultEventId`；`selectEvent()`、前后切换和复位均拒绝制造未知事件状态，且不改变地点选择或图层状态。
+- `EventTimeline.vue` 与 `TimelineControls.vue`
+  - 使用原生 `button` 和有序列表显示全部事件的 `dateLabel` 与标题，当前节点使用 `aria-current="step"`。
+  - 上一/下一在边界使用原生 `disabled`；事件节点支持鼠标直选和左右方向键，并把焦点移动到相邻节点。
+- `AnshiMvpView.vue` 与 `main.css`
+  - Repository 加载并通过运行时校验后才初始化时间轴；页面只从既有正式 Dataset 组装有序事件，不直接读取 JSON。
+  - 1024px 桌面宽度下使用可横向滚动的离散节点，宽屏下六个节点同列展开；焦点样式不只依赖颜色。
+
+### 自动验证
+
+- 环境：Node.js `24.18.0`、npm `11.16.0`；`npm ci` 通过，未增加依赖，`package.json` 只增加 worker 产物校验命令，`package-lock.json` 未修改。
+- `npm --prefix frontend run typecheck`：通过。
+- `npm --prefix frontend run validate:data`：通过，0 个警告。
+- `npm --prefix frontend run test`：12 个测试文件、78 个测试全部通过。
+- `npm --prefix frontend run build`：通过；MapLibre worker 生成自包含的 `maplibre-gl-worker-*.js`，主入口仍有既存的 500 kB chunk 提示，不是构建失败。
+- `npm --prefix frontend run check`：通过；依次完成类型检查、正式数据校验、78 个测试、根路径生产构建和 worker 产物闭包校验。
+- `npm --prefix frontend run build -- --base=/history-map/` 与随后运行的 `verify:worker-bundle`：通过；入口、样式、MapLibre worker 和本地空白样式使用一致的非根 base。
+
+新增测试覆盖排序不修改输入、首尾边界、未知 ID、空集合、默认事件、重复选择、前后往返、复位、`dateLabel`/标题渲染、`aria-current`、原生禁用状态、到达边界后的焦点转移、无修饰键方向导航、修饰键保留，以及 View 中 Repository → store → 控件/节点的状态同步。worker 回归测试同时覆盖自包含产物通过和引用未发布 `maplibre-gl-shared.mjs` 的坏产物失败；既有地图样式失败、重复 `style.load`、图层恢复、监听器和实例清理测试继续全部通过。
+
+### 生产 worker 修复
+
+- 生产静态验证发现的既存 worker 缺口经用户明确授权纳入本任务：`useMapLibre.ts` 把 MapLibre 入口从普通 `?url` 资源改为 Vite `?worker&url` 入口，使 Vite 分析并打包 worker 的模块依赖。
+- 修复前产物 `maplibre-gl-worker-*.mjs` 静态导入未发布的 `maplibre-gl-shared.mjs`；修复后根路径与非根路径均生成自包含 `maplibre-gl-worker-*.js`，不再存在该相对导入。
+- `verify-worker-bundle.ts` 要求构建目录中恰好存在一个 MapLibre worker，并验证其中每个静态或动态相对模块引用都能在发布产物中解析；`check` 已把该验证作为根路径生产构建后的固定门禁。
+
+### 浏览器现场验证
+
+- 未配置 `VITE_MAP_STYLE_URL`：首次进入严格选择正式 `topic.defaultEventId`，显示第 1/6 个事件；连续前进到第 6/6 个事件后“下一事件”禁用，反向和任意节点直选正常。
+- 重复选择第 3 个事件两次，`selectedEventId` 与第 3/6 状态完全一致；在第 3 个节点按 ArrowRight 后，选择与 DOM 焦点都移动到第 4 个节点，焦点轮廓实测为 3px。
+- 拖动地图后仍保持第 4/6 个事件，页面仍只有 1 个 MapLibre 地图和 1 个 Canvas；时间轴切换不强制地图飞行，也不创建额外地图实例。
+- 1024×768 下地图为 934×480，时间轴控件宽 934px，页面无横向溢出；六个节点在时间轴自身范围内横向滚动。1440×900 下时间轴无需横向滚动，页面同样无横向溢出。
+- 显式配置有效本地 `/map/empty-style.json` 时无降级提示，事件可切到第 2/6；配置故意损坏的 `/map/missing-style.json` 后完整降级到本地中性背景，事件仍可切到第 3/6，且只有 1 个 MapLibre 地图和 1 个 Canvas。
+- 根路径生产预览加载正式数据并显示 6 个事件；最终构建从第 5 个事件进入末端后保持单一 MapLibre/Canvas，并把焦点移到可用的“上一事件”。
+- 非根生产构建按既有静态 API 契约验证：应用挂载于 `/history-map/`，正式数据同时挂载于根 `/data/`；入口和样式来自 `/history-map/assets/`，最终时间轴交互正常。仅用 `vite preview --base=/history-map/` 不会把契约规定的根 `/data/` 自动额外挂载出来，因此不能替代该部署形态验证。
+- 无外部配置、有效本地样式、故意损坏样式、根路径生产预览和非根生产预览的浏览器 console 均为 0 warning/error。
+- worker 修复后重新使用裸静态服务器验证：根路径依次取得入口、样式、根 `/data/`、`maplibre-gl-worker-*.js` 和本地空白样式的 HTTP 200；非根路径依次取得 `/history-map/` 下入口、样式、worker、空白样式和根 `/data/` 的 HTTP 200，服务器日志中不再出现 shared 模块 404。
+- 根路径与非根路径生产页面均实际渲染河流、地形/通道和 5 个历史地点，地点图层可关闭并恢复；时间轴切换期间始终只有 1 个 MapLibre 地图和 1 个 Canvas。1024×768 下页面无横向溢出、时间轴自身横向滚动；1440×900 下时间轴完全展开且页面无横向溢出。两种部署的最终浏览器 console 均为 0 warning/error。
+
+### 限时静态复核
+
+ChatGPT Pro 在 8 分 21 秒的一次只读静态复核中未报告 P0 或 P1，提出 2 个 P2 和 1 个 P3：到达首尾时当前控制按钮动态禁用可能使键盘焦点落回 `body`；事件节点未排除带修饰键的左右方向键，可能拦截浏览器快捷键；普通 `div` 上的“事件切换控制”标签缺少明确分组角色。复核没有安装依赖、修改代码或 lockfile，也没有直接判定 MVP-06 是否验收通过。
+
+Codex 逐项独立核实后全部采纳：真实浏览器复现了从第 5 个事件点击“下一事件”后焦点落到 `body`，因此在到达首尾时把焦点转移到仍可用的相邻控制按钮；为时间轴方向键增加 Alt/Ctrl/Meta/Shift 防护；为控制容器增加 `role="group"`。新增自动测试覆盖两端焦点和修饰键 `defaultPrevented=false`，真实浏览器确认末端焦点落到“上一事件”、起点焦点落到“下一事件”，Alt+ArrowRight 不改变事件或焦点。修复后 76 个测试和完整 `check` 通过；最终工程判断仍只依据当前源码、本地门禁和浏览器证据。
+
+### 范围与内容边界
+
+- 没有修改 `frontend/public/data/anshi/mvp-v1.json`、资料笔记、内容审核表、历史事实、日期、坐标、路线、许可记录或审核签字。
+- 时间轴直接展示正式 `dateLabel`；全部 Event 仍为 `APPROXIMATE`、`normalizedDate=null`、`certainty=UNKNOWN`，页面明确说明时间文字不等同于精确公历日期。
+- 没有新增或选择生产外部底图供应商，没有填写未经核对的 Style URL、Token、许可或署名结论。
+- 经用户明确授权只额外修复 MVP-04 遗留的 MapLibre worker 生产打包缺口；没有改变地图数据契约、图层语义、外部底图策略或历史内容。
+- 没有实现自动播放、连续滑块、速度控制、动画队列或 ECharts；也没有提前实现 MVP-07 的路线图层/事件地图同步、MVP-08 的详情/引用或其他后续阶段能力。
+
+## 9. 下一步边界
+
+1. `MVP-05` 完成提交 `db785d4` 已推送；当前未提交 diff 只包含 MVP-06 实现、获授权的 MapLibre worker 生产修复、测试和本进度记录。
+2. `MVP-06` 实现与本地验证已完成；提交和推送仍须先经过用户确认。
+3. 下一工程任务为 `MVP-07`，仅实现路线逐段显隐和事件地图同步；本次不得提前开始。
+4. `MVP-07` 必须继续消费当前正式 RouteSegment 与 Event，不得自行补画路线、修改 `appearAtEventId` 或把 `INFERENCE / LOW` 示意方向表现为精确历史路线。
+5. 本轮发现的 MapLibre worker 共享模块缺失已按授权修复并完成根路径/非根路径生产重验；整体发布不再受该缺口阻塞。

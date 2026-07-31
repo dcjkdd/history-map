@@ -3,7 +3,7 @@ import type {
   ErrorEvent as MapLibreErrorEvent,
   MapOptions,
 } from 'maplibre-gl'
-import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url'
+import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
 import { ref, shallowRef } from 'vue'
 
 import type { InitialView } from '../domain/mvpTypes'

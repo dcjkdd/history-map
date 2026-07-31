@@ -1,3 +1,4 @@
+import { createPinia } from 'pinia'
 import { createApp, nextTick } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -13,7 +14,7 @@ describe('App', () => {
     document.body.append(host)
     const app = createApp(App)
 
-    app.mount(host)
+    app.use(createPinia()).mount(host)
     await nextTick()
 
     expect(host.querySelector('h1')?.textContent).toBe('中国古代战争地形地图')
