@@ -1,10 +1,10 @@
 # 安史之乱二维交互地图：MVP 实施进度
 
 - 状态：执行进度索引
-- 更新日期：2026-07-30
-- 当前工程实施基线：`MVP-02@9012469ea5feafd17a055bf86a0e95e8ad4575e6`
-- 最近完成任务：`MVP-02`
-- 下一工程任务：`MVP-04`（`MVP-03` 仍受内容门禁阻断）
+- 更新日期：2026-07-31
+- 当前 Git 基线：`9fe5b3accfcd3eb368713d354281d274b707d56c`（`MVP-02@9012469ea5feafd17a055bf86a0e95e8ad4575e6` 的直接后继文档提交）
+- 最近完成任务：`MVP-03`
+- 下一工程任务：`MVP-04`
 
 ## 1. 文档定位
 
@@ -23,8 +23,8 @@
 | `MVP-00` | `COMPLETED` | `110c93a` | Vue 3、TypeScript、Vite 最小工程骨架已完成 |
 | `MVP-01` | `COMPLETED` | `d66f326` | 数据契约、运行时校验、selectors、静态 Repository 和技术空数据集已完成 |
 | `MVP-02` | `COMPLETED` | `9012469` | 数据完整性校验命令、构建门禁和损坏数据失败测试已完成并推送 |
-| `MVP-03` | `BLOCKED_BY_CONTENT` | — | 等待人工提供并批准资料版本、页码或稳定定位、坐标/几何依据和许可证 |
-| `MVP-04` | `READY_NEXT` | — | 可开发 MapLibre 地图壳；不依赖仍被内容门禁阻断的 MVP-03 |
+| `MVP-03` | `COMPLETED` | 本次提交 | 缩小版正式数据、双表审核门禁和内容测试已完成；完整工程检查通过，用户已确认提交/推送 |
+| `MVP-04` | `READY_NEXT` | — | 下一步开发 MapLibre 地图壳、底图配置与本地降级方案 |
 | `MVP-05`—`MVP-11` | `PENDING` | — | 按任务依赖顺序推进 |
 
 提交 `0394d7e` 只删除旧版文档归档 `history-map-docs.zip`，不代表新的 MVP 阶段。
@@ -108,15 +108,48 @@ MVP-02 已形成实施提交 `9012469`（`前端：完成 MVP-02 数据完整性
 
 ## 5. 当前内容门禁
 
-- `data/curated/anshi-mvp-source-notes.md` 当前批准记录数为 0。
-- `docs/reviews/anshi-mvp-content-review.md` 尚未完成人工签字。
-- 地点、事件槽位、RoutePlan、地理要素和 Source 仍为 `PENDING_SOURCE`。
-- 当前 `mvp-v1.json` 只用于验证技术合同和加载边界。
+### 正式组装结果
+
+- `frontend/public/data/anshi/mvp-v1.json` 已由 `scripts/assemble-anshi-mvp-data.mjs` 生成：5 个 Place、3 个 Geography、3 个 RouteSegment（2 个逻辑 routeId）、6 个 Event、19 个 Source、36 个 Citation，以及 33 条运行时 SourcedClaim。另有 2 条已批准 RoutePlan Claim 仅作审核组织，不写入运行时 JSON。
+- 组装器同时读取资料笔记与内容审核表，要求每个拟发布 Source、Citation、Claim 在两处均为 `APPROVED`，且审核人为 `banq`、审核日期为 `2026-07-31`；Claim 还必须精确匹配 entityType、entityId、field。
+- 地点坐标全部保持 `DISPUTED`；事件时间全部保持 `APPROXIMATE` 且 `normalizedDate=null`；三段示意方向全部保持 `INFERENCE / LOW`，并逐段验证两端恰好等于已批准地点代表点。
+- `PENDING_SOURCE`、`PENDING_REVIEW`、`REJECTED` 及后续候选没有进入正式数据。它们不属于本次缩小版发布范围，不阻塞 MVP-03。
+
+### 工程验证与静态复核
+
+- 环境：Node.js `24.18.0`、npm `11.16.0`；未增加依赖，未修改 `package.json` 或 `package-lock.json`。
+- `npm --prefix frontend run validate:data`：通过，0 个警告。
+- `npm --prefix frontend run check`：通过；4 个测试文件、40 个测试全部通过，TypeScript 检查与生产构建通过。
+- ChatGPT Pro 的一次限时只读静态复核未报告 P0，但指出审核表未被生成器交叉校验、发布 ID 未按人工审核表精确锁定、路线端点和 Event Claim 归属断言不足等 P1，以及 Markdown 解析、Polygon 闭合与 Geography certainty 等 P2。Codex 独立核对后修复了成立的问题：组装器和内容测试现在执行双表 `APPROVED`/reviewer/reviewDate 校验、正式 ID 集合一致性、Claim entityType/entityId/field、路线两端、Polygon 闭合和现代地理不确定性检查；Markdown 表行也增加了严格列数断言。最终工程判断由 Codex 依据本地门禁作出，Pro 不直接判定验收。
+- 用户已于 2026-07-31 明确确认提交并推送；本文件与 MVP-03 实现一并进入本次提交。
+
+### 审核历程与边界
+
+以下逐项段落保留审批历程；其中“尚未写入”“等待其余实体”等措辞描述的是当时状态，均已由上面的正式组装结果取代，不代表当前门禁状态。
+
+- `data/curated/anshi-mvp-source-notes.md` 当前已批准 90 个 Source/Citation/Claim 记录：19 个 Source、36 个 Citation、35 个 Claim；另有 3 个已批准的现代背景几何和 3 个已批准的 `INFERENCE / LOW` 示意路线分段。
+- `banq` 已于 2026-07-31 完成潼关、陕州、洛阳、长安各自的限定地点摘要、战略作用、现代遗址或展示地标代表点及直接来源链，灵宝限定摘要、现代“稠桑原”同名居民点候选、成组 CRS 技术核验和直接 Source/Citation，“燕军受阻于潼关”“燕军推进至潼关前”“唐廷催令唐军出关”“唐燕军战于灵宝西原”“燕军攻克潼关”“玄宗离开后燕军占领长安”六个 Event 的完整字段、各两条 Claim、《资治通鉴》固定修订有限使用边界和直接 Citation，以及黄河、渭河、秦岭现代背景几何和保守摘要的人工签字；其余内容记录仍未审核。
+- 5 个 Place、3 个 Geography、6 个 Event 和 2 个逻辑路线槽位均已组装；两个 RoutePlan、共 3 个 `INFERENCE / LOW` RouteSegment 以及全部运行时必填 Claim 已获得人工批准，16/16 个逻辑实体达到字段齐全的发布条件。
+- 潼关已补充官方文保名单、陕西省文物志转载、新华社报道、用户提供的 1992 年《潼关县志》、OpenStreetMap `way/1195138308` v3，以及用户提供的《安史之乱：历史、宣传与神话》EPUB。`banq` 已批准 `[110.2909781, 34.6035548]` 作为严格标注 `DISPUTED` 的“现代旧城遗址代表点”，批准说明多来源冲突的地点摘要，并批准限定战略作用；这不确认 755—756 年唐城中心、关防范围或现代景区对应。`place-tongguan` 实体状态为 `APPROVED`，但正式数据仍保持技术空集，等待缩小版其余必需实体完成。
+- 灵宝地点摘要已批准为“灵宝西原及南山—黄河间狭窄通道”的相对描述，但没有把现代灵宝市中心、秦函谷关景区或任一 POI 认定为战场。`banq` 于 2026-07-31 批准现代“稠桑原”原值 `[110.872607, 34.615468]` 作为必须保持 `DISPUTED` 的 OGC:CRS84 同名居民点代表点，并独立批准限定的 `Place.strategicRole`；`place-lingbao` 已满足正式发布契约。
+- 灵宝市政府 2025-01-03 公示环境报告的表 2.6-1 提供现代“稠桑原”居民点原始坐标 `[110.872607, 34.615468]`。2026-07-31 已完成五个居民点、三个厂址锚点与 Esri World Imagery 的成组技术核验：三个可区分居民点和厂址现场关系支持原值直接叠加，两个居民点记为歧义，没有样本支持 GCJ-02 转换；转换假设会整体西南移约 `517.7—518.0m`，并使厂址落入坡寨村聚落，与报告现场文字冲突。`banq` 已批准技术记录、两个直接 Source/Citation、原值候选和使用边界；WGS84/CGCS2000 无法区分的残余不确定性继续保留。当前 `mvp-v1.json` 保持不变，等待缩小版其余必需实体完成。
+- 陕州证据链已获人工批准：河南档案信息网与三门峡日报分别支持宝轮寺塔位于故城东南部及故城在唐宋城址基础上延续；OpenStreetMap `node/12768197183` v1 的 `[111.1488645, 34.7915940]` 已接受为 `DISPUTED / APPROVED` 的现代故城内部地标代表点。CHGIS `hvd_83048` 仍只作内部交叉核对，其 `CC BY-NC 4.0` 坐标不打包，州级 `hvd_115770` 点位也不是治所证据。`place-shanzhou` 已满足缩小版发布条件，但尚未写入正式数据或地图。
+- 洛阳证据链已获人工批准：国家发展改革委网页支持隋唐洛阳城以洛水贯穿、主要分布于今洛阳四个城区，并明确应天门为宫城正南门；OpenStreetMap `way/865951589` v4 展示建筑范围的质心 `[112.4545867, 34.6769987]` 已接受为 `DISPUTED / APPROVED` 的现代应天门遗址展示地标代表点。该点不是 755—756 年洛阳城中心、完整城界、历史城门原状或事件点。地点摘要、战略作用、坐标候选及直接 Source/Citation 均已由 `banq` 于 2026-07-31 批准；`place-luoyang` 已满足缩小版发布条件，但尚未写入正式数据或地图。
+- 长安证据链已获人工批准：西安市地方志办公室网页支持唐长安城承继隋大兴城、遗迹多数叠压在现代城市下，并把大明宫和丹凤门列入遗址；陕西省文物局网页支持大明宫的宫殿与权力中心属性，并区分丹凤门遗址和展示设施；OpenStreetMap `way/280412702` v4 的现代丹凤门建筑范围质心 `[108.9594728, 34.2828248]` 已接受为 `DISPUTED / APPROVED` 的现代大明宫遗址展示地标代表点。该点不是 755—756 年长安城中心、完整城界、唐代丹凤门原状或具体事件点。地点摘要、战略作用、坐标候选及直接 Source/Citation 均已由 `banq` 于 2026-07-31 批准；`place-changan` 已满足缩小版发布条件，但尚未写入正式数据或地图。
+- “潼关防线背景”事件证据链已获人工批准：正式候选标题为“燕军受阻于潼关”，`eventType=DEFENSE`，时间仅写“安禄山起兵约半年后（原书相对表述）”，保持 `normalizedDate=null`、`APPROXIMATE / UNKNOWN`。用户提供 EPUB 的固定段落与《资治通鉴》卷二百一十八维基文库固定修订 `oldid=1996147` 已完成交叉核对；完整 Event 字段、两条 Claim、`SRC-PRIMARY-01` 的有限使用边界、`CIT-ZZTJ218-R1996147-P00`、`P01` 及既有 EPUB Citation 的事件用途均由 `banq` 于 2026-07-31 批准。本批准不包括兵力、伤亡、精确公历日期、坐标、防线范围、路线几何或后续出关事件；该 Event 尚未写入正式数据或地图。
+- “燕军西进背景”事件证据链已获人工批准：正式候选标题为“燕军推进至潼关前”，`eventType=MARCH`，时间只写“洛阳失守后至潼关防线形成”，保持 `normalizedDate=null`、`APPROXIMATE / UNKNOWN`；相关地点只引用已批准的洛阳、陕州、潼关。用户提供 EPUB 的两个固定段落与《资治通鉴（四库全书本）》卷二百一十七固定修订 `oldid=783496` 只用于宏观节点和防御节点收缩的限定归纳；普通转录 `oldid=617834` 因可见“炅昌”“至峽”等错字明确排除。`SRC-PRIMARY-03`、三条本轮批准的 Citation、完整 Event 字段和两条 Claim 均由 `banq` 于 2026-07-31 批准；不生成 RouteSegment、坐标、现代道路路线或精确日期，也不采用地形/后勤单一因果或责任判断。该 Event 尚未写入正式数据或地图。
+- “唐军出关决策”事件证据链已获人工批准：标题为“唐廷催令唐军出关”，`eventType=POLITICAL`，时间只写“唐军出关前的命令过程至实际出关（传统纪日未换算）”，保持 `normalizedDate=null`、`APPROXIMATE / UNKNOWN`。候选只采用《资治通鉴》固定修订所载“收到报告—固守异议—继续催令—最终出关”的顺序，以及 EPUB 对最终离开潼关和后续灵宝方向交战的有限衔接；不把报告敌情视为已证事实，不采用兵力、精确传统纪日、粮运/军政单一因果、责任判断或路线几何。完整 Event、两条 Claim、固定修订新增用途和 EPUB Citation 限定用途均由 `banq` 于 2026-07-31 批准；该 Event 尚未写入正式数据或地图。
+- “灵宝方向交战”事件证据链已获人工批准：标题为“唐燕军战于灵宝西原”，`eventType=BATTLE`，时间只写“唐军出关后、潼关失守前（传统纪日未换算）”，保持 `normalizedDate=null`、`APPROXIMATE / UNKNOWN`。只采用《资治通鉴》固定修订所载灵宝西原、南近山北临河的狭道、交战和唐军溃败，以及 EPUB 的相对地形文字与交战开始；`body-p027`—`body-p042` 的兵力、部署、火攻、风向和责任重建明确不采用。现代“稠桑原”代表点只作 `DISPUTED` 叙事锚点，不是战场坐标；潼关失守留给下一 Event。完整 Event、两条 Claim、固定修订 Citation 和两个 EPUB Citation 的限定用途均由 `banq` 于 2026-07-31 批准；该 Event 尚未写入正式数据或地图。
+- “潼关失守”事件证据链已获人工批准：标题为“燕军攻克潼关”，`eventType=CAPTURE`，时间只写“灵宝西原交战后（传统纪日未换算）”，保持 `normalizedDate=null`、`APPROXIMATE / UNKNOWN`。只采用《资治通鉴》固定修订和 EPUB `part0010.html#body-p002` 共同支持的“哥舒翰收集散卒—火拔归仁等控制并带走哥舒翰—崔乾祐攻克潼关”顺序，不把先后写成唯一因果；兵力、伤亡、守关可能性、反事实、精确间隔、人物评价和路线均不采用。现代潼关代表点只作 `DISPUTED` 叙事锚点，不是 756 年关城或攻关位置。完整 Event、两条 Claim 及两个既有 Citation 的新增限定用途均由 `banq` 于 2026-07-31 批准；该 Event 尚未写入正式数据或地图。
+- “长安局势变化”事件证据链已获人工批准：标题为“玄宗离开后燕军占领长安”，`eventType=CAPTURE`，时间只写“潼关失守后至燕军占领长安（传统纪日未换算）”，保持 `normalizedDate=null`、`APPROXIMATE / UNKNOWN`。只采用《资治通鉴》固定修订与 EPUB 支持的“玄宗离开长安—燕军先留兵潼关—随后另遣军进入长安”顺序，把离城与占领作为两个先后节点而非同一天；精确纪日/间隔、兵力、路线、地点、动机、占领后细节和唯一因果均不采用。现代丹凤门代表点只作 `DISPUTED` 叙事锚点，不是事件点。完整 Event、两条 Claim、`CIT-ZZTJ218-R1996147-P03` 及两个 EPUB Citation 的新增事件用途均由 `banq` 于 2026-07-31 批准；该事件已计入当前 15/16 个字段完整逻辑实体，正式数据仍等待灵宝必填 `Place.strategicRole` 完成。
+- “燕军向潼关方向推进”逻辑路线已获人工批准：历史材料只支持“洛阳—陕郡—潼关”的宏观节点顺序，因此明确排除灵宝；以三个已批准但保持 `DISPUTED` 的现代代表点分成“洛阳→陕州”“陕州→潼关”两个两点直连 RouteSegment，均为 `side=YAN`、`actionType=ADVANCE`、`appearAtEventId=event-02-yan-westward`、`INFERENCE / LOW`。不增加中间顶点，不调用或跟随现代道路/路由，不主张唐代道路、行军轨迹、城市/关城中心、渡口、攻关位置、里程或速度。RoutePlan、两个 RouteSegment、三条 Claim 和处理边界均由 `banq` 于 2026-07-31 批准；正式数据继续等待灵宝必填 `Place.strategicRole` 完成。
+- “唐军出关行动”逻辑路线已获人工批准：历史材料只支持唐军从潼关出关并在灵宝西原方向交战，因此只生成“潼关→灵宝”一个两点直连 RouteSegment；陕州、洛阳只是意图方向，未证明战败前实际到达，溃败撤退也明确排除。该路线使用两个已批准但保持 `DISPUTED` 的现代代表点，字段为 `side=TANG`、`actionType=ADVANCE`、`appearAtEventId=event-03-decision-to-advance`、`INFERENCE / LOW`。不增加中间顶点，不调用或跟随现代道路/路由，不主张唐代关城、战场、道路、部署、行军轨迹、撤退线、里程或速度。RoutePlan、RouteSegment 和两条 Claim 均由 `banq` 于 2026-07-31 批准；正式数据仍因灵宝必填 `Place.strategicRole` 待审核而不变。
+- 当前 `mvp-v1.json` 是缩小版正式数据；技术空数据形态仅由合成测试夹具继续覆盖。
 - 不得把工作标签、猜测坐标、示例页码、未经说明的精确日期或项目推断转换成正式历史数据。
 
 ## 6. 下一步边界
 
 1. `MVP-02` 已完成、审阅、提交并推送，不再保留待提交事项。
-2. `MVP-03` 继续等待人工批准的资料、坐标/几何依据和许可证，不得录入或猜测正式历史内容。
+2. `MVP-03` 缩小版内容与工程门禁已完成，用户已确认提交并推送。
 3. 下一工程任务为 `MVP-04`，仅开发 MapLibre 地图容器、底图配置和本地降级方案。
-4. `MVP-05` 仍必须等待通过校验的正式或审核中数据。
+4. `MVP-05` 使用的内容必须继续通过当前正式数据校验，不得从范围外候选绕过人工审核。

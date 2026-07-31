@@ -1,8 +1,8 @@
 // @vitest-environment node
 
-import { readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join, resolve } from 'node:path'
+import { join } from 'node:path'
 import { spawnSync } from 'node:child_process'
 import { mkdtempSync } from 'node:fs'
 
@@ -215,13 +215,15 @@ describe('MVP 数据完整性', () => {
     })
   })
 
-  it('接受保持内容门禁的正式技术空数据集', () => {
-    const input: unknown = JSON.parse(
-      readFileSync(
-        resolve(process.cwd(), 'public/data/anshi/mvp-v1.json'),
-        'utf8',
-      ),
-    )
+  it('接受引用集合完全为空的技术数据集', () => {
+    const input = createValidDataset()
+    input.topic.defaultEventId = null
+    input.places.features = []
+    input.geography.features = []
+    input.routeSegments.features = []
+    input.events = []
+    input.sources = []
+    input.citations = []
     const contractResult = validateMvpDataset(input)
 
     expect(contractResult.ok).toBe(true)

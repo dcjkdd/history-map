@@ -1,0 +1,233 @@
+{
+  "schemaVersion": 1,
+  "id": "lingbao-chousangyuan-crs-technical-review-2026-07-31",
+  "status": "APPROVED",
+  "certainty": "DISPUTED",
+  "reviewer": "banq",
+  "reviewDate": "2026-07-31",
+  "purpose": "仅核验现代“稠桑原”居民点坐标候选的技术参考系；不核验唐代灵宝西原、756 年战场中心、区域边界或路线。",
+  "reportEvidence": {
+    "sourceId": "SRC-SPATIAL-03",
+    "pdfSha256": "17a8686f127887f180943f004c6db251161ca8585183a1fd7811a7660de7f582",
+    "coordinateReferenceSystemDeclaration": null,
+    "points": [
+      {
+        "id": "pozhai-village",
+        "name": "坡寨村",
+        "rawCoordinate": [
+          110.891736,
+          34.61947
+        ],
+        "reportLocation": "PDF 第 30 页 / 印刷第 25 页，表 2.6-1",
+        "imageryAssessment": "原值和转换值都接近坡寨村聚落，单独看这一点不能区分两种假设。",
+        "hypothesisResult": "AMBIGUOUS",
+        "gcj02ToWgs84Coordinate": [
+          110.886323,
+          34.6208289
+        ],
+        "hypothesisSeparationMeters": 517.9,
+        "conversionRoundTripErrorMeters": 0
+      },
+      {
+        "id": "pozhai-houchengzi-group",
+        "name": "坡寨村后城子组",
+        "rawCoordinate": [
+          110.888657,
+          34.62094
+        ],
+        "reportLocation": "PDF 第 30 页 / 印刷第 25 页，表 2.6-1",
+        "imageryAssessment": "原值落在坡寨村北部聚落，GCJ-02 转换值落在其西侧农田，支持原值直接叠加。",
+        "hypothesisResult": "SUPPORTS_RAW",
+        "gcj02ToWgs84Coordinate": [
+          110.8832441,
+          34.6222955
+        ],
+        "hypothesisSeparationMeters": 517.7,
+        "conversionRoundTripErrorMeters": 0
+      },
+      {
+        "id": "yuanmenshang",
+        "name": "原门上",
+        "rawCoordinate": [
+          110.883443,
+          34.618408
+        ],
+        "reportLocation": "PDF 第 30 页 / 印刷第 25 页，表 2.6-1",
+        "imageryAssessment": "原值落在聚落西缘，GCJ-02 转换值落在更西侧农田，支持原值直接叠加。",
+        "hypothesisResult": "SUPPORTS_RAW",
+        "gcj02ToWgs84Coordinate": [
+          110.8780298,
+          34.6197613
+        ],
+        "hypothesisSeparationMeters": 517.7,
+        "conversionRoundTripErrorMeters": 0
+      },
+      {
+        "id": "chousangyuan",
+        "name": "稠桑原",
+        "rawCoordinate": [
+          110.872607,
+          34.615468
+        ],
+        "reportLocation": "PDF 第 30 页 / 印刷第 25 页，表 2.6-1",
+        "imageryAssessment": "原值落在西部聚落东缘，GCJ-02 转换值落在该聚落以西的台地/农田，支持原值直接叠加。",
+        "hypothesisResult": "SUPPORTS_RAW",
+        "gcj02ToWgs84Coordinate": [
+          110.8671893,
+          34.6168116
+        ],
+        "hypothesisSeparationMeters": 517.8,
+        "conversionRoundTripErrorMeters": 0
+      },
+      {
+        "id": "leijiagou-village",
+        "name": "雷家沟村",
+        "rawCoordinate": [
+          110.876791,
+          34.613537
+        ],
+        "reportLocation": "PDF 第 30 页 / 印刷第 25 页，表 2.6-1",
+        "imageryAssessment": "原值和转换值附近都可见小型聚落，缺少独立同名标签，单独看这一点不能区分两种假设。",
+        "hypothesisResult": "AMBIGUOUS",
+        "gcj02ToWgs84Coordinate": [
+          110.8713759,
+          34.6148874
+        ],
+        "hypothesisSeparationMeters": 517.8,
+        "conversionRoundTripErrorMeters": 0
+      }
+    ],
+    "siteAnchors": [
+      {
+        "id": "site-southwest-corner",
+        "name": "厂区西南角",
+        "rawCoordinate": [
+          110.893599,
+          34.618411
+        ],
+        "reportLocation": "PDF 第 101 页 / 印刷第 96 页注释",
+        "gcj02ToWgs84Coordinate": [
+          110.8881858,
+          34.619772
+        ],
+        "hypothesisSeparationMeters": 518,
+        "conversionRoundTripErrorMeters": 0
+      },
+      {
+        "id": "site-monitoring-point",
+        "name": "项目厂区监测点",
+        "rawCoordinate": [
+          110.894194,
+          34.618871
+        ],
+        "reportLocation": "PDF 第 124 页 / 印刷第 119 页，表 4.2-4",
+        "gcj02ToWgs84Coordinate": [
+          110.8887806,
+          34.6202319
+        ],
+        "hypothesisSeparationMeters": 518,
+        "conversionRoundTripErrorMeters": 0
+      },
+      {
+        "id": "site-risk-table-point",
+        "name": "建设项目地理坐标",
+        "rawCoordinate": [
+          110.894122,
+          34.618886
+        ],
+        "reportLocation": "PDF 第 253 页 / 印刷第 248 页，表 5.2-51",
+        "gcj02ToWgs84Coordinate": [
+          110.8887086,
+          34.6202469
+        ],
+        "hypothesisSeparationMeters": 518,
+        "conversionRoundTripErrorMeters": 0
+      }
+    ],
+    "statedSiteContext": "报告称项目西侧 123 米为坡寨村、南侧为灵宝市生活垃圾填埋场，北侧及东侧为乡道和荒地。"
+  },
+  "testedHypotheses": [
+    {
+      "id": "RAW_AS_CRS84",
+      "description": "不移动报告数值，直接作为与 WGS84 / CGCS2000 兼容的经纬度叠加到 EPSG:4326 影像。"
+    },
+    {
+      "id": "GCJ02_TO_CRS84",
+      "description": "把报告数值视为 GCJ-02，再用标准迭代反算为 WGS84 后叠加。",
+      "conversion": "标准 GCJ-02 偏移公式；12 次反向迭代。这里只用于假设检验，不修改来源数据。",
+      "separationMeters": {
+        "minimum": 517.7,
+        "maximum": 518,
+        "mean": 517.9
+      }
+    }
+  ],
+  "independentImageryCrossCheck": {
+    "sourceId": "SRC-SPATIAL-07",
+    "provider": "Esri World Imagery",
+    "serviceItemId": "10df2279f9684e4a9f6a7f08febac2a9",
+    "serviceCurrentVersion": 11.3,
+    "serviceItemModified": "2026-07-01T02:13:31.000Z",
+    "accessDate": "2026-07-31",
+    "export": {
+      "boundingBox": [
+        110.855,
+        34.6,
+        110.925,
+        34.642
+      ],
+      "bboxSpatialReference": 4326,
+      "imageSpatialReference": 4326,
+      "pixelSize": [
+        1800,
+        1080
+      ],
+      "sha256": "c710bc4c093c555994ca5d36773a81f318e8e754855f59a5303ceecf97589020",
+      "retainedInRepository": false
+    },
+    "locationCitation": {
+      "provider": "Vantor",
+      "product": "Vivid",
+      "sourceDescription": "LG02",
+      "captureDate": "2025-08-19",
+      "resolutionMeters": 0.34,
+      "accuracyMeters": 5,
+      "blockName": "Vivid_Standard_30_CN20_25Q3",
+      "releaseName": "Raster Basemaps 2026.R05",
+      "coverageQuerySha256": "ff247db44e1b5467573f789465a7e0c736ceeedd81e1c218c2ad8c4471d0f2e6"
+    },
+    "manualAssessment": {
+      "namedPointResults": {
+        "supportsRaw": 3,
+        "supportsGcj02Conversion": 0,
+        "ambiguous": 2
+      },
+      "siteAnchorResult": "三个相互接近的厂址坐标在原值叠加时位于坡寨村东侧、可见填埋设施北侧，符合报告文字；按 GCJ-02 转换后整体西南移约 518 米并落入坡寨村聚落，和报告现场关系冲突。",
+      "overall": "三个可区分的村庄样本和厂址锚点一致支持原值直接叠加；两个村庄样本因两种位置附近均有聚落而记为歧义，没有样本支持 GCJ-02 转换。"
+    }
+  },
+  "osmCrossCheck": {
+    "accessDate": "2026-07-31",
+    "exactNameMatchesForFiveSamples": 0,
+    "nearbyReference": "仅找到 OpenStreetMap node/3157352047 v4“函谷关镇”，未把镇级点当作村庄或稠桑原匹配依据。",
+    "roleInDecision": "OSM 结果只用于说明缺少同名开放点；不参与选择原值或 GCJ-02 转换值。"
+  },
+  "technicalDecision": {
+    "preferredHypothesis": "RAW_AS_CRS84",
+    "rejectedHypothesis": "GCJ02_TO_CRS84",
+    "candidateCoordinate": [
+      110.872607,
+      34.615468
+    ],
+    "coordinateTreatment": "原数值作为 OGC:CRS84 候选使用，不执行 GCJ-02 转换。",
+    "residualUncertainty": "技术核验不能区分 WGS84 与 CGCS2000；两者在本项目地图尺度上的差异远小于来源与影像可验证精度。报告的小数位只表示抄录精度，不表示已证明亚米级定位准确度。",
+    "contentBoundary": "该点仍只代表现代同名居民点，并保持 DISPUTED / PENDING_REVIEW；不证明唐代灵宝西原、秦函谷关旧址或 756 年战场中心，不生成边界、缓冲区或路线。",
+    "approvalRecord": "`banq` 于 2026-07-31 批准该技术处理和候选使用边界；必须继续保持 DISPUTED，不得扩展为历史战场点、范围或路线。"
+  },
+  "methodLimits": [
+    "报告编制方未声明源 CRS，本结论是多点与独立影像的技术交叉核验，不是编制方书面确认。",
+    "影像目视核验只比较聚落和填埋设施的空间关系，不描绘或复用影像中的建筑、道路、村界或设施边界。",
+    "World Imagery 是可更新服务；本记录用访问日期、服务版本、影像块元数据、导出范围和 SHA-256 固定本次核验条件，影像文件不进入仓库。",
+    "未找到五个样本的同名 OSM 固定点，因此没有把单一镇级标签或搜索结果当作独立坐标真值。"
+  ]
+}

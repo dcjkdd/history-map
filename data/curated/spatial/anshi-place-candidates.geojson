@@ -1,0 +1,357 @@
+{
+  "type": "FeatureCollection",
+  "name": "anshi-mvp-place-candidates",
+  "candidateStatus": "APPROVED",
+  "accessDate": "2026-07-31",
+  "coordinateReferenceSystem": "OGC:CRS84 (WGS84 longitude, latitude); no reprojection performed",
+  "usageBoundary": "Curated review evidence. An approved point may enter release data only after the full Place and all other dependencies pass their own gates. It represents a documented modern mapping feature or a reproducible representative point, not a confirmed Tang-period city center.",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "candidate-place-tongguan-osm-way-1195138308-v3-centroid",
+      "bbox": [
+        110.2821341,
+        34.6004421,
+        110.3007847,
+        34.6068735
+      ],
+      "properties": {
+        "candidateFor": "place-tongguan",
+        "name": "潼关古城（现代遗址范围代表点候选）",
+        "candidateStatus": "APPROVED",
+        "certainty": "DISPUTED",
+        "reviewer": "banq",
+        "reviewDate": "2026-07-31",
+        "sourceIds": [
+          "SRC-LOCALHIST-01",
+          "SRC-HISTGEO-01",
+          "SRC-SPATIAL-02"
+        ],
+        "citationCandidateIds": [
+          "CIT-TGXZ1992-P632-P633",
+          "CIT-XINHUA-TONGGUAN-SITES",
+          "CIT-OSM-W1195138308-V3"
+        ],
+        "sourceFeature": {
+          "provider": "OpenStreetMap",
+          "wayId": 1195138308,
+          "wayVersion": 3,
+          "changeset": 139538932,
+          "timestamp": "2023-08-07T01:23:01Z",
+          "tags": {
+            "historic": "ruins",
+            "name": "潼关古城"
+          },
+          "nodeReferenceCount": 67,
+          "uniqueNodeCount": 66,
+          "nodeVersionsAtAccess": "All 66 referenced nodes were version 1",
+          "fixedWayUrl": "https://api.openstreetmap.org/api/0.6/way/1195138308/3",
+          "fullGeometryUrl": "https://api.openstreetmap.org/api/0.6/way/1195138308/full",
+          "fixedWayXmlSha256": "b88a731db27c488a3a94a9bfaa89ee9ca6fa8f5d9f877ebe74ad476ce4787a2e",
+          "fullXmlSha256AtAccess": "2ad64aab0d590de91b2ffa1dba167740ba61aa2cb9bccd2b2484116f19babb35"
+        },
+        "license": {
+          "name": "Open Database License 1.0",
+          "url": "https://opendatacommons.org/licenses/odbl/1-0/",
+          "attribution": "© OpenStreetMap contributors"
+        },
+        "processing": [
+          "Read the closed coordinate ring referenced by OpenStreetMap way 1195138308 version 3.",
+          "Preserve all 67 node references (66 unique nodes); do not clip, simplify, visually trace, or reproject.",
+          "Calculate the planar polygon centroid directly in longitude/latitude with the shoelace centroid formula.",
+          "Round longitude and latitude to 7 decimal places and verify that the resulting point is inside the source ring."
+        ],
+        "coordinateNote": "The point is the reproducible centroid of a modern OpenStreetMap ruins polygon. The 1992 Tongguan County Gazetteer associates an old-city site on the south bank at the Yellow/Wei confluence with the 691 pass, while a Xinhua report places the Tang city on the Linzhi Plateau. The point therefore does not establish the location of the 755-756 Tang pass.",
+        "reviewDecision": "Accepted as a visibly disputed modern old-city representative point. It must not be described as the confirmed center of the 755-756 Tang pass."
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.2909781,
+          34.6035548
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "candidate-place-shanzhou-osm-node-12768197183-v1",
+      "properties": {
+        "candidateFor": "place-shanzhou",
+        "name": "宝轮寺塔（现代陕州故城内部地标代表点候选）",
+        "candidateStatus": "APPROVED",
+        "certainty": "DISPUTED",
+        "reviewer": "banq",
+        "reviewDate": "2026-07-31",
+        "sourceIds": [
+          "SRC-HERITAGE-03",
+          "SRC-HERITAGE-04",
+          "SRC-SPATIAL-04"
+        ],
+        "citationCandidateIds": [
+          "CIT-HADA-BAOLUN-20210824",
+          "CIT-SMXRB-SHANZHOU-20260114",
+          "CIT-OSM-N12768197183-V1"
+        ],
+        "sourceFeature": {
+          "provider": "OpenStreetMap",
+          "nodeId": 12768197183,
+          "nodeVersion": 1,
+          "changeset": 165144967,
+          "timestamp": "2025-04-19T09:34:39Z",
+          "tags": {
+            "name": "宝轮寺塔",
+            "official_name": "宝轮寺三圣舍利宝塔",
+            "tower:type": "pagoda"
+          },
+          "fixedNodeUrl": "https://api.openstreetmap.org/api/0.6/node/12768197183/1",
+          "fixedNodeXmlSha256": "aeab32fa9a89440ccec25386e2908d10b386e49ff2ce1be9f8d7862b5c620514"
+        },
+        "license": {
+          "name": "Open Database License 1.0",
+          "url": "https://opendatacommons.org/licenses/odbl/1-0/",
+          "attribution": "© OpenStreetMap contributors"
+        },
+        "processing": [
+          "Read longitude and latitude directly from OpenStreetMap node 12768197183 version 1.",
+          "Preserve the source WGS84 / OGC:CRS84 longitude-latitude order.",
+          "Do not clip, simplify, reproject, calculate a centroid, create a buffer, or derive a city boundary."
+        ],
+        "coordinateNote": "The point is the fixed OpenStreetMap location of the modern Baolun Temple Pagoda. Henan Archives locates the pagoda in the southeast part of the Shanzhou old city. It is only a modern landmark representative point inside the old-city area, not the confirmed center or boundary of the 755-756 Shanzhou/Shanjun seat.",
+        "reviewDecision": "Accepted as a visibly disputed modern landmark representative point inside the Shanzhou old-city area. It must not be described as the confirmed center or boundary of the 755-756 Shanzhou/Shanjun seat.",
+        "excludedAlternatives": [
+          "Do not use the modern Shanzhou District government location.",
+          "Do not package the CC BY-NC CHGIS coordinate in public GeoJSON.",
+          "Do not use the CHGIS prefecture-level hvd_115770 point as a seat coordinate."
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          111.1488645,
+          34.791594
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "candidate-place-luoyang-osm-way-865951589-v4-centroid",
+      "bbox": [
+        112.4536587,
+        34.6765044,
+        112.4555557,
+        34.6774965
+      ],
+      "properties": {
+        "candidateFor": "place-luoyang",
+        "name": "应天门（现代遗址展示建筑代表点候选）",
+        "candidateStatus": "APPROVED",
+        "certainty": "DISPUTED",
+        "reviewer": "banq",
+        "reviewDate": "2026-07-31",
+        "sourceIds": [
+          "SRC-HERITAGE-05",
+          "SRC-SPATIAL-05"
+        ],
+        "citationCandidateIds": [
+          "CIT-NDRC-SUITANG-LUOYANG-20201021",
+          "CIT-OSM-W865951589-V4"
+        ],
+        "sourceFeature": {
+          "provider": "OpenStreetMap",
+          "wayId": 865951589,
+          "wayVersion": 4,
+          "changeset": 178096116,
+          "timestamp": "2026-02-04T13:55:22Z",
+          "tags": {
+            "building": "yes",
+            "historic": "city_gate",
+            "name": "应天门",
+            "name:en": "Yingtian Gate"
+          },
+          "nodeReferenceCount": 22,
+          "uniqueNodeCount": 21,
+          "nodeVersionsAtAccess": {
+            "1": 1,
+            "2": 20
+          },
+          "fixedWayUrl": "https://api.openstreetmap.org/api/0.6/way/865951589/4",
+          "fullGeometryUrl": "https://api.openstreetmap.org/api/0.6/way/865951589/full",
+          "fixedWayXmlSha256": "bad02c638aab184fdfb0847fa58ce2ba63f798b011e24b08ec51d81e0b3ab4ee",
+          "fullXmlSha256AtAccess": "698a1cee5f886d843b9c1e3c3459ddbd4dac1c4f150733ee2a544ee555dac8f8"
+        },
+        "license": {
+          "name": "Open Database License 1.0",
+          "url": "https://opendatacommons.org/licenses/odbl/1-0/",
+          "attribution": "© OpenStreetMap contributors"
+        },
+        "processing": [
+          "Read the closed coordinate ring referenced by OpenStreetMap way 865951589 version 4.",
+          "Preserve all 22 node references (21 unique nodes); do not clip, simplify, visually trace, or reproject.",
+          "Calculate the planar polygon centroid directly in longitude/latitude with the shoelace centroid formula.",
+          "Round longitude and latitude to 7 decimal places and verify that the resulting point is inside the source ring."
+        ],
+        "coordinateNote": "The point is the reproducible centroid of a modern OpenStreetMap building polygon tagged as Yingtian Gate. A National Development and Reform Commission page identifies Yingtian Gate as the south gate of the Sui-Tang Luoyang palace city and describes the modern site presentation project. The point is only a modern heritage-display landmark representative point, not the confirmed center or boundary of Luoyang in 755-756.",
+        "reviewDecision": "Accepted as a visibly disputed modern Yingtian Gate heritage-display landmark representative point. It must not be described as the center of the 755-756 city, a complete historical boundary, the exact historical gate footprint, or an event location.",
+        "excludedAlternatives": [
+          "Do not use the modern Luoyang city-center point as a substitute for the historical city.",
+          "Do not derive a 47-square-kilometer polygon from the official narrative description.",
+          "Do not use the modern display-building polygon as the historical gate footprint."
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          112.4545867,
+          34.6769987
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "candidate-place-changan-osm-way-280412702-v4-centroid",
+      "bbox": [
+        108.9583422,
+        34.2826377,
+        108.9606638,
+        34.2830177
+      ],
+      "properties": {
+        "candidateFor": "place-changan",
+        "name": "丹凤门（现代大明宫遗址展示地标代表点候选）",
+        "candidateStatus": "APPROVED",
+        "certainty": "DISPUTED",
+        "reviewer": "banq",
+        "reviewDate": "2026-07-31",
+        "sourceIds": [
+          "SRC-HERITAGE-06",
+          "SRC-HERITAGE-07",
+          "SRC-SPATIAL-06"
+        ],
+        "citationCandidateIds": [
+          "CIT-XADFZ-TANG-CHANGAN-20250827",
+          "CIT-SXWWJ-DAMING-PALACE-20121130",
+          "CIT-OSM-W280412702-V4"
+        ],
+        "sourceFeature": {
+          "provider": "OpenStreetMap",
+          "wayId": 280412702,
+          "wayVersion": 4,
+          "changeset": 98009320,
+          "timestamp": "2021-01-23T08:13:44Z",
+          "tags": {
+            "addr:city": "Xian",
+            "building": "yes",
+            "name": "丹凤门",
+            "name:en": "Danfeng Gate"
+          },
+          "nodeReferenceCount": 21,
+          "uniqueNodeCount": 20,
+          "nodeVersionsAtAccess": {
+            "2": 19,
+            "3": 1
+          },
+          "fixedWayUrl": "https://api.openstreetmap.org/api/0.6/way/280412702/4",
+          "fullGeometryUrl": "https://api.openstreetmap.org/api/0.6/way/280412702/full",
+          "fixedWayXmlSha256": "0aa8ff3aa4a7a6295587da4c439f4e816d2f5246a2e6f9aeaa9eb4ecfae6c01e",
+          "fullXmlSha256AtAccess": "29837c6e60ce1eadc0a088942fd43888048557922dc3f674911588c4d600f2d7"
+        },
+        "license": {
+          "name": "Open Database License 1.0",
+          "url": "https://opendatacommons.org/licenses/odbl/1-0/",
+          "attribution": "© OpenStreetMap contributors"
+        },
+        "processing": [
+          "Read the closed coordinate ring referenced by OpenStreetMap way 280412702 version 4.",
+          "Preserve all 21 node references (20 unique nodes); do not clip, simplify, visually trace, or reproject.",
+          "Calculate the planar polygon centroid directly in longitude/latitude with the shoelace centroid formula.",
+          "Round longitude and latitude to 7 decimal places and verify that the resulting point is inside the source ring."
+        ],
+        "coordinateNote": "The point is the reproducible centroid of a modern OpenStreetMap building polygon named Danfeng Gate. Official Xi'an local-history and Shaanxi cultural-heritage pages identify Danfeng Gate as part of the Tang Chang'an Daming Palace site and distinguish the heritage-display facility from the ruins. The point is only a modern Daming Palace heritage-display landmark representative point in the northern part of Tang Chang'an, not the confirmed center or boundary of the 755-756 city.",
+        "reviewDecision": "Approved by banq on 2026-07-31 only as a visibly disputed modern Daming Palace Danfeng Gate heritage-display landmark representative point. It must not be described as the center of the 755-756 city, a complete historical boundary, the exact Tang-period gate footprint, the location where the emperor left the city, or the location where Yan forces entered.",
+        "excludedAlternatives": [
+          "Do not use the modern Xi'an city-center point as a substitute for Tang Chang'an.",
+          "Do not use the extant Ming city-wall boundary as the Tang city boundary.",
+          "Do not derive a city polygon from the official narrative range description.",
+          "Do not use the modern display-building polygon as the Tang-period Danfeng Gate footprint."
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          108.9594728,
+          34.2828248
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "candidate-place-lingbao-eia-chousangyuan-technical-crs-review",
+      "properties": {
+        "candidateFor": "place-lingbao",
+        "name": "稠桑原（现代同名居民点代表点候选）",
+        "candidateStatus": "APPROVED",
+        "certainty": "DISPUTED",
+        "reviewer": "banq",
+        "reviewDate": "2026-07-31",
+        "sourceIds": [
+          "SRC-SPATIAL-03",
+          "SRC-SPATIAL-07"
+        ],
+        "citationCandidateIds": [
+          "CIT-LB-EIA-P25-CHOUSANGYUAN",
+          "CIT-ESRI-WORLD-IMAGERY-LINGBAO-20260731"
+        ],
+        "sourceFeature": {
+          "provider": "灵宝市城市管理局公示；名辰环境工程有限公司编制",
+          "reportTitle": "灵宝市城乡餐厨垃圾收运转及综合处理项目环境影响报告书（征求意见稿）",
+          "pdfSha256": "17a8686f127887f180943f004c6db251161ca8585183a1fd7811a7660de7f582",
+          "reportLocation": "PDF 第 30 页 / 印刷第 25 页，表 2.6-1“稠桑原”行",
+          "declaredCoordinateReferenceSystem": null,
+          "rawCoordinate": [
+            110.872607,
+            34.615468
+          ]
+        },
+        "license": {
+          "reportCoordinate": "不适用：只引用单项事实数据并保留报告、页码和表号，不复制原表、附图或编排。",
+          "imagery": "Esri Master License Agreement；只作一次性内部技术核验，影像文件、描绘几何和派生图层均不进入仓库。",
+          "imageryTermsUrl": "https://goto.arcgis.com/termsofuse/viewtermsofuse",
+          "imageryAttribution": "Source: Esri, Vantor, Earthstar Geographics, and the GIS User Community"
+        },
+        "processing": [
+          "从同一报告选取坡寨村、坡寨村后城子组、原门上、稠桑原、雷家沟村五个现代居民点，以及三个相互接近的厂址坐标作为成组样本。",
+          "分别测试原值直接按 EPSG:4326 叠加，以及把原值视为 GCJ-02 后用标准公式迭代转换为 WGS84 的两种假设。",
+          "GCJ-02 转换会使八个样本整体西南移约 517.7—518.0 米。",
+          "把两组结果叠加到访问日为 2026-07-31 的 Esri World Imagery EPSG:4326 导出影像；三个可区分的村庄样本和厂址现场关系支持原值，两个村庄样本记为歧义，没有样本支持 GCJ-02 转换。",
+          "不从影像描绘建筑、道路、村界、填埋场边界、战场区域、缓冲区或路线；影像文件不进入仓库。",
+          "将报告原数值登记为 OGC:CRS84 候选，不执行 GCJ-02 转换；保留 WGS84 与 CGCS2000 无法通过本次方法区分的残余不确定性。"
+        ],
+        "technicalReview": {
+          "record": "data/curated/spatial/lingbao-crs-technical-review.json",
+          "generator": "scripts/verify-lingbao-crs-candidate.mjs",
+          "imageryProvider": "Vantor Vivid",
+          "imageryCaptureDate": "2025-08-19",
+          "imageryResolutionMeters": 0.34,
+          "imageryAccuracyMeters": 5,
+          "imageryRelease": "Raster Basemaps 2026.R05",
+          "imageryExportSha256": "c710bc4c093c555994ca5d36773a81f318e8e754855f59a5303ceecf97589020"
+        },
+        "coordinateNote": "报告原值在多点技术交叉核验中与 EPSG:4326 影像关系一致，GCJ-02 转换假设被排除；但报告没有书面声明 WGS84 或 CGCS2000。本点因此只作为现代同名居民点的 DISPUTED / PENDING_REVIEW 代表点，不是已确认的唐代灵宝西原、秦函谷关旧址或 756 年战场中心。",
+        "reviewDecision": "`banq` 于 2026-07-31 批准原值 [110.872607, 34.615468] 作为 OGC:CRS84 候选及其技术核验边界；必须保持 DISPUTED，不得描述为唐代灵宝西原、秦函谷关旧址或 756 年战场中心。",
+        "excludedAlternatives": [
+          "不采用 GCJ-02 转换值 [110.8671893, 34.6168116]。",
+          "不使用现代灵宝市中心、秦函谷关景区或任一无直接来源的网络 POI 代替该候选。",
+          "不从单点生成历史战场范围、精确边界、缓冲区或路线。",
+          "不把来源坐标的六位小数解释为已证明的亚米级定位准确度。"
+        ]
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.872607,
+          34.615468
+        ]
+      }
+    }
+  ]
+}

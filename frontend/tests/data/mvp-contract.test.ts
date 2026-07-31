@@ -1,6 +1,3 @@
-import { readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
-
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { loadMvpDataset } from '../../src/data/mvpRepository'
@@ -210,13 +207,15 @@ describe('MVP 数据合同', () => {
     }
   })
 
-  it('接受不包含历史内容的正式技术空数据集', () => {
-    const raw: unknown = JSON.parse(
-      readFileSync(
-        resolve(process.cwd(), 'public/data/anshi/mvp-v1.json'),
-        'utf8',
-      ),
-    )
+  it('接受不包含历史内容的完全空技术数据集', () => {
+    const raw = createValidDataset()
+    raw.topic.defaultEventId = null
+    raw.places.features = []
+    raw.geography.features = []
+    raw.routeSegments.features = []
+    raw.events = []
+    raw.sources = []
+    raw.citations = []
 
     const result = validateMvpDataset(raw)
 

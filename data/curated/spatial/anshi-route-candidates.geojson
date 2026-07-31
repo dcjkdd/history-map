@@ -1,0 +1,233 @@
+{
+  "type": "FeatureCollection",
+  "name": "anshi-mvp-route-candidates",
+  "candidateStatus": "APPROVED",
+  "approvedRoutePlanIds": [
+    "route-yan-westward",
+    "route-tang-advance"
+  ],
+  "pendingRoutePlanIds": [],
+  "reviewer": "banq",
+  "reviewDate": "2026-07-31",
+  "reviewDecision": "Both illustrative RoutePlans and all three RouteSegments are approved within the stated low-certainty usage boundary.",
+  "coordinateReferenceSystem": "OGC:CRS84 (WGS84 longitude, latitude); no reprojection performed",
+  "routePlans": [
+    {
+      "routeId": "route-yan-westward",
+      "routeName": "燕军向潼关方向推进（示意）",
+      "side": "YAN",
+      "actionType": "ADVANCE",
+      "appearAtEventId": "event-02-yan-westward",
+      "nodeOrder": [
+        "place-luoyang",
+        "place-shanzhou",
+        "place-tongguan"
+      ],
+      "certainty": "LOW",
+      "candidateStatus": "APPROVED",
+      "reviewer": "banq",
+      "reviewDate": "2026-07-31",
+      "excludedNodes": [
+        {
+          "placeId": "place-lingbao",
+          "reason": "The reviewed evidence supports Luoyang, Shanzhou and Tongguan as the macro sequence for this route, but does not establish Lingbao as a Yan westward route node before Tongguan."
+        }
+      ]
+    },
+    {
+      "routeId": "route-tang-advance",
+      "routeName": "唐军出关行动（示意）",
+      "side": "TANG",
+      "actionType": "ADVANCE",
+      "appearAtEventId": "event-03-decision-to-advance",
+      "nodeOrder": [
+        "place-tongguan",
+        "place-lingbao"
+      ],
+      "certainty": "LOW",
+      "candidateStatus": "APPROVED",
+      "reviewer": "banq",
+      "reviewDate": "2026-07-31",
+      "excludedNodes": [
+        {
+          "placeId": "place-shanzhou",
+          "reason": "The reviewed evidence records an intended eastward advance but does not establish that the Tang force reached Shanzhou before the Lingbao defeat."
+        },
+        {
+          "placeId": "place-luoyang",
+          "reason": "The reviewed evidence records an intended eastward advance but does not establish that the Tang force reached Luoyang before the Lingbao defeat."
+        }
+      ],
+      "excludedMovement": "The post-battle retreat or rout is not part of this ADVANCE RoutePlan."
+    }
+  ],
+  "processing": [
+    "Use only already approved modern representative point coordinates for the reviewed macro nodes of each RoutePlan.",
+    "Create one two-position LineString for each adjacent reviewed node pair; do not add intermediate vertices.",
+    "Do not query or follow modern roads, railways, river crossings, mountain passes, shortest paths or routing services.",
+    "Treat each line as a LOW-certainty explanatory connector between modern narrative anchors, not as a historical route reconstruction."
+  ],
+  "usageBoundary": "Curated review evidence. Both RoutePlans and all three RouteSegments are approved. Every straight connector must be visibly labelled as illustrative. The lines do not establish Tang-period roads, exact city, pass or battlefield positions, marching tracks, crossings, retreat routes, distances, speeds, widths or occupied areas. No route feature may enter release data until all remaining MVP-03 field-level dependencies receive human approval.",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "route-yan-westward-01",
+        "routeId": "route-yan-westward",
+        "routeName": "燕军向潼关方向推进（示意）",
+        "segmentNo": 1,
+        "side": "YAN",
+        "actionType": "ADVANCE",
+        "appearAtEventId": "event-02-yan-westward",
+        "fromPlaceId": "place-luoyang",
+        "toPlaceId": "place-shanzhou",
+        "certainty": "LOW",
+        "candidateStatus": "APPROVED",
+        "reviewer": "banq",
+        "reviewDate": "2026-07-31",
+        "summary": {
+          "claimId": "claim-route-yan-westward-segment-01-inference-01",
+          "text": "本段以已批准的洛阳与陕州现代代表点直接连线，只表达燕军由洛阳向陕郡方向西进的宏观节点关系，不代表历史道路或行军轨迹。",
+          "viewpointType": "INFERENCE",
+          "certainty": "LOW",
+          "citationIds": [
+            "CIT-ANSHI25-CH04-P018",
+            "CIT-ZZTJ217-R783496-P01",
+            "CIT-ZZTJ217-R783496-P02",
+            "CIT-OSM-W865951589-V4",
+            "CIT-OSM-N12768197183-V1"
+          ]
+        },
+        "citationIds": [
+          "CIT-ANSHI25-CH04-P018",
+          "CIT-ZZTJ217-R783496-P01",
+          "CIT-ZZTJ217-R783496-P02",
+          "CIT-OSM-W865951589-V4",
+          "CIT-OSM-N12768197183-V1"
+        ],
+        "geometryMethod": "Straight two-position connector from the approved modern Yingtianmen display-landmark representative point to the approved modern Baolun Temple Pagoda old-city landmark representative point; no interpolation or routing."
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            112.4545867,
+            34.6769987
+          ],
+          [
+            111.1488645,
+            34.791594
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "route-yan-westward-02",
+        "routeId": "route-yan-westward",
+        "routeName": "燕军向潼关方向推进（示意）",
+        "segmentNo": 2,
+        "side": "YAN",
+        "actionType": "ADVANCE",
+        "appearAtEventId": "event-02-yan-westward",
+        "fromPlaceId": "place-shanzhou",
+        "toPlaceId": "place-tongguan",
+        "certainty": "LOW",
+        "candidateStatus": "APPROVED",
+        "reviewer": "banq",
+        "reviewDate": "2026-07-31",
+        "summary": {
+          "claimId": "claim-route-yan-westward-segment-02-inference-01",
+          "text": "本段以已批准的陕州与潼关现代代表点直接连线，只表达燕军由陕郡向潼关方向继续推进的宏观节点关系，不代表历史道路、攻关位置或行军轨迹。",
+          "viewpointType": "INFERENCE",
+          "certainty": "LOW",
+          "citationIds": [
+            "CIT-ANSHI25-CH05-P018-P023",
+            "CIT-ZZTJ217-R783496-P02",
+            "CIT-OSM-N12768197183-V1",
+            "CIT-OSM-W1195138308-V3"
+          ]
+        },
+        "citationIds": [
+          "CIT-ANSHI25-CH05-P018-P023",
+          "CIT-ZZTJ217-R783496-P02",
+          "CIT-OSM-N12768197183-V1",
+          "CIT-OSM-W1195138308-V3"
+        ],
+        "geometryMethod": "Straight two-position connector from the approved modern Baolun Temple Pagoda old-city landmark representative point to the approved disputed modern Tongguan old-city representative point; no interpolation or routing."
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            111.1488645,
+            34.791594
+          ],
+          [
+            110.2909781,
+            34.6035548
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "route-tang-advance-01",
+        "routeId": "route-tang-advance",
+        "routeName": "唐军出关行动（示意）",
+        "segmentNo": 1,
+        "side": "TANG",
+        "actionType": "ADVANCE",
+        "appearAtEventId": "event-03-decision-to-advance",
+        "fromPlaceId": "place-tongguan",
+        "toPlaceId": "place-lingbao",
+        "certainty": "LOW",
+        "candidateStatus": "APPROVED",
+        "reviewer": "banq",
+        "reviewDate": "2026-07-31",
+        "summary": {
+          "claimId": "claim-route-tang-advance-segment-01-inference-01",
+          "text": "本段以已批准的潼关与灵宝现代代表点直接连线，只表达唐军从潼关出关后向灵宝西原方向推进并发生交战的宏观关系，不代表历史道路、战场坐标、行军轨迹或溃败撤退路线。",
+          "viewpointType": "INFERENCE",
+          "certainty": "LOW",
+          "citationIds": [
+            "CIT-ZZTJ218-R1996147-P01",
+            "CIT-ZZTJ218-R1996147-P02",
+            "CIT-ANSHI25-CH09-P001-P003",
+            "CIT-ANSHI25-CH09-P015-P020",
+            "CIT-ANSHI25-CH09-P025-P026",
+            "CIT-OSM-W1195138308-V3",
+            "CIT-LB-EIA-P25-CHOUSANGYUAN",
+            "CIT-ESRI-WORLD-IMAGERY-LINGBAO-20260731"
+          ]
+        },
+        "citationIds": [
+          "CIT-ZZTJ218-R1996147-P01",
+          "CIT-ZZTJ218-R1996147-P02",
+          "CIT-ANSHI25-CH09-P001-P003",
+          "CIT-ANSHI25-CH09-P015-P020",
+          "CIT-ANSHI25-CH09-P025-P026",
+          "CIT-OSM-W1195138308-V3",
+          "CIT-LB-EIA-P25-CHOUSANGYUAN",
+          "CIT-ESRI-WORLD-IMAGERY-LINGBAO-20260731"
+        ],
+        "geometryMethod": "Straight two-position connector from the approved disputed modern Tongguan old-city representative point to the approved disputed modern Chousangyuan same-name narrative anchor; no interpolation or routing."
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            110.2909781,
+            34.6035548
+          ],
+          [
+            110.872607,
+            34.615468
+          ]
+        ]
+      }
+    }
+  ]
+}
