@@ -23,6 +23,8 @@ const maplibreMock = vi.hoisted(() => {
     readonly sources = new Map<string, unknown>()
     readonly layers = new Map<string, unknown>()
     readonly fitBounds = vi.fn()
+    readonly easeTo = vi.fn()
+    readonly getZoom = vi.fn(() => 6.5)
     readonly jumpTo = vi.fn()
     readonly remove = vi.fn()
     readonly setFilter = vi.fn()
@@ -150,6 +152,77 @@ function makeEvent(
 const firstEvent = makeEvent('event-first', 1, ['place-tongguan'])
 const secondEvent = makeEvent('event-second', 2, ['place-lingbao'])
 const routeEvents = [firstEvent, secondEvent]
+const focusPlaces: MvpDataset['places'] = {
+  type: 'FeatureCollection',
+  features: [
+    {
+      type: 'Feature',
+      geometry: { type: 'Point', coordinates: [110.25, 34.5] },
+      properties: {
+        id: 'place-tongguan',
+        name: '测试潼关',
+        modernName: null,
+        placeType: 'PASS',
+        summary: {
+          claimId: 'claim-place-tongguan-summary',
+          text: '仅用于地图定位测试。',
+          viewpointType: 'INFERENCE',
+          certainty: 'UNKNOWN',
+          citationIds: ['citation-test'],
+        },
+        strategicRole: {
+          claimId: 'claim-place-tongguan-role',
+          text: '仅用于地图定位测试。',
+          viewpointType: 'INFERENCE',
+          certainty: 'UNKNOWN',
+          citationIds: ['citation-test'],
+        },
+        certainty: 'UNKNOWN',
+        coordinateNote: {
+          claimId: 'claim-place-tongguan-coordinate',
+          text: '仅用于地图定位测试。',
+          viewpointType: 'INFERENCE',
+          certainty: 'UNKNOWN',
+          citationIds: ['citation-test'],
+        },
+        citationIds: ['citation-test'],
+      },
+    },
+    {
+      type: 'Feature',
+      geometry: { type: 'Point', coordinates: [111.25, 35.5] },
+      properties: {
+        id: 'place-lingbao',
+        name: '测试灵宝',
+        modernName: null,
+        placeType: 'OTHER',
+        summary: {
+          claimId: 'claim-place-lingbao-summary',
+          text: '仅用于地图定位测试。',
+          viewpointType: 'INFERENCE',
+          certainty: 'UNKNOWN',
+          citationIds: ['citation-test'],
+        },
+        strategicRole: {
+          claimId: 'claim-place-lingbao-role',
+          text: '仅用于地图定位测试。',
+          viewpointType: 'INFERENCE',
+          certainty: 'UNKNOWN',
+          citationIds: ['citation-test'],
+        },
+        certainty: 'UNKNOWN',
+        coordinateNote: {
+          claimId: 'claim-place-lingbao-coordinate',
+          text: '仅用于地图定位测试。',
+          viewpointType: 'INFERENCE',
+          certainty: 'UNKNOWN',
+          citationIds: ['citation-test'],
+        },
+        citationIds: ['citation-test'],
+      },
+    },
+  ],
+}
 const routeSegments: MvpDataset['routeSegments'] = {
   type: 'FeatureCollection',
   features: [
@@ -665,5 +738,133 @@ describe('useMapLibre', () => {
 
     app.unmount()
     host.remove()
+  })
+
+  it('只在用户主动触发时定位当前事件，时间轴切换不会自动移动地图', async () => {
+    const host = document.createElement('div')
+    document.body.append(host)
+    const pinia = createPinia()
+    const store = useMvpStore(pinia)
+    store.initializeTimeline(routeEvents, firstEvent.id)
+    const app = createApp(HistoryMap, {
+      ...emptyHistoryMapProps,
+      events: routeEvents,
+      places: focusPlaces,
+      routeSegments,
+    })
+
+    app.use(pinia).mount(host)
+    await nextTick()
+    const instance = maplibreMock.instances[0]
+    const focusButton = host.querySelector<HTMLButtonElement>(
+      '[aria-label="定位当前事件"]',
+    )
+
+    expect(focusButton?.disabled).toBe(false)
+    expect(instance.easeTo).not.toHaveBeenCalled()
+    expect(instance.fitBounds).not.toHaveBeenCalled()
+
+    store.selectNextEvent()
+    await nextTick()
+
+    expect(instance.easeTo).not.toHaveBeenCalled()
+    expect(instance.fitBounds).not.toHaveBeenCalled()
+
+    focusButton?.click()
+
+    expect(instance.fitBounds).toHaveBeenCalledWith(
+      [
+        [110, 34],
+        [111.25, 35.5],
+      ],
+      {
+        duration: 450,
+        maxZoom: 9,
+        padding: 64,
+      },
+    )
+
+    app.unmount()
+    host.remove()
+  })
+
+  it('路线图层关闭不影响定位计算，重复定位与 style.load 后定位均可用', async () => {
+    const host = document.createElement('div')
+    document.body.append(host)
+    const pinia = createPinia()
+    const store = useMvpStore(pinia)
+    store.initializeTimeline(routeEvents, secondEvent.id)
+    store.toggleLayer('routes')
+    const app = createApp(HistoryMap, {
+      ...emptyHistoryMapProps,
+      events: routeEvents,
+      places: focusPlaces,
+      routeSegments,
+    })
+
+    app.use(pinia).mount(host)
+    await nextTick()
+    const instance = maplibreMock.instances[0]
+    const focusButton = host.querySelector<HTMLButtonElement>(
+      '[aria-label="定位当前事件"]',
+    )
+
+    focusButton?.click()
+    focusButton?.click()
+    expect(instance.fitBounds).toHaveBeenCalledTimes(2)
+
+    instance.emit('style.load')
+    await nextTick()
+    focusButton?.click()
+
+    expect(instance.fitBounds).toHaveBeenCalledTimes(3)
+    expect(store.layerVisibility.routes).toBe(false)
+
+    app.unmount()
+    host.remove()
+  })
+
+  it('单地点事件使用点定位，缺少定位几何时按钮正确禁用', async () => {
+    const pointHost = document.createElement('div')
+    document.body.append(pointHost)
+    const pointPinia = createPinia()
+    const pointStore = useMvpStore(pointPinia)
+    pointStore.initializeTimeline(routeEvents, firstEvent.id)
+    const pointApp = createApp(HistoryMap, {
+      ...emptyHistoryMapProps,
+      events: routeEvents,
+      places: focusPlaces,
+      routeSegments,
+    })
+
+    pointApp.use(pointPinia).mount(pointHost)
+    await nextTick()
+    const pointInstance = maplibreMock.instances[0]
+    pointHost
+      .querySelector<HTMLButtonElement>('[aria-label="定位当前事件"]')
+      ?.click()
+
+    expect(pointInstance.easeTo).toHaveBeenCalledWith({
+      center: [110.25, 34.5],
+      duration: 450,
+      zoom: 8,
+    })
+    pointApp.unmount()
+    pointHost.remove()
+
+    const emptyHost = document.createElement('div')
+    document.body.append(emptyHost)
+    const emptyApp = createApp(HistoryMap, emptyHistoryMapProps)
+    emptyApp.use(createPinia()).mount(emptyHost)
+    await nextTick()
+
+    expect(
+      emptyHost.querySelector<HTMLButtonElement>(
+        '[aria-label="定位当前事件"]',
+      )?.disabled,
+    ).toBe(true)
+
+    emptyApp.unmount()
+    emptyHost.remove()
   })
 })

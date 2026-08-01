@@ -14,6 +14,30 @@
   inset: 0;
 }
 
+.history-map__actions {
+  position: absolute;
+  z-index: 3;
+  top: 1rem;
+  left: 1rem;
+}
+
+.history-map__actions button {
+  min-height: 2.7rem;
+  padding: 0.55rem 0.85rem;
+  border: 1px solid #7c3f24;
+  border-radius: 999px;
+  background: rgb(255 253 247 / 96%);
+  box-shadow: 0 0.35rem 1.25rem rgb(50 44 35 / 14%);
+  color: #6b351f;
+  cursor: pointer;
+  font-weight: 750;
+}
+
+.history-map__actions button:disabled {
+  border-color: rgb(53 58 53 / 22%);
+  color: #8f8981;
+}
+
 .layer-control,
 .map-legend {
   position: absolute;
@@ -209,7 +233,7 @@
 }
 
 .history-map__message {
-  top: 1rem;
+  top: 4.4rem;
 }
 
 .history-map__message--error {

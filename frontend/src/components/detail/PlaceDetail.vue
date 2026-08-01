@@ -14,6 +14,7 @@ const props = defineProps<{
 
 defineEmits<{
   close: []
+  focus: []
 }>()
 
 const placeTypeLabels: Record<PlaceType, string> = {
@@ -66,9 +67,19 @@ const coordinateCitations = computed(() =>
           地点类型：{{ placeTypeLabels[place.properties.placeType] }}
         </p>
       </div>
-      <button type="button" class="detail-close" @click="$emit('close')">
-        关闭地点详情
-      </button>
+      <div class="detail-article__actions">
+        <button
+          type="button"
+          class="detail-focus"
+          aria-label="在地图上定位此地点"
+          @click="$emit('focus')"
+        >
+          定位此地点
+        </button>
+        <button type="button" class="detail-close" @click="$emit('close')">
+          关闭地点详情
+        </button>
+      </div>
     </header>
 
     <ConfidenceBadge :certainty="place.properties.certainty" />

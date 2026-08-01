@@ -1,5 +1,5 @@
 import { createApp, h, nextTick, ref } from 'vue'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import type {
   MvpDataset,
@@ -138,6 +138,7 @@ function mountDetail(initialSelection: SelectionState) {
   document.body.append(host)
   mountedHosts.push(host)
   const selection = ref<SelectionState>({ ...initialSelection })
+  const focusPlace = vi.fn()
   const app = createApp({
     setup() {
       return () =>
@@ -150,6 +151,7 @@ function mountDetail(initialSelection: SelectionState) {
               selectedPlaceId: undefined,
             }
           },
+          onFocusPlace: focusPlace,
           onSelectPlace: (placeId: string) => {
             selection.value = { ...selection.value, selectedPlaceId: placeId }
           },
@@ -157,7 +159,7 @@ function mountDetail(initialSelection: SelectionState) {
     },
   })
   app.mount(host)
-  return { app, host, selection }
+  return { app, focusPlace, host, selection }
 }
 
 afterEach(() => {
@@ -175,6 +177,10 @@ describe('MVP-08 detail components', () => {
     expect(host.querySelector('.detail-panel')?.getAttribute('data-detail-mode')).toBe(
       'EVENT',
     )
+    const detailPanel = host.querySelector<HTMLElement>('.detail-panel')
+    if (detailPanel) {
+      detailPanel.scrollTop = 320
+    }
 
     selection.value = {
       selectedEventId: 'event-test',
@@ -185,6 +191,7 @@ describe('MVP-08 detail components', () => {
     expect(host.querySelector('.detail-panel')?.getAttribute('data-detail-mode')).toBe(
       'PLACE',
     )
+    expect(detailPanel?.scrollTop).toBe(0)
     host.querySelector<HTMLButtonElement>('.detail-close')?.click()
     await nextTick()
 
@@ -240,7 +247,7 @@ describe('MVP-08 detail components', () => {
   })
 
   it('地点详情省略空现代名，并用文字说明 DISPUTED/UNKNOWN 与坐标边界', () => {
-    const { app, host } = mountDetail({ selectedPlaceId: 'place-test' })
+    const { app, focusPlace, host } = mountDetail({ selectedPlaceId: 'place-test' })
 
     expect(host.textContent).toContain('地点类型：关隘')
     expect(host.textContent).not.toContain('现代对应：')
@@ -253,6 +260,12 @@ describe('MVP-08 detail components', () => {
     expect(
       host.querySelector('.place-detail > .citation-list > h3')?.textContent,
     ).toContain('地点与代表点依据')
+
+    const focusButton = host.querySelector<HTMLButtonElement>(
+      '[aria-label="在地图上定位此地点"]',
+    )
+    focusButton?.click()
+    expect(focusPlace).toHaveBeenCalledWith('place-test')
 
     app.unmount()
   })

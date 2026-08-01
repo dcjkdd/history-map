@@ -1,0 +1,92 @@
+@media (max-width: 63rem) {
+  .hero {
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: 0.75rem;
+  }
+
+  .mvp-workspace {
+    grid-template-areas:
+      "map"
+      "timeline"
+      "detail";
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto;
+  }
+
+  .detail-panel {
+    position: static;
+    max-height: none;
+    min-height: 0;
+    overflow: visible;
+  }
+}
+
+@media (max-width: 44rem) {
+  .app-shell {
+    width: min(100% - 1rem, 72rem);
+    padding: 1rem 0;
+  }
+
+  .map-panel,
+  .timeline-panel,
+  .detail-panel,
+  .loading-state,
+  .error-state {
+    border-radius: 0.75rem;
+  }
+
+  .map-panel {
+    grid-template-rows: auto minmax(24rem, 1fr);
+    padding: 0.5rem;
+  }
+
+  .map-panel .history-map {
+    min-height: 24rem;
+  }
+
+  .map-panel__heading,
+  .timeline-panel__heading,
+  .detail-article__header,
+  .detail-claim__heading,
+  .citation-card__header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .map-panel__hint,
+  .timeline-panel__heading > p {
+    text-align: left;
+  }
+
+  .detail-article__actions {
+    justify-content: flex-start;
+  }
+
+  .timeline-controls {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.65rem;
+  }
+
+  .timeline-controls__position {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .detail-claim__metadata,
+  .confidence-badge {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .loading-state {
+    grid-template-columns: 1fr;
+    min-height: 20rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-state__indicator {
+    animation: none;
+  }
+}

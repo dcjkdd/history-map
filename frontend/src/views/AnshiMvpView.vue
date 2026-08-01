@@ -1,18 +1,23 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 
+import ErrorState from '../components/common/ErrorState.vue'
+import type { DisplayDataError } from '../components/common/ErrorState.vue'
+import LoadingState from '../components/common/LoadingState.vue'
 import DetailPanel from '../components/detail/DetailPanel.vue'
 import HistoryMap from '../components/map/HistoryMap.vue'
 import EventTimeline from '../components/timeline/EventTimeline.vue'
 import TimelineControls from '../components/timeline/TimelineControls.vue'
 import { loadMvpDataset } from '../data/mvpRepository'
+import { MvpDataError } from '../domain/mvpTypes'
 import type { LoadState, MvpDataset } from '../domain/mvpTypes'
 import { useMvpStore } from '../stores/mvpStore'
 
 const store = useMvpStore()
 const dataset = ref<MvpDataset | null>(null)
 const loadState = ref<LoadState>('idle')
-const dataError = ref<string | null>(null)
+const dataError = ref<DisplayDataError | null>(null)
+const historyMap = ref<InstanceType<typeof HistoryMap> | null>(null)
 
 const orderedEvents = computed(() => {
   if (!dataset.value) {
@@ -30,19 +35,31 @@ const orderedEvents = computed(() => {
 })
 
 let isActive = true
+let loadAttemptId = 0
 
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error)
+function displayError(error: unknown): DisplayDataError {
+  if (error instanceof MvpDataError) {
+    return {
+      code: error.code,
+      message: error.message,
+      path: error.path,
+    }
+  }
+
+  return {
+    message: error instanceof Error ? error.message : String(error),
+  }
 }
 
-async function loadDataset(): Promise<void> {
+async function retryLoadDataset(): Promise<void> {
+  const attemptId = ++loadAttemptId
   loadState.value = 'loading'
   dataError.value = null
 
   try {
     const loadedDataset = await loadMvpDataset()
 
-    if (!isActive) {
+    if (!isActive || attemptId !== loadAttemptId) {
       return
     }
 
@@ -53,29 +70,42 @@ async function loadDataset(): Promise<void> {
     )
     loadState.value = 'ready'
   } catch (error) {
-    if (!isActive) {
+    if (!isActive || attemptId !== loadAttemptId) {
       return
     }
 
-    dataError.value = errorMessage(error)
+    console.error('专题数据加载失败', error)
+    dataError.value = displayError(error)
     loadState.value = 'error'
   }
 }
 
+function focusPlace(placeId: string): void {
+  historyMap.value?.focusPlace(placeId)
+}
+
+function selectAndFocusPlace(placeId: string): void {
+  store.selectPlace(placeId)
+  void nextTick(() => focusPlace(placeId))
+}
+
 onMounted(() => {
-  void loadDataset()
+  void retryLoadDataset()
 })
 
 onBeforeUnmount(() => {
   isActive = false
+  loadAttemptId += 1
 })
 </script>
 
 <template>
-  <main class="app-shell">
+  <main id="main-content" class="app-shell" tabindex="-1">
     <header class="hero">
-      <p class="topic-label">当前专题 · 安史之乱</p>
-      <h1>{{ dataset?.topic.title ?? '中国古代战争地形地图' }}</h1>
+      <div>
+        <p class="topic-label">当前专题 · 安史之乱</p>
+        <h1>{{ dataset?.topic.title ?? '中国古代战争地形地图' }}</h1>
+      </div>
       <p class="hero-description">
         {{
           dataset?.topic.subtitle ??
@@ -84,32 +114,40 @@ onBeforeUnmount(() => {
       </p>
     </header>
 
-    <section class="map-panel" aria-labelledby="map-panel-title">
-      <div class="map-panel__heading">
-        <div>
-          <p class="section-label">MVP-08</p>
-          <h2 id="map-panel-title">二维交互地图</h2>
-        </div>
-        <p v-if="loadState === 'loading'" class="data-status" role="status">
-          正在加载专题数据
-        </p>
-      </div>
+    <LoadingState v-if="loadState === 'idle' || loadState === 'loading'" />
+    <ErrorState
+      v-else-if="loadState === 'error' && dataError"
+      :error="dataError"
+      @retry="retryLoadDataset"
+    />
 
-      <HistoryMap
-        v-if="loadState === 'ready' && dataset"
-        :events="dataset.events"
-        :geography="dataset.geography"
-        :initial-view="dataset.topic.initialView"
-        :places="dataset.places"
-        :route-segments="dataset.routeSegments"
-      />
-      <p v-else-if="loadState === 'error'" class="data-error" role="alert">
-        专题数据加载失败：{{ dataError }}
-      </p>
-      <div v-else class="map-placeholder" aria-hidden="true"></div>
+    <div
+      v-else-if="loadState === 'ready' && dataset"
+      class="mvp-workspace"
+    >
+      <section
+        class="map-panel"
+        aria-labelledby="map-panel-title"
+      >
+        <div class="map-panel__heading">
+          <div>
+            <p class="section-label">MVP-09</p>
+            <h2 id="map-panel-title">二维交互地图</h2>
+          </div>
+          <p class="map-panel__hint">拖动浏览后可主动定位当前事件</p>
+        </div>
+
+        <HistoryMap
+          ref="historyMap"
+          :events="dataset.events"
+          :geography="dataset.geography"
+          :initial-view="dataset.topic.initialView"
+          :places="dataset.places"
+          :route-segments="dataset.routeSegments"
+        />
+      </section>
 
       <section
-        v-if="loadState === 'ready' && dataset"
         class="timeline-panel"
         aria-labelledby="timeline-title"
       >
@@ -137,15 +175,15 @@ onBeforeUnmount(() => {
       </section>
 
       <DetailPanel
-        v-if="loadState === 'ready' && dataset"
         :dataset="dataset"
         :selection="{
           selectedEventId: store.selectedEventId,
           selectedPlaceId: store.selectedPlaceId,
         }"
         @clear-place="store.clearSelectedPlace()"
-        @select-place="store.selectPlace"
+        @focus-place="focusPlace"
+        @select-place="selectAndFocusPlace"
       />
-    </section>
+    </div>
   </main>
 </template>

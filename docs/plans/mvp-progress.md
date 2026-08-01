@@ -1,10 +1,11 @@
 # 安史之乱二维交互地图：MVP 实施进度
 
 - 状态：执行进度索引
-- 更新日期：2026-07-31
-- 当前 Git 基线：`bc24322b251661d92dbd601fc3dff4240f18a521`（已推送的 `MVP-07` 完成提交）
-- 最近完成任务：`MVP-08`（实现与验证完成，待用户确认提交）
-- 下一工程任务：`MVP-09`
+- 更新日期：2026-08-01
+- 当前 Git 基线：`efd3d0b1d3af3e2739f1a3eef3724f312ed2cbb7`（已推送的 `MVP-08` 完成提交）
+- 最近完成任务：`MVP-08`（完成提交 `efd3d0b` 并已推送）
+- 当前工程任务：`MVP-09`（实现与验证完成，待用户确认提交）
+- 下一工程任务：`MVP-10`
 
 ## 1. 文档定位
 
@@ -28,8 +29,9 @@
 | `MVP-05` | `COMPLETED` | `db785d4` | 地理要素、地点图层、三组图层状态、地点选择、图例与浏览器验证已完成并推送 |
 | `MVP-06` | `COMPLETED` | `9a266df` | 离散事件时间轴、默认事件、前后切换、节点直选、键盘操作、生产 worker 修复与浏览器验证已完成并推送 |
 | `MVP-07` | `COMPLETED` | `bc24322` | 路线逐段显隐、事件相关地点、手动地点优先级、路线开关和样式重载恢复已完成并推送 |
-| `MVP-08` | `COMPLETED_PENDING_COMMIT` | 待用户确认 | 事件/地点/空详情、逐条引用、观点与可信度文字、关闭地点返回事件和浏览器验证已完成 |
-| `MVP-09`—`MVP-11` | `PENDING` | — | 按任务依赖顺序推进 |
+| `MVP-08` | `COMPLETED` | `efd3d0b` | 事件/地点/空详情、逐条引用、观点与可信度文字、关闭地点返回事件和浏览器验证已完成并推送 |
+| `MVP-09` | `COMPLETED_PENDING_COMMIT` | 待用户确认 | 桌面单页布局、主动事件/地点定位、加载错误重试、键盘与生产浏览器验证已完成 |
+| `MVP-10`—`MVP-11` | `PENDING` | — | 按任务依赖顺序推进 |
 
 提交 `0394d7e` 只删除旧版文档归档 `history-map-docs.zip`，不代表新的 MVP 阶段。
 
@@ -426,9 +428,63 @@ Codex 独立核实后全部采纳：新增明确区分“结论类型”和“�
 - 没有展示完整书籍，没有生成 AI 总结/问答、用户笔记、评论或编辑入口；没有选择生产外部底图供应商或填写未经核对的 Style URL、Token、许可与署名结论。
 - 没有实现 A-017 定位当前事件、地图自动飞行、MVP-09 页面布局/加载重试或其他后续阶段能力。
 
-## 11. 下一步边界
+## 11. MVP-09 完成证据
 
-1. `MVP-07` 完成提交 `bc24322` 已推送，现场核对的 `HEAD`、本地 `origin/master` 和 GitHub 远端 `master` 一致。
-2. `MVP-08` 实现、完整门禁、真实浏览器验证和限时只读复核均已完成；提交和推送仍须先经过用户明确确认。
-3. 下一工程任务为 `MVP-09`，只能在后续独立任务实现 A-017“定位当前事件”、页面整合、加载重试和桌面体验；本次没有提前开始。
-4. 后续工作必须继续保护当前正式数据、资料笔记与审核表，不得把 DISPUTED、APPROXIMATE 或 `INFERENCE / LOW` 内容升级为确定事实。
+### 实现范围
+
+- `frontend/src/domain/mapFocus.ts`
+  - 纯函数根据当前事件的相关地点和截至该事件已活动/可见的正式路线坐标计算定位目标；单点返回 point，多点返回 bounds，未知事件或无可用几何返回 `null`。
+  - 路线图层开关只控制显示，不改变定位计算；不引入 Turf 或其他外部空间计算库。
+- `HistoryMap.vue`
+  - 暴露 `focusCurrentEvent()` 与 `focusPlace(placeId)`；事件范围使用 `fitBounds`，单地点使用 `easeTo`，重复主动定位与 `style.load` 后再次定位均可用。
+  - 只有用户点击“定位当前事件”、相关地点或地点详情中的显式定位入口才移动地图；时间轴选择、前后切换和普通 store 状态变化不自动飞行。
+- `AnshiMvpView.vue`、`LoadingState.vue` 与 `ErrorState.vue`
+  - 使用既有 Repository 和唯一 `mvpStore`；`retryLoadDataset()` 统一处理首次加载和重试，用递增 attempt ID 与卸载标记丢弃过期异步结果。
+  - 网络不可访问、非法 JSON 和 `MvpDataError` 均显示可读错误、稳定 code/path 和重试入口；重试期间按钮正确禁用，不产生未处理 Promise。
+  - 相关地点选择与地点详情中的定位共享 `focusPlace()`；切换详情时侧栏回到顶部。
+- `App.vue`、`styles/layout.css`、`responsive.css` 与相关样式
+  - 桌面网格同时容纳地图、时间轴和可滚动详情侧栏；地图保持最小可操作高度，不被长详情无限压缩。
+  - 1024 与 1440 宽度均无页面横向溢出；1440 下时间轴完整展开，较窄屏幕只做最小堆叠，不实现完整手机产品布局。
+  - 增加跳至主要内容入口和统一 3px `:focus-visible`，所有交互按钮保留可读标签、可见焦点和原生禁用状态。
+
+### 自动验证
+
+- 环境：Node.js `24.18.0`、npm `11.16.0`；`npm --prefix frontend ci` 通过，未增加依赖，未修改 `package.json` 或 `package-lock.json`。
+- `npm --prefix frontend run typecheck`：通过。
+- `npm --prefix frontend run validate:data`：通过，0 个警告。
+- `npm --prefix frontend run test`：17 个测试文件、110 个测试全部通过。
+- `npm --prefix frontend run build`、`npm --prefix frontend run check`：通过；仅保留既有的 500 kB chunk 提示。
+- 根路径 `verify:worker-bundle`：通过；worker 仍为自包含 `maplibre-gl-worker-*.js`。
+- `--base=/history-map/` 构建输出到临时验收目录并通过对应 worker 校验；没有额外构建产物留在工作树。
+
+新增或扩充测试覆盖事件相关地点加可见路线、只有地点、无定位几何、未知事件、隐藏路线仍参与范围、重复主动定位、单地点定位、`style.load` 后再次定位、时间轴切换不自动定位、按钮禁用、相关地点与详情地点定位、加载失败后成功重试、重试再次失败、组件卸载后迟到异步结果不写入、详情滚动复位、1024/宽屏布局契约、可见键盘焦点、监听器和 MapLibre 实例清理。
+
+### 浏览器现场验证
+
+- 未配置 `VITE_MAP_STYLE_URL`：实际拖动地图离开事件范围后点击“定位当前事件”回到范围；再次拖离后切换时间轴只更新到第 2/6 个事件，地图没有强制飞行。
+- 相关地点“潼关”和地点详情中的“在地图上定位此地点”都能主动定位，地点详情保持 `place-tongguan` 且侧栏回到顶部；全程只有 1 个 MapLibre 地图和 1 个 Canvas。
+- 显式有效 `/map/empty-style.json`：不显示降级警告，定位和详情正常；故意损坏 `/map/missing-style.json`：HTTP 404 后恢复本地中性背景，应用仍可定位且无错误态。
+- 受控本地响应先返回非法 JSON：页面显示 `INVALID_JSON`、路径 `$` 和重试按钮；保持失败时再次重试仍留在可读错误态，切换为正式数据后重试成功进入第 1/6 个事件。两次失败只产生受控错误日志，没有 `Uncaught` 或未处理 Promise。
+- 1024×768：页面无横向溢出，地图约 590×544，详情侧栏宽约 352px 并独立滚动；图例与 MapLibre 署名不重叠。1440×900：地图约 1006×544，详情侧栏约 352px，时间轴完全展开且页面无横向溢出。
+- 根路径裸静态生产部署取得入口、CSS、根 `/data/anshi/mvp-v1.json`、worker 和本地空白样式；`/history-map/` 裸静态部署从子路径取得入口、CSS、worker、空白样式并按既有契约取得根 `/data/`。两者均显示第 1/6 个事件、单一 MapLibre/Canvas，console 0 warning/error。
+- 页面刷新按 Repository 正式数据重新回到 `topic.defaultEventId`；本阶段没有引入 URL 或本地持久化。
+
+### 限时静态复核
+
+ChatGPT Pro 在 3 分 06 秒的一次只读静态复核中未发现 P0—P3。复核严格限定于 MVP-09 的定位计算与触发链、加载重试竞态/卸载保护、Loading/Error 可访问性、1024/宽屏布局、单 store、依赖与受保护内容边界；没有安装依赖、运行测试、修改文件或 lockfile，也没有直接判定 MVP-09 是否验收通过。
+
+Codex 随后独立核对当前源码和工作树：事件/地点定位只从显式用户入口触发，时间轴没有地图移动 watcher；定位纯函数不读取路线图层显示开关；递增 attempt ID 与卸载标记会丢弃过期异步结果；工作树没有第二个 store、依赖/lockfile或正式数据/审核文件改动。最终工程判断仍只依据当前源码、本地门禁和真实浏览器证据。
+
+### 范围与内容边界
+
+- 没有修改 `frontend/public/data/anshi/mvp-v1.json`、资料笔记、内容审核表、历史事实、日期、坐标、路线几何、来源、许可记录或审核签字。
+- 直接消费正式 5 个 Place、3 个 Geography、3 个 RouteSegment、6 个 Event、19 个 Source、36 个 Citation 和 33 条运行时 SourcedClaim；地点继续为 DISPUTED，事件时间继续为 APPROXIMATE 且 `normalizedDate=null`，路线继续为 `INFERENCE / LOW`。
+- 没有新建第二个 store，没有增加依赖、后端、数据库、生产底图供应商或外部空间计算库。
+- 没有实现完整手机布局、深链接、URL 状态同步、主题切换、国际化、登录、偏好持久化或复杂过场动画；没有提前整理 MVP-10 最终运行说明或执行 MVP-11 内容签字门禁。
+
+## 12. 下一步边界
+
+1. `MVP-08` 完成提交 `efd3d0b` 已推送；本任务开始时现场核对的 `HEAD`、本地 `origin/master` 和 GitHub 远端 `master` 一致，工作树干净。
+2. `MVP-09` 实现、完整门禁和真实浏览器验证已完成；提交和推送仍须先向用户汇报真实 diff、测试、范围/内容门禁和静态复核结论，并取得明确确认。
+3. 下一工程任务为 `MVP-10`；只能在后续独立任务整理最终运行说明、配置/降级/浏览器兼容与已知限制，不得借此扩张功能范围。
+4. `MVP-11` 仍是独立内容签字门禁；后续工作必须继续保护正式数据、资料笔记与审核表，不得把 DISPUTED、APPROXIMATE 或 `INFERENCE / LOW` 内容升级为确定事实。

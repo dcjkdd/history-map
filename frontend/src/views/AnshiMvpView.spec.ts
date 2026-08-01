@@ -2,11 +2,16 @@ import { createPinia } from 'pinia'
 import { createApp, h, nextTick } from 'vue'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { MvpDataError } from '../domain/mvpTypes'
 import type { MvpDataset } from '../domain/mvpTypes'
 import AnshiMvpView from './AnshiMvpView.vue'
 
 const repositoryMock = vi.hoisted(() => ({
   loadMvpDataset: vi.fn(),
+}))
+const mapComponentMock = vi.hoisted(() => ({
+  focusCurrentEvent: vi.fn(),
+  focusPlace: vi.fn(),
 }))
 
 vi.mock('../data/mvpRepository', () => ({
@@ -16,13 +21,20 @@ vi.mock('../data/mvpRepository', () => ({
 vi.mock('../components/map/HistoryMap.vue', () => ({
   default: {
     props: ['events', 'geography', 'initialView', 'places', 'routeSegments'],
-    setup(props: {
-      events: unknown[]
-      geography: { features: unknown[] }
-      initialView: { center: [number, number] }
-      places: { features: unknown[] }
-      routeSegments: { features: unknown[] }
-    }) {
+    setup(
+      props: {
+        events: unknown[]
+        geography: { features: unknown[] }
+        initialView: { center: [number, number] }
+        places: { features: unknown[] }
+        routeSegments: { features: unknown[] }
+      },
+      { expose }: { expose: (value: Record<string, unknown>) => void },
+    ) {
+      expose({
+        focusCurrentEvent: mapComponentMock.focusCurrentEvent,
+        focusPlace: mapComponentMock.focusPlace,
+      })
       return () =>
         h('div', {
           'data-center': JSON.stringify(props.initialView.center),
@@ -180,7 +192,11 @@ async function settleView(): Promise<void> {
 
 describe('AnshiMvpView', () => {
   beforeEach(() => {
+    vi.restoreAllMocks()
     repositoryMock.loadMvpDataset.mockReset()
+    mapComponentMock.focusCurrentEvent.mockReset()
+    mapComponentMock.focusPlace.mockReset()
+    vi.spyOn(console, 'error').mockImplementation(() => undefined)
   })
 
   it('通过 Repository 加载专题并把数据集初始视野交给地图', async () => {
@@ -239,8 +255,15 @@ describe('AnshiMvpView', () => {
     await settleView()
 
     expect(host.querySelector('[role="alert"]')?.textContent).toContain(
-      '专题数据加载失败：模拟数据错误',
+      '专题数据加载失败',
     )
+    expect(host.querySelector('[role="alert"]')?.textContent).toContain(
+      '模拟数据错误',
+    )
+    expect(
+      host.querySelector<HTMLButtonElement>('[aria-label="重试加载专题数据"]')
+        ?.disabled,
+    ).toBe(false)
     expect(host.querySelector('[data-testid="history-map"]')).toBeNull()
 
     app.unmount()
@@ -262,6 +285,8 @@ describe('AnshiMvpView', () => {
     previousButton?.click()
     await nextTick()
 
+    expect(mapComponentMock.focusCurrentEvent).not.toHaveBeenCalled()
+    expect(mapComponentMock.focusPlace).not.toHaveBeenCalled()
     expect(host.querySelector('[aria-current="step"]')?.textContent).toContain(
       '测试事件一',
     )
@@ -306,10 +331,16 @@ describe('AnshiMvpView', () => {
     await nextTick()
 
     expect(store.selectedPlaceId).toBe('place-test')
+    expect(mapComponentMock.focusPlace).toHaveBeenCalledWith('place-test')
     expect(host.querySelector('.detail-panel')?.getAttribute('data-detail-mode')).toBe(
       'PLACE',
     )
     expect(host.querySelector('.place-detail')?.textContent).toContain('测试地点')
+
+    host
+      .querySelector<HTMLButtonElement>('[aria-label="在地图上定位此地点"]')
+      ?.click()
+    expect(mapComponentMock.focusPlace).toHaveBeenCalledTimes(2)
 
     host.querySelector<HTMLButtonElement>('.detail-close')?.click()
     await nextTick()
@@ -326,6 +357,96 @@ describe('AnshiMvpView', () => {
     )
 
     app.unmount()
+    host.remove()
+  })
+
+  it('加载失败后可重试成功，并显示 Repository 错误代码与字段路径', async () => {
+    repositoryMock.loadMvpDataset
+      .mockRejectedValueOnce(
+        new MvpDataError({
+          code: 'INVALID_JSON',
+          message: 'MVP 数据不是合法 JSON',
+          path: '$.events',
+        }),
+      )
+      .mockResolvedValueOnce(dataset)
+    const host = document.createElement('div')
+    document.body.append(host)
+    const app = createApp(AnshiMvpView)
+
+    app.use(createPinia()).mount(host)
+    await settleView()
+
+    expect(host.textContent).toContain('INVALID_JSON')
+    expect(host.textContent).toContain('$.events')
+
+    host
+      .querySelector<HTMLButtonElement>('[aria-label="重试加载专题数据"]')
+      ?.click()
+    await settleView()
+
+    expect(repositoryMock.loadMvpDataset).toHaveBeenCalledTimes(2)
+    expect(host.querySelector('[data-testid="history-map"]')).not.toBeNull()
+    expect(host.querySelector('[role="alert"]')).toBeNull()
+    expect(host.querySelector('[aria-current="step"]')?.textContent).toContain(
+      '测试事件二',
+    )
+
+    app.unmount()
+    host.remove()
+  })
+
+  it('重试再次失败时保留重试入口并更新为最近一次错误', async () => {
+    repositoryMock.loadMvpDataset
+      .mockRejectedValueOnce(new Error('首次失败'))
+      .mockRejectedValueOnce(new Error('再次失败'))
+    const host = document.createElement('div')
+    document.body.append(host)
+    const app = createApp(AnshiMvpView)
+
+    app.use(createPinia()).mount(host)
+    await settleView()
+    host
+      .querySelector<HTMLButtonElement>('[aria-label="重试加载专题数据"]')
+      ?.click()
+    await settleView()
+
+    expect(repositoryMock.loadMvpDataset).toHaveBeenCalledTimes(2)
+    expect(host.textContent).toContain('再次失败')
+    expect(host.textContent).not.toContain('首次失败')
+    expect(
+      host.querySelector<HTMLButtonElement>('[aria-label="重试加载专题数据"]')
+        ?.disabled,
+    ).toBe(false)
+
+    app.unmount()
+    host.remove()
+  })
+
+  it('组件卸载后的异步结果不会写入 store 或产生错误日志', async () => {
+    let resolveDataset: ((value: MvpDataset) => void) | undefined
+    repositoryMock.loadMvpDataset.mockReturnValue(
+      new Promise<MvpDataset>((resolve) => {
+        resolveDataset = resolve
+      }),
+    )
+    const host = document.createElement('div')
+    document.body.append(host)
+    const pinia = createPinia()
+    const app = createApp(AnshiMvpView)
+
+    app.use(pinia).mount(host)
+    await nextTick()
+    app.unmount()
+    resolveDataset?.(dataset)
+    await settleView()
+
+    const { useMvpStore } = await import('../stores/mvpStore')
+    const store = useMvpStore(pinia)
+    expect(store.orderedEventIds).toEqual([])
+    expect(store.selectedEventId).toBeUndefined()
+    expect(console.error).not.toHaveBeenCalled()
+
     host.remove()
   })
 })

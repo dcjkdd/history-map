@@ -9,7 +9,7 @@ vi.mock('./data/mvpRepository', () => ({
 }))
 
 describe('App', () => {
-  it('显示 MVP-05 页面壳和数据加载状态', async () => {
+  it('显示 MVP-09 页面壳、跳转链接和数据加载状态', async () => {
     const host = document.createElement('div')
     document.body.append(host)
     const app = createApp(App)
@@ -24,6 +24,10 @@ describe('App', () => {
     expect(host.querySelector('[role="status"]')?.textContent).toContain(
       '正在加载专题数据',
     )
+    expect(host.querySelector('.skip-link')?.getAttribute('href')).toBe(
+      '#main-content',
+    )
+    expect(host.querySelector('main')?.id).toBe('main-content')
 
     app.unmount()
     host.remove()
