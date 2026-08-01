@@ -2,10 +2,10 @@
 
 - 状态：执行进度索引
 - 更新日期：2026-08-01
-- 当前 Git 基线：`efd3d0b1d3af3e2739f1a3eef3724f312ed2cbb7`（已推送的 `MVP-08` 完成提交）
-- 最近完成任务：`MVP-08`（完成提交 `efd3d0b` 并已推送）
-- 当前工程任务：`MVP-09`（实现与验证完成，待用户确认提交）
-- 下一工程任务：`MVP-10`
+- 当前 Git 基线：`d83040201afd1a6336e2b840b4984da0805678cd`（已推送的 `MVP-09` 完成提交）
+- 最近完成任务：`MVP-09`（完成提交 `d830402` 并已推送）
+- 当前工程任务：`MVP-10`（实现、验证与限时静态复核完成，待用户确认提交）
+- 下一工程任务：`MVP-11`
 
 ## 1. 文档定位
 
@@ -30,8 +30,9 @@
 | `MVP-06` | `COMPLETED` | `9a266df` | 离散事件时间轴、默认事件、前后切换、节点直选、键盘操作、生产 worker 修复与浏览器验证已完成并推送 |
 | `MVP-07` | `COMPLETED` | `bc24322` | 路线逐段显隐、事件相关地点、手动地点优先级、路线开关和样式重载恢复已完成并推送 |
 | `MVP-08` | `COMPLETED` | `efd3d0b` | 事件/地点/空详情、逐条引用、观点与可信度文字、关闭地点返回事件和浏览器验证已完成并推送 |
-| `MVP-09` | `COMPLETED_PENDING_COMMIT` | 待用户确认 | 桌面单页布局、主动事件/地点定位、加载错误重试、键盘与生产浏览器验证已完成 |
-| `MVP-10`—`MVP-11` | `PENDING` | — | 按任务依赖顺序推进 |
+| `MVP-09` | `COMPLETED` | `d830402` | 桌面单页布局、主动事件/地点定位、加载错误重试、键盘与生产浏览器验证已完成并推送 |
+| `MVP-10` | `COMPLETED_PENDING_COMMIT` | 待用户确认 | 测试/构建门禁审计、本地运行说明、双 base 静态部署、浏览器回归与限时静态复核已完成 |
+| `MVP-11` | `PENDING` | — | 独立执行内容审核清单与发布前签字，不由工程门禁替代 |
 
 提交 `0394d7e` 只删除旧版文档归档 `history-map-docs.zip`，不代表新的 MVP 阶段。
 
@@ -482,9 +483,54 @@ Codex 随后独立核对当前源码和工作树：事件/地点定位只从显�
 - 没有新建第二个 store，没有增加依赖、后端、数据库、生产底图供应商或外部空间计算库。
 - 没有实现完整手机布局、深链接、URL 状态同步、主题切换、国际化、登录、偏好持久化或复杂过场动画；没有提前整理 MVP-10 最终运行说明或执行 MVP-11 内容签字门禁。
 
-## 12. 下一步边界
+## 12. MVP-10 完成证据
 
-1. `MVP-08` 完成提交 `efd3d0b` 已推送；本任务开始时现场核对的 `HEAD`、本地 `origin/master` 和 GitHub 远端 `master` 一致，工作树干净。
-2. `MVP-09` 实现、完整门禁和真实浏览器验证已完成；提交和推送仍须先向用户汇报真实 diff、测试、范围/内容门禁和静态复核结论，并取得明确确认。
-3. 下一工程任务为 `MVP-10`；只能在后续独立任务整理最终运行说明、配置/降级/浏览器兼容与已知限制，不得借此扩张功能范围。
-4. `MVP-11` 仍是独立内容签字门禁；后续工作必须继续保护正式数据、资料笔记与审核表，不得把 DISPUTED、APPROXIMATE 或 `INFERENCE / LOW` 内容升级为确定事实。
+### 实现与审计范围
+
+- 新建 `frontend/README.md`：固定 Node `24.18.0`、npm `11.16.0` 与当前 macOS NVM 入口，记录从仓库根使用 `npm --prefix frontend` 的安装、开发、类型检查、正式数据校验、测试、构建、完整 `check` 和 worker 闭包命令。
+- 运行说明明确正式文件 `frontend/public/data/anshi/mvp-v1.json` 与浏览器根 `/data/anshi/mvp-v1.json` 契约，说明 `VITE_MAP_STYLE_URL` 的有效 Style 要求、本地 `map/empty-style.json` 降级、秘密禁入、Token/许可/配额/署名由部署者核对。
+- 运行说明提供根路径和 `--base=/history-map/` 的裸静态部署命令；非根应用资产位于 `/history-map/`，业务数据仍须单独部署到站点根 `/data/`，并明确仅用 `vite preview` 不能自动满足该契约。
+- 运行说明记录 Node/npm、Repository/`MvpDataError` code/path、数据/样式 404、worker 闭包等常见错误，以及桌面优先、仅实测 `1024×768` / `1440×900`、无完整手机布局/持久化/深链接/后端数据库和外部样式失败降级等已知限制；没有宣称完整浏览器矩阵。
+- 根 `README.md` 只增加第一期 MVP 本地入口和 `frontend/README.md` 链接，原有长期技术栈与规划保持不变。
+- 审计 `frontend/package.json` 后确认 `dev`、`typecheck`、`validate:data`、`test`、`build`、`check` 和 `verify:worker-bundle` 均已存在；`check` 的实际顺序为 `typecheck → validate:data → test → build → verify:worker-bundle`，没有修改脚本、依赖或 lockfile。
+- 逐项审计 17 个测试文件：数据合同/Repository/完整性、时间轴、路线按事件显隐，以及组件加载成功/失败、事件前后与节点切换、地点详情均已有有效覆盖；关键测试不存在 `skip`、`todo`、`only`，因此没有为覆盖率数字增加测试或 MapLibre canvas 快照。
+
+### 环境、命令与静态产物
+
+- 开始时现场确认工作树干净；`HEAD`、本地 `master`、本地 `origin/master` 与 GitHub 远端 `master` 均为 `d83040201afd1a6336e2b840b4984da0805678cd`，远端继续使用 `git@github.com:dcjkdd/history-map.git`。
+- 通过 `/Users/banq/.nvm/nvm.sh` 执行 `nvm use`，真实环境为 Node.js `24.18.0`、npm `11.16.0`。
+- `npm --prefix frontend ci`：通过，安装 143 个包；npm 只提示 `fsevents@2.3.3` 的 install script 尚未加入 allowScripts，不影响退出状态，也没有修改 `package.json` 或 `package-lock.json`。
+- `npm --prefix frontend run typecheck`：通过。
+- `npm --prefix frontend run validate:data`：通过，正式数据 0 个警告。
+- `npm --prefix frontend run test`：17 个测试文件、110 个测试全部通过。
+- `npm --prefix frontend run build`、根路径 `verify:worker-bundle` 与完整 `npm --prefix frontend run check`：通过；worker 为单一自包含 `maplibre-gl-worker-*.js`，0 个相对依赖。仅保留既有的 MapLibre 主入口 500 kB 体积提示，不是构建失败。
+- `npm --prefix frontend run build -- --base=/history-map/ --outDir /private/tmp/history-map-mvp10.axmKDZ/history-map`：通过；对应临时 `assets` 目录的 worker 闭包校验通过，工作树没有 `dist-history-map`。
+- 根构建产物约 1.8 MB，只包含 `index.html`、CSS、JavaScript、MapLibre worker、`data/anshi/mvp-v1.json` 和 `map/empty-style.json`。生产直接依赖只有 Vue、Pinia、MapLibre；仓库根没有 `package.json`，源码中唯一业务 `fetch` 位于 `MvpRepository` 并固定读取版本化静态数据 API，因此不依赖 Go、PostgreSQL/PostGIS、Redis、Docker 或 MinIO。
+
+### 浏览器现场验证
+
+- 按 `frontend/README.md` 原样启动 Vite `dev`，页面加载正式标题、本地中性背景、单一 MapLibre 和单一 Canvas，正常 console 0 warning/error。
+- 根路径裸静态部署取得 `/`、CSS、JavaScript、根 `/data/anshi/mvp-v1.json`、worker 和 `/map/empty-style.json` 的 HTTP 200；从默认事件连续点击“下一事件”逐项到达第 6/6 个事件，末端按钮正确禁用。
+- 第 6 个事件通过“长安”进入地点详情，页面继续显示 `DISPUTED` 与代表点边界；“在地图上定位此地点”和拖动后的“定位当前事件”均可执行。再次拖动后切换到第 5/6 个事件没有产生第二个地图实例或未处理异常。
+- 根生产构建分别验证未配置外部样式、显式有效 `/map/empty-style.json`、故意损坏 `/map/missing-style.json` 三条路径；有效配置无降级警告，损坏样式收到 HTTP 404 后请求本地样式 HTTP 200，并显示可读降级提示，三条路径始终只有 1 个 MapLibre/Canvas，正常 console 0 warning/error。
+- 受控裸静态服务器让前两次 `/data/anshi/mvp-v1.json` 返回非法 JSON：首次和第一次重试均显示 `INVALID_JSON`、路径 `$` 和可用重试按钮；第二次重试取得正式数据后恢复第 1/6 个事件、单一 MapLibre/Canvas和无错误页面。控制台只有两条预期且已捕获的 `MvpDataError` 诊断，没有 `Uncaught` 或未处理 Promise。
+- `1024×768`：页面 `scrollWidth=1024`，地图约 `590×544`，详情侧栏约 352px 并独立滚动；`1440×900`：页面 `scrollWidth=1440`，地图约 `1006×544`，详情侧栏约 352px。两种尺寸均为单一 MapLibre/Canvas。
+- `/history-map/` 裸静态部署从子路径取得入口、CSS、JavaScript、worker 和本地空白样式，同时从根 `/data/` 取得正式数据，全部 HTTP 200；实际前进到第 3/6 个事件，单一 MapLibre/Canvas，console 0 warning/error。
+
+### 限时静态复核
+
+ChatGPT Pro 在约 7 分 03 秒的一次只读静态复核中未发现 P0—P3。复核严格限定于本次 3 份文档 diff，核对 `package.json` 脚本、根 `/data/` 静态 API、Vite base、本地样式降级、worker 闭包、根/非根部署命令、常见错误与兼容范围；没有安装依赖、运行测试、修改文件或 lockfile，也没有审查历史内容、执行 MVP-11 或直接判定验收。
+
+Codex 随后独立对照当前源码、构建产物、服务请求日志、浏览器状态和最终工作树核实复核结论：文档命令均已现场执行，根/非根资源路径与 Repository/worker 代码一致，正常路径无未处理异常；没有需要采纳的 P0—P3 修复。最终工程判断仍只依据本次真实门禁与浏览器证据。
+
+### 范围与内容边界
+
+- 没有修改 `frontend/public/data/anshi/mvp-v1.json`、`data/curated/anshi-mvp-source-notes.md`、`docs/reviews/anshi-mvp-content-review.md`、历史事实、日期、坐标、路线、Source/Citation、许可记录或审核签字。
+- 没有修改产品交互、地图语义、数据契约、生产依赖、`package-lock.json` 或既有测试；没有增加后端、数据库、CI/CD、Docker、Kubernetes、云部署、覆盖率追数、视觉回归平台或完整浏览器矩阵。
+- 上述工程、静态部署和浏览器证据只用于 MVP-10，不生成或批准 MVP-11 的内容审核签字，也不把工程通过等同于历史内容可以发布。
+
+## 13. 下一步边界
+
+1. `MVP-09` 完成提交 `d830402` 已推送；本任务开始时现场核对的 `HEAD`、本地 `master`、本地 `origin/master` 和 GitHub 远端 `master` 一致，工作树干净。
+2. `MVP-10` 实现、完整门禁、双 base 构建、双 worker 校验、真实浏览器验证和一次限时只读静态复核已完成；提交和推送仍须先向用户汇报真实 diff、测试、纯静态/范围/内容门禁和复核结论，并取得明确确认。
+3. 下一工程任务为 `MVP-11`，它仍是独立内容签字门禁；后续工作必须继续保护正式数据、资料笔记与审核表，不得把 DISPUTED、APPROXIMATE 或 `INFERENCE / LOW` 内容升级为确定事实。

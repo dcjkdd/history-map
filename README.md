@@ -15,6 +15,19 @@
 
 发生实施冲突时，以 ADR 中记录的文档权威顺序为准。下方技术栈仍是长期演进目标。
 
+## 第一期 MVP 本地入口
+
+当前可运行的第一期 MVP 位于 `frontend/`；仓库根目录没有 `package.json`。在仓库根目录执行：
+
+```bash
+source /Users/banq/.nvm/nvm.sh
+nvm use
+npm --prefix frontend ci
+npm --prefix frontend run dev
+```
+
+完整的环境版本、数据路径、地图样式、测试/构建门禁以及根路径和 `/history-map/` 静态部署方法见 [前端本地运行说明](frontend/README.md)。
+
 ## 项目目标
 
 本项目不只是展示“某场战争发生在哪里”，而是尝试回答：
