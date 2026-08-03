@@ -1,11 +1,11 @@
 # 安史之乱二维交互地图：MVP 实施进度
 
 - 状态：执行进度索引
-- 更新日期：2026-08-01
-- 当前 Git 基线：`d83040201afd1a6336e2b840b4984da0805678cd`（已推送的 `MVP-09` 完成提交）
-- 最近完成任务：`MVP-09`（完成提交 `d830402` 并已推送）
-- 当前工程任务：`MVP-10`（实现、验证与限时静态复核完成，待用户确认提交）
-- 下一工程任务：`MVP-11`
+- 更新日期：2026-08-02
+- 当前 Git 基线：`0dd3faa109a3a04d5702c320da233945a537935a`（已推送的 `MVP-10` 完成提交）
+- 最近完成任务：`MVP-10`（完成提交 `0dd3faa` 并已推送）
+- 当前工程任务：`MVP-11`（自动内容映射门禁、测试、构建、HTTP 资源核对与当前真实浏览器回归完成；最终三方签字待完成）
+- 下一工程任务：无；先完成 MVP-11 人工签字，不提前进入长期规划
 
 ## 1. 文档定位
 
@@ -31,8 +31,8 @@
 | `MVP-07` | `COMPLETED` | `bc24322` | 路线逐段显隐、事件相关地点、手动地点优先级、路线开关和样式重载恢复已完成并推送 |
 | `MVP-08` | `COMPLETED` | `efd3d0b` | 事件/地点/空详情、逐条引用、观点与可信度文字、关闭地点返回事件和浏览器验证已完成并推送 |
 | `MVP-09` | `COMPLETED` | `d830402` | 桌面单页布局、主动事件/地点定位、加载错误重试、键盘与生产浏览器验证已完成并推送 |
-| `MVP-10` | `COMPLETED_PENDING_COMMIT` | 待用户确认 | 测试/构建门禁审计、本地运行说明、双 base 静态部署、浏览器回归与限时静态复核已完成 |
-| `MVP-11` | `PENDING` | — | 独立执行内容审核清单与发布前签字，不由工程门禁替代 |
+| `MVP-10` | `COMPLETED` | `0dd3faa` | 测试/构建门禁审计、本地运行说明、双 base 静态部署、浏览器回归与限时静态复核已完成并推送 |
+| `MVP-11` | `IN_PROGRESS_AWAITING_SIGNOFF` | 待用户确认 | 正式集合映射门禁、失败测试、双 base 构建、HTTP 与当前真实浏览器回归完成；产品/内容/开发最终签字仍待完成 |
 
 提交 `0394d7e` 只删除旧版文档归档 `history-map-docs.zip`，不代表新的 MVP 阶段。
 
@@ -529,8 +529,46 @@ Codex 随后独立对照当前源码、构建产物、服务请求日志、浏�
 - 没有修改产品交互、地图语义、数据契约、生产依赖、`package-lock.json` 或既有测试；没有增加后端、数据库、CI/CD、Docker、Kubernetes、云部署、覆盖率追数、视觉回归平台或完整浏览器矩阵。
 - 上述工程、静态部署和浏览器证据只用于 MVP-10，不生成或批准 MVP-11 的内容审核签字，也不把工程通过等同于历史内容可以发布。
 
-## 13. 下一步边界
+## 13. MVP-11 当前实施证据
 
-1. `MVP-09` 完成提交 `d830402` 已推送；本任务开始时现场核对的 `HEAD`、本地 `master`、本地 `origin/master` 和 GitHub 远端 `master` 一致，工作树干净。
-2. `MVP-10` 实现、完整门禁、双 base 构建、双 worker 校验、真实浏览器验证和一次限时只读静态复核已完成；提交和推送仍须先向用户汇报真实 diff、测试、纯静态/范围/内容门禁和复核结论，并取得明确确认。
-3. 下一工程任务为 `MVP-11`，它仍是独立内容签字门禁；后续工作必须继续保护正式数据、资料笔记与审核表，不得把 DISPUTED、APPROXIMATE 或 `INFERENCE / LOW` 内容升级为确定事实。
+### 实现与审计范围
+
+- 新增 `frontend/scripts/audit-content-release.ts` 与 `audit:content` 命令：从正式 JSON 反向枚举 Place、Event、Geography、实际 RouteSegment、运行时 Claim、Citation、Source，并与资料笔记和审核表做唯一键、状态、审核人/日期、字段和引用交叉核对。
+- `scripts/assemble-anshi-mvp-data.mjs` 原来只读取 Source/Citation/Claim 审核行；现在同时要求每个正式 Place、Event、Geography、实际 RouteSegment 以及对应 RoutePlan 组织项具备 `banq / 2026-07-31 / APPROVED` 的人工审核行。RoutePlan 仍不能替代实际 RouteSegment。
+- 新增 `frontend/tests/data/mvp-content-audit.test.ts` 的 6 个高价值测试，覆盖正式集合成功映射、RoutePlan 仍在但实际 RouteSegment 审核行缺失、正式行未批准、Claim `entityType/entityId/field/citationIds` 映射错误、空间 Source 许可证链接缺失和 Citation 悬空 Source。
+- `frontend/README.md` 增加内容审计命令和签字边界；`docs/reviews/anshi-mvp-content-review.md` 增加产品/内容/开发最终签字清单，但未替任何负责人勾选、填写姓名或日期。
+- 没有修改产品交互、地图语义、数据契约、生产依赖或 lockfile；没有改写历史事实、日期、坐标、路线、Source/Citation、许可证、署名或已有批准结论。
+
+### 正式集合、许可与范围门禁
+
+- 正式集合为 5 个 Place、6 个 Event、3 个 Geography、3 个实际 RouteSegment、33 条运行时 SourcedClaim、36 个 Citation、19 个 Source；共 105 个正式审核键均唯一、为 `APPROVED`，且具有真实 reviewer/reviewDate。
+- 2 个 RoutePlan 和 2 条对应 RoutePlan Claim 只作审核组织，不写入正式 JSON；3 个 RouteSegment 各自具有独立资料笔记记录、审核行、Claim 和空间来源。
+- 33 条正式 Claim 的 `entityType/entityId/field/citationIds` 与资料笔记逐条匹配；36 个 Citation 均有章节及页码或稳定定位，并解析到带版本标识的正式 Source。
+- 7 个空间 Source 均保留数据版本、访问日期、原始坐标系、覆盖范围、许可名称、使用限制、处理过程与输出对象；需要开放许可的 Source 同时具有许可证链接和署名文字。灵宝政府报告只引用必要单项事实数据，继续保留 `licenseName=不适用` 的限定边界。
+- 范围外记录没有被删除或自动批准：9 条 `PENDING_REVIEW`（2 Source、6 Citation、1 Claim）、5 条 `PENDING_SOURCE`（1 Geography、4 Source）和 2 条 `REJECTED` Geography 历史作用 Claim 均明确留在正式集合之外。
+- 正式数据继续保持 5 个 Place 全部 `DISPUTED`，6 个 Event 全部 `APPROXIMATE` 且 `normalizedDate=null`，3 个 RouteSegment 全部 `INFERENCE / LOW`；不含 `TODO_REVIEW`、示例页码、占位坐标、`PENDING_*` 或 `CHANGES_REQUIRED`。
+- 重跑组装器前后 `frontend/public/data/anshi/mvp-v1.json` 的 SHA-256 均为 `34927c09eb03f37e2b7d884afb34172dc9990bc3549a6c1638813ddc251beee6`，正式 JSON 字节未变。
+
+### 环境、命令与静态产物
+
+- 开始时工作树干净；当前 worktree 为 detached `HEAD`，`HEAD`、本地 `origin/master` 与 GitHub 远端 `master` 均现场核对为 `0dd3faa109a3a04d5702c320da233945a537935a`；远端继续使用 `git@github.com:dcjkdd/history-map.git`。仓库根没有 `.codegraph/`，因此按规则跳过 CodeGraph。
+- `/Users/banq/.nvm/nvm.sh`、Node `24.18.0`、npm `11.16.0`；`npm --prefix frontend ci` 通过，安装 143 个包，仅保留既有 `fsevents@2.3.3` allowScripts 提示。
+- `npm --prefix frontend run typecheck`、`validate:data`（0 warning）、`audit:content`、`test`、`build` 与完整 `check` 均通过；18 个测试文件、116 个测试全部通过。
+- 根路径构建及 worker 闭包校验通过；`--base=/history-map/` 构建输出到 `/private/tmp/history-map-mvp11.9DDWZ0/history-map` 并通过第二次 worker 校验，工作树没有非根构建产物。
+- 根路径 `/`、根 `/data/anshi/mvp-v1.json`、根 worker，以及 `/history-map/`、站点根 `/data/anshi/mvp-v1.json`、非根 worker 均通过裸静态服务器取得 HTTP 200。
+- 根构建约 1.8 MB，只包含 HTML、CSS、JavaScript、单一 MapLibre worker、正式 JSON 和本地空白样式；生产直接依赖仍只有 Vue、Pinia、MapLibre。业务源码唯一 `fetch` 仍位于 `MvpRepository`；没有跟踪 `.env`/私钥文件，构建与源码未发现 Vite 秘密变量或私钥标记。
+
+### 当前浏览器与最终签字边界
+
+- 用户在应用内浏览器显式打开并交付 `http://127.0.0.1:4173/` 与 `http://127.0.0.1:4174/history-map/` 后，Codex 只使用获授权的既有标签页完成当前真实回归；没有改用其他浏览器通道，也没有把 MVP-10 的旧结果冒充本次验证。
+- 根路径从第 1 个事件连续 5 次点击“下一事件”到第 6/6 个事件，随后打开“长安”地点详情，执行地点主动定位、关闭地点详情并执行当前事件主动定位；引用版本/稳定定位、`APPROXIMATE`/“尚不确定”和 `DISPUTED` 展示均保持可见。
+- `/history-map/` 从第 1 个事件直选第 6/6 个事件，打开“长安”详情并执行地点主动定位；图例继续明确路线为 `INFERENCE / LOW` 的解释性示意。根路径另完成行动路线图层关闭与恢复。
+- 根路径在精确 `1024×768`、子路径在精确 `1440×900` 下均无横向溢出；现场截图确认地图、图例、MapLibre 署名和详情面板没有遮挡。两个路径始终只有 1 个 MapLibre 容器和 1 个 Canvas，正常 console 均为 0 warning/error，且未配置外部底图时正确显示本地中性背景。
+- MVP-10 已验证显式有效本地样式和损坏样式降级；MVP-11 没有修改产品代码、地图语义或依赖，本次浏览器证据只新增当前默认本地中性背景、内容展示和交互回归，不把未重跑的浏览器矩阵写成新证据。
+- 行级内容审核虽然已由 `banq` 于 2026-07-31 完成，仍不等于 `mvp-acceptance.md` 的最终产品/内容/开发三方签字；最终三类复选项、真实姓名、日期和明确批准结论目前全部保持空白。
+- 在三方最终签字完成前，`MVP-11` 与整期 MVP 均不得标为 `COMPLETED`。
+
+## 14. 下一步边界
+
+1. Codex 汇报最终真实 diff、完整测试、数据/许可/内容/范围门禁、浏览器结果和待签清单；产品、内容、开发负责人分别核对并填写真实签字。
+2. 即使三方签字完成，commit/push 仍须用户另行明确确认；未确认不得提交或推送。继续使用中文提交信息和现有 Git SSH，不安装 `gh`、不创建 PR。

@@ -33,12 +33,15 @@ npm --prefix frontend run dev -- --host 127.0.0.1 --port 5173
 ```bash
 npm --prefix frontend run typecheck
 npm --prefix frontend run validate:data
+npm --prefix frontend run audit:content
 npm --prefix frontend run test
 npm --prefix frontend run build
 npm --prefix frontend run check
 ```
 
-`check` 依次执行 `typecheck`、`validate:data`、`test`、`build`，最后执行固定的 MapLibre worker 闭包校验。`build` 自身会在 Vite 构建前再次执行类型检查和正式数据校验，因此数据不合法时不会生成可发布版本。
+`audit:content` 从正式 JSON 反向枚举 Place、Event、Geography、实际 RouteSegment、运行时 Claim、Citation 和 Source，逐项核对资料笔记与内容审核表中的唯一 `APPROVED` 行、Claim 字段/引用映射、Citation 定位和空间来源许可记录。它会明确列出范围外候选；不会删除、批准这些候选，也不会代替最终人工签字。
+
+`check` 依次执行 `typecheck`、`validate:data`、`audit:content`、`test`、`build`，最后执行固定的 MapLibre worker 闭包校验。`build` 自身会在 Vite 构建前再次执行类型检查和正式数据校验，因此数据不合法时不会生成可发布版本；最终三方签字仍是独立发布门禁。
 
 也可以在已有根路径构建产物上单独复核 worker：
 

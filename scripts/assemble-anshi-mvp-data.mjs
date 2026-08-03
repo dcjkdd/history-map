@@ -301,14 +301,19 @@ assert(claimsById.size === claimRows.length, 'Claim IDs must be unique')
 
 const reviewRows = contentReview
   .split('\n')
-  .filter((line) => /^\| (Source|Citation|Claim) \|/.test(line))
+  .filter((line) =>
+    /^\| (Place|Event|Geography|RoutePlan|RouteSegment|Source|Citation|Claim) \|/.test(
+      line,
+    ),
+  )
   .map((line) =>
     assertMarkdownRowLength(splitMarkdownRow(line), [15], 'Review row'),
   )
 
 assert(
-  reviewRows.length === 105,
-  `Expected 105 Source/Citation/Claim review rows, found ${reviewRows.length}`,
+  reviewRows.filter((row) => ['Source', 'Citation', 'Claim'].includes(row[1]))
+    .length === 105,
+  `Expected 105 Source/Citation/Claim review rows, found ${reviewRows.filter((row) => ['Source', 'Citation', 'Claim'].includes(row[1])).length}`,
 )
 
 const reviewsByKey = new Map(
@@ -467,6 +472,7 @@ const placesById = new Map(
 const places = {
   type: 'FeatureCollection',
   features: placeConfigurations.map((configuration) => {
+    assertHumanApproval('Place', configuration.id)
     const candidate = placesById.get(configuration.id)
     assertApprovedSpatialCandidate(candidate, configuration.id)
 
@@ -544,6 +550,7 @@ const geographyByCandidateId = new Map(
 const geography = {
   type: 'FeatureCollection',
   features: geographyConfigurations.map((configuration) => {
+    assertHumanApproval('Geography', configuration.id)
     const candidate = geographyByCandidateId.get(configuration.candidateId)
     assertApprovedSpatialCandidate(candidate, configuration.id)
 
@@ -571,6 +578,7 @@ const routeSegments = {
   type: 'FeatureCollection',
   features: routeCandidates.features.map((candidate) => {
     const properties = candidate.properties
+    assertHumanApproval('RouteSegment', properties.id)
     assertApprovedSpatialCandidate(
       {
         properties: {
@@ -636,6 +644,12 @@ const routeSegments = {
   }),
 }
 
+for (const routeId of new Set(
+  routeSegments.features.map((feature) => feature.properties.routeId),
+)) {
+  assertHumanApproval('RoutePlan', routeId)
+}
+
 const eventRows = sourceNotes
   .split('\n')
   .filter((line) => /^\| event-/.test(line))
@@ -647,6 +661,7 @@ assert(eventRows.length === 6, `Expected 6 approved Events, found ${eventRows.le
 const events = eventRows.map((row) => {
   const id = row[1]
   const sequence = Number(row[2])
+  assertHumanApproval('Event', id)
 
   return {
     id,

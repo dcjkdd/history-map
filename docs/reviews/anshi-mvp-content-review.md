@@ -1,6 +1,6 @@
 # 安史之乱 MVP 内容审核记录
 
-- 状态：缩小版发布范围已完成逐项人工签字，等待用户提交确认
+- 状态：缩小版正式集合已完成行级人工审核、MVP-11 自动映射审计与当前浏览器回归；最终三方签字待完成
 - 建立日期：2026-07-29
 - 资料笔记：`data/curated/anshi-mvp-source-notes.md`
 - 当前已批准 Source/Citation/Claim 记录数：90（19 个 Source、36 个 Citation、35 个 Claim）
@@ -164,3 +164,60 @@ NOT_APPLICABLE   本项不适用
 - 姓名：待定
 - 日期：待定
 - 结论：尚未签字（只有填写真实姓名、日期并明确写明“批准”后才生效）
+
+## MVP-11 发布前最终签字门禁
+
+本节是第一期 MVP 的最终三方签字，不由上面的行级 `APPROVED`、首批内容签字、自动测试或浏览器路径单独替代。Codex 只记录可复核证据，不勾选负责人结论，不填写签字姓名或日期。
+
+### 当前可复核证据
+
+| 门禁 | 当前证据 | 状态 |
+|---|---|---|
+| 正式集合映射 | `npm --prefix frontend run audit:content`：5 Place、6 Event、3 Geography、3 实际 RouteSegment、33 运行时 Claim、36 Citation、19 Source，共 105 个正式键均有唯一 `APPROVED` 审核行 | 已通过 |
+| RoutePlan 边界 | 2 个 RoutePlan 和 2 条 RoutePlan Claim 仅作审核组织；3 个实际 RouteSegment 分别具有独立审核行 | 已通过 |
+| 范围外记录 | 9 条 `PENDING_REVIEW`、5 条 `PENDING_SOURCE`、2 条 `REJECTED` 明确保留在正式集合之外；没有为“清零”而批准或删除 | 已通过 |
+| Claim / Citation / Source | 33 条 Claim 的 `entityType/entityId/field/citationIds` 与资料笔记逐条一致；36 个 Citation 均有章节及页码或稳定定位并解析到 19 个有版本标识的 Source | 已通过 |
+| 空间来源 | 7 个空间 Source 的数据版本、访问日期、坐标系、覆盖范围、许可名称、使用限制、处理过程和输出对象均可解析；需要开放许可的 Source 同时有许可证链接和署名文字 | 已通过 |
+| 不确定性与占位 | 5 个 Place 继续为 `DISPUTED`；6 个 Event 继续为 `APPROXIMATE` 且 `normalizedDate=null`；3 个 RouteSegment 继续为 `INFERENCE / LOW`；正式 JSON 不含 `TODO_REVIEW`、示例页码、占位坐标或待审核状态 | 已通过 |
+| 工程门禁 | Node `24.18.0`、npm `11.16.0`；`npm ci` 通过；`check` 通过，18 个测试文件、116 个测试；根/非根构建和双 worker 闭包校验通过 | 已通过 |
+| 裸静态资源 | 根 `/`、根 `/data/`、worker，以及 `/history-map/`、站点根 `/data/`、非根 worker 均由干净构建取得 HTTP 200 | 已通过 |
+| 当前真实浏览器回归 | 用户显式交付根路径与 `/history-map/` 标签页后，从干净裸静态构建完成根路径连续 1→6 事件、长安详情、地点/事件主动定位、子路径事件与地点交互、路线图层关闭/恢复；根路径 `1024×768`、子路径 `1440×900` 均无横向溢出，正常 console 0 warning/error，并始终只有 1 个 MapLibre/Canvas | 已通过 |
+
+范围外记录保留理由如下：
+
+- `SRC-MODERN-02`—`05` 只有书目，缺少实际版本和正文；`SRC-PRIMARY-02` 与两条《旧唐书》Citation 因转录质量仅 25% 待对校；`SRC-HISTGEO-02` 与 `CIT-CHGIS-HVD83048-SHANXIAN` 只作带非商业许可的内部核对，不打包坐标。
+- `CIT-ANSHI25-CH04-P032-P037`、`CIT-ANSHI25-CH09-P027-P042`、`CIT-TGXZ1992-P558` 涉及尚未采用的部署、战术、兵力、日期或地方叙事，继续等待逐项审核。
+- `geography-guanzhong-corridor` 与 `claim-geography-guanzhong-corridor-modern-01` 是用户明确推迟的后续候选，不属于缩小版正式集合。
+- `claim-geography-yellow-river-role-modern-01` 与 `claim-geography-qinling-role-modern-01` 只是不纳入本版历史作用摘要的保留项；`REJECTED` 不表示其内容已被判为错误，也不能为了“清零”删除。
+
+### 产品负责人核对与签字
+
+- [ ] 核心故事可在 5—10 次交互内讲清，并能回答 D-007 的五个问题。
+- [ ] 页面没有被非核心功能干扰。
+- [ ] 地图、时间轴、详情、引用与不确定性的信息层级清楚。
+- 签字姓名：
+- 签字日期：
+- 结论（批准 / 不批准并说明）：
+
+### 内容负责人最终核对与签字
+
+- [ ] 正式 Place、Event、Geography、实际 RouteSegment、逐条 Claim、Citation 和 Source 版本全部复核。
+- [ ] 坐标、时间和争议信息没有被过度确定化；空间数据许可证、署名和处理过程已核对。
+- [ ] 范围外 `PENDING_SOURCE`、`PENDING_REVIEW`、`REJECTED` 候选保留合理，且不属于本次正式发布集合。
+- [ ] 不存在编造页码、占位数据和未说明推断。
+- 签字姓名：
+- 签字日期：
+- 结论（批准 / 不批准并说明）：
+
+### 开发负责人核对与签字
+
+- [ ] `npm --prefix frontend run check` 通过。
+- [ ] 根路径和 `/history-map/` 裸静态部署的真实浏览器回归完成，正常 console 无 warning/error，且保持单一 MapLibre/Canvas。
+- [ ] 正常样式与本地降级样式均通过验收。
+- [ ] 无 Blocker 和 Major 缺陷。
+- [ ] 构建产物为纯静态文件，不依赖后端、数据库或秘密。
+- 签字姓名：
+- 签字日期：
+- 结论（批准 / 不批准并说明）：
+
+产品、内容、开发三方负责人填写真实姓名、日期并明确批准后，才可把整期 MVP 标记为完成。当前工程通过、行级 `APPROVED` 和 HTTP 200 均不自动满足本节。
