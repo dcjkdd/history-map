@@ -2,6 +2,8 @@
 
 本目录是“潼关防线、灵宝出战与长安失守”第一期 MVP 的可运行前端。它是 Vue 3、TypeScript、Vite 与 MapLibre GL JS 构成的只读单页应用；生产构建只包含静态 HTML、CSS、JavaScript、MapLibre worker、地图样式和版本化 JSON，不需要 Go、PostgreSQL/PostGIS、Redis、Docker 或 MinIO。
 
+> 产品状态：当前代码是已完成工程与内容门禁验证的二维技术原型，不是最终产品验收通过版本。2026-08-02 起的现行产品范围是 [地形优先第二期](../docs/plans/phase-2-terrain-scope.md)；本运行说明继续作为可复用技术基线，不能用中性空白地图的正常运行证明地形产品已经完成。
+
 ## 环境与安装
 
 - Node.js：`24.18.0`，由仓库根目录 `.nvmrc` 固定。

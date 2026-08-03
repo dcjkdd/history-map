@@ -6,16 +6,23 @@
 
 ## 当前执行基线
 
-当前第一可发布版本采用只读静态前端 MVP，聚焦“潼关防线、灵宝出战与长安失守”。本期暂不建设 Go、PostgreSQL/PostGIS、数据后台、RAG 和三维地形。
+MVP-01—MVP-11 已形成可运行、可审计的二维静态技术原型，但它没有证明产品核心价值：用户仍无法直接从地图看出山川形势、关隘作用以及军队为什么沿特定方向行动。因此，原“先用弱地形二维版验证地形解释价值”的产品验证结论作废；当前执行阶段改为**地形优先的第二期产品纠偏**。
+
+- [第二期地形优先范围](docs/plans/phase-2-terrain-scope.md)
+- [第二期开发任务](docs/plans/phase-2-terrain-tasks.md)
+- [第二期验收标准](docs/plans/phase-2-terrain-acceptance.md)
+- [ADR-0002：地形优先二期产品纠偏](docs/decisions/0002-地形优先二期产品纠偏.md)
+
+下列文档保留为已完成技术原型的实施记录，不再定义当前产品是否成立：
 
 - [MVP 范围](docs/plans/mvp-scope.md)
 - [MVP 开发任务](docs/plans/mvp-tasks.md)
 - [MVP 验收标准](docs/plans/mvp-acceptance.md)
 - [ADR-0001：静态前端 MVP 优先](docs/decisions/0001-静态前端MVP优先.md)
 
-发生实施冲突时，以 ADR 中记录的文档权威顺序为准。下方技术栈仍是长期演进目标。
+第二期继续复用 Vue、MapLibre 和版本化静态数据，不因产品纠偏自动引入后端、数据库、RAG 或多专题平台。发生实施冲突时，以 ADR-0002 的权威顺序为准。下方技术栈仍是长期演进目标。
 
-## 第一期 MVP 本地入口
+## 当前技术原型本地入口
 
 当前可运行的第一期 MVP 位于 `frontend/`；仓库根目录没有 `package.json`。在仓库根目录执行：
 
@@ -70,11 +77,15 @@ history-map/
 │   │   ├── 03-开发阶段规划.md
 │   │   └── 04-本地环境检查.md
 │   ├── decisions/
-│   │   └── 0001-静态前端MVP优先.md
+│   │   ├── 0001-静态前端MVP优先.md
+│   │   └── 0002-地形优先二期产品纠偏.md
 │   ├── plans/
 │   │   ├── mvp-scope.md
 │   │   ├── mvp-tasks.md
-│   │   └── mvp-acceptance.md
+│   │   ├── mvp-acceptance.md
+│   │   ├── phase-2-terrain-scope.md
+│   │   ├── phase-2-terrain-tasks.md
+│   │   └── phase-2-terrain-acceptance.md
 │   ├── reviews/
 │   │   └── anshi-mvp-content-review.md
 │   └── data/
@@ -93,6 +104,6 @@ history-map/
 
 1. 单体优先，不做微服务。
 2. 数据质量优先，不先追求大而全。
-3. 先完成二维可用版，再做三维地形。
+3. 先让地形、关隘、河流、平原、通道和路线方向在地图上共同讲清军事地理，再扩张后台、知识库、多专题或更复杂的三维表现。
 4. 先人工录入核心史料，再做自动 RAG。
 5. 每个地点、路线和观点都保留资料来源和可信度。
