@@ -13,10 +13,12 @@
     "typecheck": "vue-tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.node.json",
     "validate:data": "node scripts/validate-data.ts",
     "audit:content": "node scripts/audit-content-release.ts",
+    "verify:terrain-assets": "node scripts/verify-terrain-assets.ts public/terrain/phase2-02",
+    "verify:terrain-bundle": "node scripts/verify-terrain-assets.ts dist/terrain/phase2-02",
     "verify:worker-bundle": "node scripts/verify-worker-bundle.ts",
     "test": "vitest run",
-    "build": "npm run typecheck && npm run validate:data && vite build",
-    "check": "npm run typecheck && npm run validate:data && npm run audit:content && npm run test && npm run build && npm run verify:worker-bundle"
+    "build": "npm run typecheck && npm run validate:data && npm run verify:terrain-assets && vite build",
+    "check": "npm run typecheck && npm run validate:data && npm run audit:content && npm run test && npm run build && npm run verify:worker-bundle && npm run verify:terrain-bundle"
   },
   "dependencies": {
     "maplibre-gl": "6.0.0",

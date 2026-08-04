@@ -7,6 +7,10 @@ import type { Event, InitialView, MvpDataset } from '../domain/mvpTypes'
 import { GEOGRAPHY_LAYER_IDS } from '../map/layers/geographyLayer'
 import { PLACE_LAYER_IDS } from '../map/layers/placeLayer'
 import { ROUTE_LAYER_IDS } from '../map/layers/routeLayer'
+import {
+  TERRAIN_LAYER_IDS,
+  TERRAIN_SOURCE_IDS,
+} from '../map/layers/terrainLayer'
 import { useMvpStore } from '../stores/mvpStore'
 import {
   EMPTY_MAP_STYLE_URL,
@@ -38,6 +42,7 @@ const maplibreMock = vi.hoisted(() => {
     readonly addLayer = vi.fn((layer: { id: string }) => {
       this.layers.set(layer.id, layer)
     })
+    readonly addControl = vi.fn()
     private styleLoaded = false
 
     constructor(options: Record<string, unknown>) {
@@ -87,11 +92,21 @@ const maplibreMock = vi.hoisted(() => {
     })
   }
 
-  return { instances, MockMap }
+  class MockNavigationControl {
+    constructor(readonly options: Record<string, unknown>) {}
+  }
+
+  class MockScaleControl {
+    constructor(readonly options: Record<string, unknown>) {}
+  }
+
+  return { instances, MockMap, MockNavigationControl, MockScaleControl }
 })
 
 vi.mock('maplibre-gl', () => ({
   Map: maplibreMock.MockMap,
+  NavigationControl: maplibreMock.MockNavigationControl,
+  ScaleControl: maplibreMock.MockScaleControl,
   setWorkerUrl: vi.fn(),
 }))
 
@@ -111,9 +126,12 @@ const emptyHistoryMapProps = {
   places: emptyPlaces,
   routeSegments: emptyRouteSegments,
 }
-const historySourceCount = 3
+const historySourceCount = 4 + TERRAIN_SOURCE_IDS.length
 const historyLayerCount =
-  GEOGRAPHY_LAYER_IDS.length + PLACE_LAYER_IDS.length + ROUTE_LAYER_IDS.length
+  GEOGRAPHY_LAYER_IDS.length +
+  PLACE_LAYER_IDS.length +
+  ROUTE_LAYER_IDS.length +
+  TERRAIN_LAYER_IDS.length
 
 function makeEvent(
   id: string,
@@ -281,11 +299,20 @@ describe('useMapLibre', () => {
     expect(maplibreMock.instances).toHaveLength(1)
     expect(secondHandle).toBe(firstHandle)
     expect(instance.options).toMatchObject({
+      attributionControl: { compact: true },
+      bearing: 0,
       center: centerView.center,
       container,
+      localIdeographFontFamily: 'PingFang SC, system-ui, sans-serif',
+      pitch: 0,
       style: 'https://maps.example.test/style.json',
       zoom: centerView.zoom,
     })
+    expect(instance.addControl).toHaveBeenCalledTimes(2)
+    expect(instance.addControl.mock.calls.map((call: unknown[]) => call[1])).toEqual([
+      'top-left',
+      'bottom-left',
+    ])
 
     fitToTopic()
 
@@ -340,7 +367,7 @@ describe('useMapLibre', () => {
 
     expect(maplibreMock.instances[0].options.style).toBe(EMPTY_MAP_STYLE_URL)
     expect(isUsingFallbackStyle.value).toBe(true)
-    expect(mapStyleWarning.value).toContain('本地中性背景')
+    expect(mapStyleWarning.value).toBeNull()
   })
 
   it('按 Vite base 解析本地空白样式路径', () => {
@@ -470,13 +497,14 @@ describe('useMapLibre', () => {
 
     expect(maplibreMock.instances).toHaveLength(1)
     expect(host.querySelector('[aria-busy="true"]')).not.toBeNull()
-    expect(host.textContent).toContain('本地中性背景')
+    expect(host.textContent).toContain('地形加载中')
 
     instance.emit('style.load')
+    instance.emit('idle')
     await nextTick()
 
     expect(host.querySelector('[aria-busy="false"]')).not.toBeNull()
-    expect(host.textContent).not.toContain('地图底图加载中')
+    expect(host.textContent).toContain('地形已加载')
     expect(instance.addSource).toHaveBeenCalledTimes(historySourceCount)
     expect(instance.addLayer).toHaveBeenCalledTimes(historyLayerCount)
 
@@ -648,8 +676,9 @@ describe('useMapLibre', () => {
     const instance = maplibreMock.instances[0]
 
     expect(instance.listeners['style.load']).toHaveLength(2)
-    expect(instance.listeners.error).toHaveLength(1)
+    expect(instance.listeners.error).toHaveLength(2)
     expect(instance.listeners.click).toHaveLength(1)
+    expect(instance.listeners.idle).toHaveLength(1)
 
     instance.emit('error', {
       error: {
@@ -704,14 +733,16 @@ describe('useMapLibre', () => {
     expect(instance.addSource).toHaveBeenCalledTimes(historySourceCount)
     expect(instance.addLayer).toHaveBeenCalledTimes(historyLayerCount)
     expect(instance.listeners['style.load']).toHaveLength(2)
-    expect(instance.listeners.error).toHaveLength(1)
+    expect(instance.listeners.error).toHaveLength(2)
     expect(instance.listeners.click).toHaveLength(1)
+    expect(instance.listeners.idle).toHaveLength(1)
 
     app.unmount()
 
     expect(instance.listeners['style.load']).toHaveLength(0)
     expect(instance.listeners.error).toHaveLength(0)
     expect(instance.listeners.click).toHaveLength(0)
+    expect(instance.listeners.idle).toHaveLength(0)
     host.remove()
   })
 
@@ -735,6 +766,67 @@ describe('useMapLibre', () => {
     expect(host.querySelector('[aria-busy="false"]')).not.toBeNull()
     expect(host.textContent).not.toContain('地图底图加载中')
     expect(host.textContent).toContain('本地降级底图未能加载')
+
+    app.unmount()
+    host.remove()
+  })
+
+  it('地形失败时保留历史图层，并可经 setStyle -> style.load 幂等恢复状态', async () => {
+    const host = document.createElement('div')
+    document.body.append(host)
+    const pinia = createPinia()
+    const store = useMvpStore(pinia)
+    store.toggleLayer('routes')
+    store.selectPlace('place-tongguan')
+    const app = createApp(HistoryMap, emptyHistoryMapProps)
+
+    app.use(pinia).mount(host)
+    await nextTick()
+    const instance = maplibreMock.instances[0]
+
+    instance.emit('style.load')
+    instance.emit('idle')
+    await nextTick()
+    expect(host.querySelector('[data-terrain-status="ready"]')).not.toBeNull()
+
+    instance.emit('error', {
+      sourceId: 'phase2-terrain-dem',
+      error: {
+        message: 'terrain tile HTTP 404',
+        url: '/terrain/phase2-02/terrain/8/205/101.png',
+      },
+    })
+    await nextTick()
+
+    expect(host.querySelector('[data-terrain-status="degraded"]')).not.toBeNull()
+    expect(host.textContent).toContain('历史地点、路线与事件仍可阅读')
+    expect(instance.layers.has('mvp-places-city')).toBe(true)
+    expect(instance.layers.has('mvp-routes-tang')).toBe(true)
+
+    host.querySelector<HTMLButtonElement>('.history-map__terrain-degraded button')?.click()
+    expect(instance.setStyle).toHaveBeenCalledWith(EMPTY_MAP_STYLE_URL, { diff: false })
+
+    instance.emit('style.load')
+    instance.emit('idle')
+    await nextTick()
+
+    expect(host.querySelector('[data-terrain-status="ready"]')).not.toBeNull()
+    expect(maplibreMock.instances).toHaveLength(1)
+    expect(instance.addSource).toHaveBeenCalledTimes(historySourceCount * 2)
+    expect(instance.addLayer).toHaveBeenCalledTimes(historyLayerCount * 2)
+    expect(instance.setLayoutProperty).toHaveBeenCalledWith(
+      'mvp-routes-tang',
+      'visibility',
+      'none',
+    )
+    expect(instance.setFilter).toHaveBeenCalledWith('mvp-places-selected', [
+      '==',
+      ['get', 'id'],
+      'place-tongguan',
+    ])
+    expect(instance.listeners['style.load']).toHaveLength(2)
+    expect(instance.listeners.error).toHaveLength(2)
+    expect(instance.listeners.idle).toHaveLength(1)
 
     app.unmount()
     host.remove()

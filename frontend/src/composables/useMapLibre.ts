@@ -1,4 +1,9 @@
-import { Map as MapLibreMap, setWorkerUrl } from 'maplibre-gl'
+import {
+  Map as MapLibreMap,
+  NavigationControl,
+  ScaleControl,
+  setWorkerUrl,
+} from 'maplibre-gl'
 import type {
   ErrorEvent as MapLibreErrorEvent,
   MapOptions,
@@ -127,7 +132,11 @@ export function useMapLibre(options: UseMapLibreOptions = {}) {
     const configuredStyleUrl = resolveConfiguredStyleUrl(options.styleUrl)
     const usingFallbackInitially = configuredStyleUrl === null
     const mapOptions: MapOptions = {
+      attributionControl: { compact: true },
+      bearing: 0,
       container,
+      localIdeographFontFamily: 'PingFang SC, system-ui, sans-serif',
+      pitch: 0,
       style: configuredStyleUrl ?? EMPTY_MAP_STYLE_URL,
       center: nextInitialView.center,
       zoom: nextInitialView.zoom,
@@ -146,14 +155,17 @@ export function useMapLibre(options: UseMapLibreOptions = {}) {
     }
 
     const instance = new MapLibreMap(mapOptions)
+    instance.addControl(
+      new NavigationControl({ showCompass: true, showZoom: true }),
+      'top-left',
+    )
+    instance.addControl(new ScaleControl({ maxWidth: 120, unit: 'metric' }), 'bottom-left')
 
     initialView = nextInitialView
     map.value = instance
     mapStyleState.value = 'loading'
     isUsingFallbackStyle.value = usingFallbackInitially
-    mapStyleWarning.value = usingFallbackInitially
-      ? '未配置外部底图，当前使用本地中性背景。'
-      : null
+    mapStyleWarning.value = null
     onStyleLoad = () => {
       mapStyleState.value = 'ready'
     }

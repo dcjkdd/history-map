@@ -1,6 +1,7 @@
 <template>
-  <aside class="map-legend" aria-labelledby="map-legend-title">
-    <h3 id="map-legend-title">图例</h3>
+  <details class="map-legend">
+    <summary>图例与不确定性</summary>
+    <div class="map-legend__content">
 
     <div class="map-legend__section">
       <p>地点类型</p>
@@ -12,10 +13,12 @@
     </div>
 
     <div class="map-legend__section">
-      <p>现代地理背景</p>
+      <p>地形与现代定位</p>
       <ul>
+        <li><span class="legend-terrain"></span>高程分层 + hillshade</li>
         <li><span class="legend-line legend-line--river"></span>河流</li>
         <li><span class="legend-area legend-area--mountain"></span>山地 / 通道</li>
+        <li><span class="legend-line legend-line--province"></span>今省界</li>
       </ul>
     </div>
 
@@ -33,5 +36,9 @@
       <span class="legend-symbol legend-symbol--uncertain"></span>
       外圈表示 LOW、DISPUTED 或 UNKNOWN；虚线路线保持 INFERENCE / LOW，只是宏观节点间的解释性示意，不应理解为精确历史坐标或行军轨迹。
     </p>
-  </aside>
+      <p class="map-legend__uncertainty">
+        河南、陕西边界与“今”标签仅用于现代方位，不表示唐代边界；秦岭文字锚点仅用于显示，未写入正式历史 JSON。
+      </p>
+    </div>
+  </details>
 </template>

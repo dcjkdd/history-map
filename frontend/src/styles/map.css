@@ -14,11 +14,15 @@
   inset: 0;
 }
 
+.history-map .maplibregl-ctrl-bottom-left {
+  bottom: 9rem;
+}
+
 .history-map__actions {
   position: absolute;
   z-index: 3;
   top: 1rem;
-  left: 1rem;
+  left: 3.65rem;
 }
 
 .history-map__actions button {
@@ -91,18 +95,24 @@
   top: 10.25rem;
   right: 1rem;
   width: min(18rem, calc(100% - 2rem));
-  padding: 0.8rem;
+  padding: 0;
 }
 
-.map-legend h3,
 .map-legend p,
 .map-legend ul {
   margin: 0;
 }
 
-.map-legend h3 {
+.map-legend summary {
+  padding: 0.75rem 0.8rem;
   color: #523b2d;
+  cursor: pointer;
   font-size: 0.82rem;
+  font-weight: 750;
+}
+
+.map-legend__content {
+  padding: 0 0.8rem 0.8rem;
 }
 
 .map-legend__section {
@@ -172,6 +182,21 @@
   width: 1.2rem;
 }
 
+.legend-terrain {
+  display: inline-block;
+  flex: none;
+  width: 1.2rem;
+  height: 0.75rem;
+  border: 1px solid rgb(63 71 52 / 35%);
+  border-radius: 0.15rem;
+  background: linear-gradient(135deg, #c9d6b4, #d7c68b 42%, #8a6c52 72%, #4a423e);
+  box-shadow: inset -0.12rem -0.12rem 0.2rem rgb(32 35 30 / 30%);
+}
+
+.legend-line--province {
+  border-top: 2px dashed #514d47;
+}
+
 .legend-line--river {
   border-top: 3px solid #4f8191;
 }
@@ -217,7 +242,9 @@
 }
 
 .history-map__message,
-.history-map__warning {
+.history-map__warning,
+.history-map__terrain-ready,
+.history-map__terrain-degraded {
   position: absolute;
   z-index: 3;
   left: 1rem;
@@ -233,7 +260,39 @@
 }
 
 .history-map__message {
-  top: 4.4rem;
+  top: 7rem;
+}
+
+.history-map__terrain-ready {
+  top: 1rem;
+  left: 12.5rem;
+  padding: 0.42rem 0.65rem;
+  color: #31583d;
+  font-size: 0.72rem;
+}
+
+.history-map__terrain-degraded {
+  top: 7rem;
+  display: grid;
+  max-width: min(29rem, calc(100% - 22rem));
+  gap: 0.25rem;
+  color: #7e352a;
+}
+
+.history-map__terrain-degraded span {
+  font-size: 0.75rem;
+}
+
+.history-map__terrain-degraded button {
+  justify-self: start;
+  padding: 0.32rem 0.6rem;
+  border: 1px solid currentcolor;
+  border-radius: 999px;
+  background: #fffdf7;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
 }
 
 .history-map__message--error {
@@ -243,7 +302,7 @@
 .history-map__warning {
   left: 1rem;
   right: auto;
-  bottom: 1rem;
+  bottom: 3.25rem;
   max-width: min(36rem, calc(100% - 21rem));
   color: #70442c;
 }
@@ -258,6 +317,11 @@
   }
 
   .history-map__warning {
+    right: 1rem;
+    max-width: none;
+  }
+
+  .history-map__terrain-degraded {
     right: 1rem;
     max-width: none;
   }

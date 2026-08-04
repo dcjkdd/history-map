@@ -13,6 +13,8 @@ export const PLACE_LAYER_IDS = [
   'mvp-places-pass-inner',
   'mvp-places-related',
   'mvp-places-selected',
+  'mvp-places-label',
+  'mvp-places-pass-label',
 ] as const
 
 export const PLACE_INTERACTIVE_LAYER_IDS = [
@@ -141,6 +143,50 @@ export function addPlaceLayers(
         'circle-color': 'rgba(255, 253, 247, 0)',
         'circle-stroke-color': '#17231d',
         'circle-stroke-width': 4,
+      },
+    })
+  }
+
+  if (!map.getLayer(PLACE_LAYER_IDS[7])) {
+    map.addLayer({
+      id: PLACE_LAYER_IDS[7],
+      type: 'symbol',
+      source: PLACE_SOURCE_ID,
+      filter: ['!=', ['get', 'placeType'], 'PASS'],
+      layout: {
+        'text-field': ['get', 'name'],
+        'text-size': 13,
+        'text-offset': [0, 1.25],
+        'text-anchor': 'top',
+        'text-allow-overlap': false,
+        'text-optional': false,
+      },
+      paint: {
+        'text-color': '#17231d',
+        'text-halo-color': '#fff8e7',
+        'text-halo-width': 2,
+      },
+    })
+  }
+
+  if (!map.getLayer(PLACE_LAYER_IDS[8])) {
+    map.addLayer({
+      id: PLACE_LAYER_IDS[8],
+      type: 'symbol',
+      source: PLACE_SOURCE_ID,
+      filter: ['==', ['get', 'placeType'], 'PASS'],
+      layout: {
+        'text-field': ['concat', ['get', 'name'], '（关隘代表点）'],
+        'text-size': 14,
+        'text-offset': [0, 1.25],
+        'text-anchor': 'top',
+        'text-allow-overlap': true,
+        'text-ignore-placement': true,
+      },
+      paint: {
+        'text-color': '#3d2618',
+        'text-halo-color': '#fff8e7',
+        'text-halo-width': 2.2,
       },
     })
   }

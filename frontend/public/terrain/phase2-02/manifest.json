@@ -1,0 +1,559 @@
+{
+  "schemaVersion": "1.0",
+  "assetSetId": "phase2-02-glo90-topdown",
+  "generatedOn": "2026-08-04",
+  "runtimeNetworkRequired": false,
+  "sourceBounds": [
+    108.0,
+    33.0,
+    113.0,
+    36.0
+  ],
+  "displayBounds": [
+    108.45,
+    33.65,
+    112.8,
+    35.45
+  ],
+  "dem": {
+    "source": "Copernicus DEM GLO-90 AWS 2021 COG",
+    "sourceUrl": "https://copernicus-dem-90m.s3.eu-central-1.amazonaws.com/",
+    "sourceInputsCommitted": false,
+    "inputs": [
+      {
+        "file": "Copernicus_DSM_COG_30_N35_00_E108_00_DEM.tif",
+        "bytes": 5242615,
+        "sha256": "6ce5cfa8c849cbf82070ca36bc46756d88d6402715ba87761dec88ae60fe7ff2"
+      },
+      {
+        "file": "Copernicus_DSM_COG_30_N35_00_E109_00_DEM.tif",
+        "bytes": 5243369,
+        "sha256": "c0bd58628b730b5ffbddc5d1b19ef5ac643ca163cb875aa98f72589f9ff296d2"
+      },
+      {
+        "file": "Copernicus_DSM_COG_30_N35_00_E110_00_DEM.tif",
+        "bytes": 5070539,
+        "sha256": "f71d2e6bead1c1b7341a8ca9528db794c06affbcb7c40638a120269888ab406f"
+      },
+      {
+        "file": "Copernicus_DSM_COG_30_N35_00_E111_00_DEM.tif",
+        "bytes": 5209404,
+        "sha256": "ab2f7ba20634fd54fda5afbcedf0fa2bc3df7260550c017b04026ac983fb448f"
+      },
+      {
+        "file": "Copernicus_DSM_COG_30_N35_00_E112_00_DEM.tif",
+        "bytes": 5372703,
+        "sha256": "0a3193500e9888366b90104fe920ca4f580f8606cd3ffb866118bc82a28e5132"
+      },
+      {
+        "file": "Copernicus_DSM_COG_30_N34_00_E108_00_DEM.tif",
+        "bytes": 4914922,
+        "sha256": "b93bc07e4ed351dae8764a020c6de3586c1e85df6fdaf75bb98bc5080a332938"
+      },
+      {
+        "file": "Copernicus_DSM_COG_30_N34_00_E109_00_DEM.tif",
+        "bytes": 4975422,
+        "sha256": "81862980d1c806a514d383f04b5091cb1077abb6b70ddef1258e02b923092da6"
+      },
+      {
+        "file": "Copernicus_DSM_COG_30_N34_00_E110_00_DEM.tif",
+        "bytes": 5136759,
+        "sha256": "874bb8ee2be07bbc4f0f21c823351ee05f7de0a349e81cdb3df70ca236d4d7b2"
+      },
+      {
+        "file": "Copernicus_DSM_COG_30_N34_00_E111_00_DEM.tif",
+        "bytes": 5448446,
+        "sha256": "0dfdb693d6f0992311b754c806e33b21875015f65129787b7394f5aa9555d55d"
+      },
+      {
+        "file": "Copernicus_DSM_COG_30_N34_00_E112_00_DEM.tif",
+        "bytes": 5299701,
+        "sha256": "da49c916a4530c472d971801e0bf60b3a6c5c516d0e38f7508e65440d67352bd"
+      },
+      {
+        "file": "Copernicus_DSM_COG_30_N33_00_E108_00_DEM.tif",
+        "bytes": 5534646,
+        "sha256": "da9dc510b0942784697566cea3c3963e5007a26fba59050d37626768a957a88d"
+      },
+      {
+        "file": "Copernicus_DSM_COG_30_N33_00_E109_00_DEM.tif",
+        "bytes": 5537127,
+        "sha256": "2f32ba28bbd5b43759687e3c199b5c8c00113a174b881b6274efea2d8e005358"
+      },
+      {
+        "file": "Copernicus_DSM_COG_30_N33_00_E110_00_DEM.tif",
+        "bytes": 5590675,
+        "sha256": "2e1140f015dd475b6a259f0f50ea33ef4a07df8c242d759a352d59d7ddc22de4"
+      },
+      {
+        "file": "Copernicus_DSM_COG_30_N33_00_E111_00_DEM.tif",
+        "bytes": 5596706,
+        "sha256": "a0723e06bc72a5e7d5e29ba670266b0c14868b4cfb67703efc651751a740ae77"
+      },
+      {
+        "file": "Copernicus_DSM_COG_30_N33_00_E112_00_DEM.tif",
+        "bytes": 5475927,
+        "sha256": "c24ef1f6024b91197440c006cf33d296adf64bf4709f49764842823bd5409684"
+      }
+    ],
+    "heightMinM": 101.39,
+    "heightMaxM": 3002.14,
+    "encoding": "Mapbox Terrarium PNG"
+  },
+  "provinces": {
+    "source": "geoBoundaries gbOpen CHN ADM1",
+    "boundaryId": "CHN-ADM1-43563684",
+    "geometryCommit": "9469f09",
+    "sourceUrl": "https://www.geoboundaries.org/api/current/gbOpen/CHN/ADM1/",
+    "inputSha256": "bc4afc7eacf4351ae5b3ae7a612327987ce1123cb5deb8574fb49107091c6623",
+    "boundaryFeatures": 2,
+    "labelFeatures": 2
+  },
+  "licenses": {
+    "copernicus": {
+      "access": "GLO-90 Full, Free and Open",
+      "licenseUrl": "https://dataspace.copernicus.eu/sites/default/files/media/files/2025-06/copernicus_contributing_mission_data_access_v2_cop_dem_licenses.pdf",
+      "requiredAttribution": "produced using Copernicus WorldDEM-90 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved",
+      "requiredDisclaimer": "The organisations in charge of the Copernicus programme by law or by delegation do not incur any liability for any use of the Copernicus WorldDEM™-90."
+    },
+    "geoBoundaries": {
+      "distributionLicense": "CC BY 4.0",
+      "upstreamBoundaryMetadataLicense": "Public Domain",
+      "licenseUrl": "https://www.geoboundaries.org/api.html",
+      "requiredAttribution": "geoBoundaries"
+    }
+  },
+  "processing": [
+    "verify 15 fixed GLO-90 COG SHA-256 values",
+    "mosaic and crop to the audited regional bounds",
+    "render an 1800x1080 hypsometric image",
+    "encode zoom 5-9 Terrarium tiles for client-side hillshade",
+    "extract only modern Henan and Shaanxi ADM1 boundaries and add display labels"
+  ],
+  "terrainTiles": [
+    {
+      "zoom": 5,
+      "tiles": 2
+    },
+    {
+      "zoom": 6,
+      "tiles": 2
+    },
+    {
+      "zoom": 7,
+      "tiles": 6
+    },
+    {
+      "zoom": 8,
+      "tiles": 20
+    },
+    {
+      "zoom": 9,
+      "tiles": 48
+    }
+  ],
+  "assetBudgetBytes": 10485760,
+  "totalBytes": 9572150,
+  "assets": [
+    {
+      "path": "color-relief.png",
+      "bytes": 2030838,
+      "sha256": "def742a6ba80cb13785f4b5e4aead5caa48dd410c3f5e898318c623dcd2f031f"
+    },
+    {
+      "path": "provinces.geojson",
+      "bytes": 12083,
+      "sha256": "d21184e991f798cf48259472c99f3cfaf5df1f24ad25ba6f55700135b0276887"
+    },
+    {
+      "path": "terrain/5/25/12.png",
+      "bytes": 22899,
+      "sha256": "aaebe399f3af83db432a8288b79c51942c6fd4114a214d81f609bda472c87444"
+    },
+    {
+      "path": "terrain/5/26/12.png",
+      "bytes": 3575,
+      "sha256": "8a43978be0db10152bfb6f8e818602b63233e540ef974f6517ce28fee1c78fbe"
+    },
+    {
+      "path": "terrain/6/51/25.png",
+      "bytes": 85445,
+      "sha256": "b758a95a995540a831cc5600be94a1051c87297cdec6bffdd1da5614974e1b84"
+    },
+    {
+      "path": "terrain/6/52/25.png",
+      "bytes": 10816,
+      "sha256": "701611a1832bf5b76c594722da425bf8e72a61de05849fa8d4531fd6c51d8675"
+    },
+    {
+      "path": "terrain/7/102/50.png",
+      "bytes": 70775,
+      "sha256": "d98d12bce51cea17f6ccc60fbe35cd1fae69e48a79d0cf17be56f4315603c0e6"
+    },
+    {
+      "path": "terrain/7/102/51.png",
+      "bytes": 56808,
+      "sha256": "fca36ab998f568d21921faa74ef07d8f7275e4edf5569acd1893960547f7dd8a"
+    },
+    {
+      "path": "terrain/7/103/50.png",
+      "bytes": 116147,
+      "sha256": "55b6342aa32fca23e5909cfa3ebf9097621ead50e608c328b981412d4554dfd8"
+    },
+    {
+      "path": "terrain/7/103/51.png",
+      "bytes": 92397,
+      "sha256": "4ab1bdab2bcaca82d5802fb82ca84e701e41463f547a3b510b7f6e23941371ac"
+    },
+    {
+      "path": "terrain/7/104/50.png",
+      "bytes": 22350,
+      "sha256": "6a5050e1ec2e5a3a2949a492b1e5dd0e18f82fa45307598df8e9d8d1ea44d6d0"
+    },
+    {
+      "path": "terrain/7/104/51.png",
+      "bytes": 17002,
+      "sha256": "39a7e98cf3dab42c18ba0f3346722d98179490895fdb3ab35178b2f454f15541"
+    },
+    {
+      "path": "terrain/8/204/100.png",
+      "bytes": 16491,
+      "sha256": "cf439514dbc2233ef881a10f19d97669fb83dc8537e26d3496f403b064249c57"
+    },
+    {
+      "path": "terrain/8/204/101.png",
+      "bytes": 32154,
+      "sha256": "db1c8416070cf746ef0b93700dda68e2712f028d7e42cfaf0ab00d1ad1c524b0"
+    },
+    {
+      "path": "terrain/8/204/102.png",
+      "bytes": 33656,
+      "sha256": "2f75eeec4f96b087814365207a71afc9de7ac4d092c0da60d04e6b8c515c8106"
+    },
+    {
+      "path": "terrain/8/204/103.png",
+      "bytes": 4993,
+      "sha256": "c9f274b189612fab50d6bc2c101283586a9cf0a2421bccf4324f2c9748fe5286"
+    },
+    {
+      "path": "terrain/8/205/100.png",
+      "bytes": 76350,
+      "sha256": "4867c6d7fb269d165d9ef7835a5886e56622d523dd63ebb4b382d69796b06c0b"
+    },
+    {
+      "path": "terrain/8/205/101.png",
+      "bytes": 148382,
+      "sha256": "0d7108bd75524450ac04554e9a29a95a77b06936ecc18396373b50daa7a650bc"
+    },
+    {
+      "path": "terrain/8/205/102.png",
+      "bytes": 161282,
+      "sha256": "fb193b06650857c4c888c3a956638d1a4cbcaadfa00b7a730d265f2a5eb9d534"
+    },
+    {
+      "path": "terrain/8/205/103.png",
+      "bytes": 20604,
+      "sha256": "89641845723b50dd6b049df7405cb4f1d6b8cef8dd512ae98a24cc3eb0200ae6"
+    },
+    {
+      "path": "terrain/8/206/100.png",
+      "bytes": 75733,
+      "sha256": "a55e35a38a97cb15a10f90b49ad57e7951f848d3fc5b04223382a9172f4e3c22"
+    },
+    {
+      "path": "terrain/8/206/101.png",
+      "bytes": 144849,
+      "sha256": "e477ddfe5391aa3369c3813f24762b28251561b670a0501b3a82fff696cd9f14"
+    },
+    {
+      "path": "terrain/8/206/102.png",
+      "bytes": 163197,
+      "sha256": "116012c91734d1600681425e05569a50ca7edf3ae9751b40ed141a2f2f263e5e"
+    },
+    {
+      "path": "terrain/8/206/103.png",
+      "bytes": 20375,
+      "sha256": "bf63dc26dc2078d2f32977e0d2144edc74e2bb95efcea201305b5a7f396d8ad9"
+    },
+    {
+      "path": "terrain/8/207/100.png",
+      "bytes": 74151,
+      "sha256": "6b56b70b6fe1a04f1b158e9f8ad92277fdf24b831726fd0cb2d23897235244f5"
+    },
+    {
+      "path": "terrain/8/207/101.png",
+      "bytes": 156309,
+      "sha256": "8f78e26de61789f6123f892cc8ff2e9e92ddbdde1381539e055944f7834acf7a"
+    },
+    {
+      "path": "terrain/8/207/102.png",
+      "bytes": 161443,
+      "sha256": "4af7223c59c9134d905407288c09745a9d1e3288933e9aa39e106c36abccd31c"
+    },
+    {
+      "path": "terrain/8/207/103.png",
+      "bytes": 18874,
+      "sha256": "26442ed47def5d64af4ce50956518ae7542ae071587d01bd662643165459cf5f"
+    },
+    {
+      "path": "terrain/8/208/100.png",
+      "bytes": 27926,
+      "sha256": "9d30711d570347ef83bc77af8b177b465aa5903306dde6822f28422784b73c2f"
+    },
+    {
+      "path": "terrain/8/208/101.png",
+      "bytes": 55298,
+      "sha256": "6692616f554e3851263f07f4e296da4120d455f2b25ab388e1e3384b35ac2f53"
+    },
+    {
+      "path": "terrain/8/208/102.png",
+      "bytes": 55456,
+      "sha256": "3827eea1c867253ec7b5c45ac0080f5bc3d17e89f79323d6d1455b3a16274c3b"
+    },
+    {
+      "path": "terrain/8/208/103.png",
+      "bytes": 6815,
+      "sha256": "cb8099d597cb6d4c2020e676e14682f3243d93f68fdd9575c498c3df4c07cd93"
+    },
+    {
+      "path": "terrain/9/409/201.png",
+      "bytes": 60513,
+      "sha256": "da9d09092c06dcd7866427ea3b5357b9419134bd7c57fd32942dffeae6db768d"
+    },
+    {
+      "path": "terrain/9/409/202.png",
+      "bytes": 61932,
+      "sha256": "8d1d9f672e97dbf3d0da66b33d6713a0541e783c3e30986493c4e65f168bf9f6"
+    },
+    {
+      "path": "terrain/9/409/203.png",
+      "bytes": 59241,
+      "sha256": "71eb3f71e7d85860ca8e06218f89385de4e853ad4dc27e5a052a4c58a0f5b5d4"
+    },
+    {
+      "path": "terrain/9/409/204.png",
+      "bytes": 62130,
+      "sha256": "1665fa3c70a7ce6331815d30f6834c01362e5fbcdb549ef0b7b4fde489df9b1b"
+    },
+    {
+      "path": "terrain/9/409/205.png",
+      "bytes": 65899,
+      "sha256": "db618c61ccb725a8fa2da63b140b92d995dd59d584f2ab58e862c3e60697f85b"
+    },
+    {
+      "path": "terrain/9/409/206.png",
+      "bytes": 16279,
+      "sha256": "c93c839e24c6dc34e95a6ab5e85e2d38df03235f2366e225cbd2af29c4fef21e"
+    },
+    {
+      "path": "terrain/9/410/201.png",
+      "bytes": 148368,
+      "sha256": "4fd240c6d90de79a8b2e0be1e8137330324e07f990cfebfccc2476c2c7f05048"
+    },
+    {
+      "path": "terrain/9/410/202.png",
+      "bytes": 155713,
+      "sha256": "12cfb1ccaac2612a283b1073b8910791033887c613305e3ad461a6f7f5166972"
+    },
+    {
+      "path": "terrain/9/410/203.png",
+      "bytes": 135200,
+      "sha256": "3a548e7d4877788ae3bea463b15a679d7ae4995072794256688317d5e3ac1df1"
+    },
+    {
+      "path": "terrain/9/410/204.png",
+      "bytes": 145192,
+      "sha256": "d30d9981efc8faebb5327aada0b02380c88d5b36b06f4dc3c14762795204213e"
+    },
+    {
+      "path": "terrain/9/410/205.png",
+      "bytes": 162860,
+      "sha256": "49e08537e69e1ee28e90ab1c3585fa22adfbcd21c24f5d0a25c8c559a652586d"
+    },
+    {
+      "path": "terrain/9/410/206.png",
+      "bytes": 39122,
+      "sha256": "3c84f155b6c2af9fc595ec1c1f84cc8a2546534b4371f62cba922aeb91aedc15"
+    },
+    {
+      "path": "terrain/9/411/201.png",
+      "bytes": 146314,
+      "sha256": "6153b16f6e498da54eb4f062ba6e86d8ae3e51f4e5b24f4692dc1990787c3ae9"
+    },
+    {
+      "path": "terrain/9/411/202.png",
+      "bytes": 149684,
+      "sha256": "8348b77df827c899066638ee5ae210abfd3e3795b93acf1717844d6ba32a4b45"
+    },
+    {
+      "path": "terrain/9/411/203.png",
+      "bytes": 126657,
+      "sha256": "51f1f85da056943a1aee2afd3e43f07c543e1ab793a8963e15c062bfc85ad482"
+    },
+    {
+      "path": "terrain/9/411/204.png",
+      "bytes": 157697,
+      "sha256": "e09f54c482ad96cd26b6f0ce9f2a4a4d290a80b7d17ba32fcabf94a8fd06c6d2"
+    },
+    {
+      "path": "terrain/9/411/205.png",
+      "bytes": 162782,
+      "sha256": "55065062d48b5276aa96ec546f5124f69e6054d9daa3ee0fe6e354596b0955da"
+    },
+    {
+      "path": "terrain/9/411/206.png",
+      "bytes": 39276,
+      "sha256": "4620032fa86a80d53ab58d4117797cfdba5bdc053117a1fe5c997855bf80928e"
+    },
+    {
+      "path": "terrain/9/412/201.png",
+      "bytes": 149724,
+      "sha256": "2a9bb193bd8d4062dfd271b86d2123d6c9674dd7e8c3366bcba6131d1776cefb"
+    },
+    {
+      "path": "terrain/9/412/202.png",
+      "bytes": 137537,
+      "sha256": "f1e0b0e4a4ce0501f22c7390dc2ff5cff5e735e23799e1cf503a533dea553161"
+    },
+    {
+      "path": "terrain/9/412/203.png",
+      "bytes": 137690,
+      "sha256": "279bc057aeeba1bce8788f05c4ef9010ad2c5b9520650b301c23064a492ec31d"
+    },
+    {
+      "path": "terrain/9/412/204.png",
+      "bytes": 158501,
+      "sha256": "5311015d7be3db7407d6b2758d98b4cca2248d267e05060fbba3faec9efa6b43"
+    },
+    {
+      "path": "terrain/9/412/205.png",
+      "bytes": 161819,
+      "sha256": "9595e0ca36aaf60c379ceafaaf64a526620628cba4926a911e35c040926d1d49"
+    },
+    {
+      "path": "terrain/9/412/206.png",
+      "bytes": 38891,
+      "sha256": "b2477f7a25409c225f5c96499f5546b83bd0caf6ae6cc4533b1b4365463b5d5e"
+    },
+    {
+      "path": "terrain/9/413/201.png",
+      "bytes": 140345,
+      "sha256": "dd4d37811c1a81cff9aba789a423087efcb19b6128dddc582be13b100c9398f2"
+    },
+    {
+      "path": "terrain/9/413/202.png",
+      "bytes": 126488,
+      "sha256": "a37886b6a4bacf03e93f8f1e47e4b013a83836288ed2acdce263a6912b4681e1"
+    },
+    {
+      "path": "terrain/9/413/203.png",
+      "bytes": 149563,
+      "sha256": "cd4ff17b8accf4dbe7d6d56107cc4db74de50e68da09716fc48dfc74f9263b8f"
+    },
+    {
+      "path": "terrain/9/413/204.png",
+      "bytes": 159594,
+      "sha256": "a21f23cece02eb88094fc906887fea242374e8fc843fa9909ceb8e9b78c9b85f"
+    },
+    {
+      "path": "terrain/9/413/205.png",
+      "bytes": 160033,
+      "sha256": "83d861143a818e0e58c34dc2b83764725f406c3daa8f5314bdd782c59e5af116"
+    },
+    {
+      "path": "terrain/9/413/206.png",
+      "bytes": 38642,
+      "sha256": "151193d0c7a81fe7ea4324dcbb1009dbb2127ad0f28f8830f4e43e12ab9b6b29"
+    },
+    {
+      "path": "terrain/9/414/201.png",
+      "bytes": 134072,
+      "sha256": "8f3e93334a25c49d479b71f930de4f40ef4112bed987dbbb193d75434dbdb9a5"
+    },
+    {
+      "path": "terrain/9/414/202.png",
+      "bytes": 153489,
+      "sha256": "5342943c78144b7ec06a2b68ee17a5d4fd2014d4f76f4fac481a7520de9368a1"
+    },
+    {
+      "path": "terrain/9/414/203.png",
+      "bytes": 152516,
+      "sha256": "3d9f37f4f4f159f7a02c84cd0d1b566c77759e7c7faec4802f7401b2e40b5638"
+    },
+    {
+      "path": "terrain/9/414/204.png",
+      "bytes": 159917,
+      "sha256": "3a1b70219fe0c666c550d7e3447fde2414c20594e0b5dc7a737bfe5f63432308"
+    },
+    {
+      "path": "terrain/9/414/205.png",
+      "bytes": 158328,
+      "sha256": "1fa6889aaa9f8c28b97afb7eda0c153aaa152581d7a1a115689673a566febabb"
+    },
+    {
+      "path": "terrain/9/414/206.png",
+      "bytes": 36989,
+      "sha256": "d1064c9e4bb1d33d24957658e2b84fa029232807a71ebf6f8a1f2780871ee45a"
+    },
+    {
+      "path": "terrain/9/415/201.png",
+      "bytes": 146833,
+      "sha256": "4c1c3c6a663286e8cf2cc9ce57d232d01208e85b530f441c2474acd5d16a812f"
+    },
+    {
+      "path": "terrain/9/415/202.png",
+      "bytes": 153224,
+      "sha256": "aed4642206e267fd9d29aea58e05ed3041b56b3b16d6572c1d461b15cb7bc848"
+    },
+    {
+      "path": "terrain/9/415/203.png",
+      "bytes": 146055,
+      "sha256": "0d39f8daf1a62a57e1cefc28cc64cce1bec90dc03ff33d17d67564f2c7461af8"
+    },
+    {
+      "path": "terrain/9/415/204.png",
+      "bytes": 155894,
+      "sha256": "38695bb1940c1cd1027a84801376f992e820de6663832378bacdc35524a92511"
+    },
+    {
+      "path": "terrain/9/415/205.png",
+      "bytes": 156262,
+      "sha256": "76837ba6388053f0e2439bff34ca5e7bf6b8a8c51f058820acf1f13eb527f26b"
+    },
+    {
+      "path": "terrain/9/415/206.png",
+      "bytes": 32726,
+      "sha256": "f977f27ae1a76f4ddef38955bcf2cf974e3031e4fbc17194a5a81eb0c7873d7c"
+    },
+    {
+      "path": "terrain/9/416/201.png",
+      "bytes": 102878,
+      "sha256": "47c448151b1badbf383fe1decbc73a58b586cf385ed1c6c5927863baae9e07f1"
+    },
+    {
+      "path": "terrain/9/416/202.png",
+      "bytes": 102916,
+      "sha256": "7624bb2f875dda2b8afbe0c7c3a6742582581ac5839da5ed7b9b2864f8046d6b"
+    },
+    {
+      "path": "terrain/9/416/203.png",
+      "bytes": 101517,
+      "sha256": "a72a8d28847a46c088176b6a3fd5467c1881412f3f9c683e0c68058d4eba833d"
+    },
+    {
+      "path": "terrain/9/416/204.png",
+      "bytes": 103312,
+      "sha256": "7b53589c0217b73b7b6f426999d94b17fc10afed6ac421964f105b7f07b2d2d2"
+    },
+    {
+      "path": "terrain/9/416/205.png",
+      "bytes": 103843,
+      "sha256": "92706182db80399ad58c2ba4750fffc6b2f0fab13f6f62e69f4a6f577759df2b"
+    },
+    {
+      "path": "terrain/9/416/206.png",
+      "bytes": 22220,
+      "sha256": "f7ee8d397396e0a1d6f0ba6d216264def6603be4c68f92083aab8510ea0f8684"
+    }
+  ]
+}

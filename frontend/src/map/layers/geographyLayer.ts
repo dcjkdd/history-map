@@ -5,13 +5,38 @@ import { PLACE_LAYER_IDS } from './placeLayer'
 import { ROUTE_LAYER_IDS } from './routeLayer'
 
 export const GEOGRAPHY_SOURCE_ID = 'mvp-geography'
+export const GEOGRAPHY_DISPLAY_LABEL_SOURCE_ID = 'mvp-geography-display-labels'
+
+export const HISTORY_GEOGRAPHY_ATTRIBUTION =
+  'Made with <a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener">Natural Earth</a> · 正式历史数据含 DISPUTED 代表点、APPROXIMATE 事件与 INFERENCE / LOW 路线；不表示精确古代边界、河道或行军轨迹'
 
 export const GEOGRAPHY_LAYER_IDS = [
   'mvp-geography-area',
   'mvp-geography-area-outline',
+  'mvp-geography-river-casing',
   'mvp-geography-river',
   'mvp-geography-linear-landform',
+  'mvp-geography-river-label',
+  'mvp-geography-mountain-label',
 ] as const
+
+const DISPLAY_ONLY_GEOGRAPHY_LABELS = {
+  type: 'FeatureCollection' as const,
+  features: [
+    {
+      type: 'Feature' as const,
+      geometry: {
+        type: 'Point' as const,
+        coordinates: [110.45, 33.86],
+      },
+      properties: {
+        name: '秦岭',
+        labelBasis:
+          'display-only anchor derived from the approved generalized polygon; not formal history data',
+      },
+    },
+  ],
+}
 
 const LAYER_IDS_BY_GROUP: Record<LayerGroup, readonly string[]> = {
   geography: GEOGRAPHY_LAYER_IDS,
@@ -27,6 +52,14 @@ export function addGeographyLayers(
     map.addSource(GEOGRAPHY_SOURCE_ID, {
       type: 'geojson',
       data: geography,
+      attribution: HISTORY_GEOGRAPHY_ATTRIBUTION,
+    })
+  }
+
+  if (!map.getSource(GEOGRAPHY_DISPLAY_LABEL_SOURCE_ID)) {
+    map.addSource(GEOGRAPHY_DISPLAY_LABEL_SOURCE_ID, {
+      type: 'geojson',
+      data: DISPLAY_ONLY_GEOGRAPHY_LABELS,
     })
   }
 
@@ -77,9 +110,9 @@ export function addGeographyLayers(
         ['==', ['get', 'geographyType'], 'RIVER'],
       ],
       paint: {
-        'line-color': '#4f8191',
-        'line-opacity': 0.8,
-        'line-width': ['interpolate', ['linear'], ['zoom'], 5, 1.5, 8, 3],
+        'line-color': '#f4f1df',
+        'line-opacity': 0.78,
+        'line-width': ['interpolate', ['linear'], ['zoom'], 5, 4, 8, 6],
       },
     })
   }
@@ -92,6 +125,24 @@ export function addGeographyLayers(
       filter: [
         'all',
         ['==', ['geometry-type'], 'LineString'],
+        ['==', ['get', 'geographyType'], 'RIVER'],
+      ],
+      paint: {
+        'line-color': '#236f9b',
+        'line-opacity': 0.96,
+        'line-width': ['interpolate', ['linear'], ['zoom'], 5, 1.8, 8, 3.2],
+      },
+    })
+  }
+
+  if (!map.getLayer(GEOGRAPHY_LAYER_IDS[4])) {
+    map.addLayer({
+      id: GEOGRAPHY_LAYER_IDS[4],
+      type: 'line',
+      source: GEOGRAPHY_SOURCE_ID,
+      filter: [
+        'all',
+        ['==', ['geometry-type'], 'LineString'],
         ['!=', ['get', 'geographyType'], 'RIVER'],
       ],
       paint: {
@@ -99,6 +150,47 @@ export function addGeographyLayers(
         'line-opacity': 0.7,
         'line-width': 4,
         'line-dasharray': [1.5, 1.5],
+      },
+    })
+  }
+
+  if (!map.getLayer(GEOGRAPHY_LAYER_IDS[5])) {
+    map.addLayer({
+      id: GEOGRAPHY_LAYER_IDS[5],
+      type: 'symbol',
+      source: GEOGRAPHY_SOURCE_ID,
+      filter: ['==', ['get', 'geographyType'], 'RIVER'],
+      layout: {
+        'symbol-placement': 'line',
+        'symbol-spacing': 360,
+        'text-field': ['get', 'name'],
+        'text-size': 13,
+        'text-allow-overlap': false,
+        'text-keep-upright': true,
+      },
+      paint: {
+        'text-color': '#155b83',
+        'text-halo-color': '#fff8e5',
+        'text-halo-width': 1.8,
+      },
+    })
+  }
+
+  if (!map.getLayer(GEOGRAPHY_LAYER_IDS[6])) {
+    map.addLayer({
+      id: GEOGRAPHY_LAYER_IDS[6],
+      type: 'symbol',
+      source: GEOGRAPHY_DISPLAY_LABEL_SOURCE_ID,
+      layout: {
+        'text-field': ['get', 'name'],
+        'text-size': 17,
+        'text-letter-spacing': 0.14,
+        'text-allow-overlap': false,
+      },
+      paint: {
+        'text-color': '#3f4734',
+        'text-halo-color': '#fff8e5',
+        'text-halo-width': 2,
       },
     })
   }

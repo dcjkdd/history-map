@@ -5,6 +5,7 @@ import type { MvpDataset } from '../../domain/mvpTypes'
 import type { DerivedMapState } from '../../domain/deriveMapState'
 import {
   addGeographyLayers,
+  GEOGRAPHY_DISPLAY_LABEL_SOURCE_ID,
   GEOGRAPHY_LAYER_IDS,
   GEOGRAPHY_SOURCE_ID,
   setLayerVisibility,
@@ -78,8 +79,9 @@ describe('MVP map layers', () => {
     addRouteLayers(map, routeSegments)
     addPlaceLayers(map, places)
 
-    expect(mapMock.addSource).toHaveBeenCalledTimes(3)
+    expect(mapMock.addSource).toHaveBeenCalledTimes(4)
     expect(mapMock.sources.has(GEOGRAPHY_SOURCE_ID)).toBe(true)
+    expect(mapMock.sources.has(GEOGRAPHY_DISPLAY_LABEL_SOURCE_ID)).toBe(true)
     expect(mapMock.sources.has(PLACE_SOURCE_ID)).toBe(true)
     expect(mapMock.sources.has(ROUTE_SOURCE_ID)).toBe(true)
     expect(mapMock.addLayer).toHaveBeenCalledTimes(
@@ -96,6 +98,15 @@ describe('MVP map layers', () => {
     expect(mapMock.layers.get('mvp-places-pass-outer')).toMatchObject({
       source: PLACE_SOURCE_ID,
       type: 'circle',
+    })
+    expect(mapMock.layers.get('mvp-places-pass-label')).toMatchObject({
+      source: PLACE_SOURCE_ID,
+      type: 'symbol',
+      filter: ['==', ['get', 'placeType'], 'PASS'],
+      layout: {
+        'text-allow-overlap': true,
+        'text-ignore-placement': true,
+      },
     })
     expect(mapMock.layers.get('mvp-places-uncertain')).toMatchObject({
       filter: [
