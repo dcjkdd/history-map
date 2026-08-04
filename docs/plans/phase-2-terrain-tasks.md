@@ -75,7 +75,7 @@
 
 ## PHASE2-03：山河、平原、通道与关隘表达
 
-实施状态（2026-08-04）：`IMPLEMENTED_AWAITING_COMMIT_PUSH_CONFIRMATION`。四组候选已由用户明确批准；现代流向、现代低地概览、两点解释性通道、潼关独立 `PASS` 语义和三条获批短说明已实现。正式 JSON、既有 `PENDING_*` / `REJECTED` 与历史不确定性未改；自动门禁、根路径与 `/history-map/` 的 `1024×768` / `1440×900` 浏览器复验已完成。当前尚未 commit/push，PHASE2-04 未启动，详细证据见 [PHASE2-03 军事地理记录](../data/phase2-03-military-geography.md)。
+实施状态（2026-08-04）：`COMPLETED`。四组候选已由用户明确批准；现代流向、现代低地概览、两点解释性通道、潼关独立 `PASS` 语义和三条获批短说明已在提交 `fd8aa92` 实现。正式 JSON、既有 `PENDING_*` / `REJECTED` 与历史不确定性未改；自动门禁、根路径与 `/history-map/` 的 `1024×768` / `1440×900` 浏览器复验已完成。用户已明确确认提交并推送；PHASE2-04 未启动，详细证据见 [PHASE2-03 军事地理记录](../data/phase2-03-military-geography.md)。
 
 ### 目标
 

@@ -4,10 +4,11 @@
 - 更新日期：2026-08-04
 - `PHASE2-02` Git 起点：`a88fbd287422321c5f082df9410bd43b5112d591`（已推送的 `PHASE2-01` 提交）
 - `PHASE2-02` 实施提交：`ab3ac2dbc84b23e66bc4266ad4fdd7bcfd7b791e`（已推送至 GitHub `master`）
-- 最近完成并推送提交：`PHASE2-02` 地形基底与基本定位（`ab3ac2d`）
+- `PHASE2-03` 实施提交：`fd8aa92f698e14180b15d727dc7533e9898c81a7`（已推送至 GitHub `master`）
+- 最近完成并推送阶段：`PHASE2-03` 山河、平原、通道与关隘表达（实施提交 `fd8aa92`）
 - MVP-11 结论：内容映射、工程门禁和浏览器回归已完成并提交；2026-08-02 产品复核确认当前二维原型缺少地形解释力，因此产品最终签字暂停，不得标为整期产品完成
-- 当前阶段：`PHASE2-03` 已完成四组候选的人工批准、实现、自动门禁和双尺寸/双 base 浏览器复验；当前状态为 `IMPLEMENTED_AWAITING_COMMIT_PUSH_CONFIRMATION`
-- 下一动作：汇报真实 diff、命令、内容状态、资产/许可、浏览器证据和未决风险，等待用户明确确认后才可 commit/push；不得提前进入 `PHASE2-04`
+- 当前阶段：`PHASE2-03` 已完成四组候选的人工批准、实现、自动门禁、双尺寸/双 base 浏览器复验、用户提交确认和 GitHub `master` 推送
+- 下一动作：在 PHASE2-03 后停止；PHASE2-04 只能由新的明确任务启动，不得从本次完成状态自动续做
 
 ## 1. 文档定位
 
@@ -38,7 +39,7 @@
 | `PHASE2-00` | `COMPLETED` | `5baf7bf` | ADR-0002、地形优先 scope/tasks/acceptance 和文档权威同步已完成并推送 |
 | `PHASE2-01` | `COMPLETED` | `a88fbd2` | GLO-90、geoBoundaries、Natural Earth 来源/许可/体积审计与真实视觉试验已完成；产品负责人选择方案 A |
 | `PHASE2-02` | `COMPLETED` | `ab3ac2d` | 默认俯视地形、现代豫陕定位、署名、降级/恢复、资产闭包、自动测试和双尺寸/双 base 浏览器复验完成；产品视觉确认及 GitHub `master` 推送完成 |
-| `PHASE2-03` | `IMPLEMENTED_AWAITING_COMMIT_PUSH_CONFIRMATION` | — | 四组候选获批；现代流向、现代低地概览、解释性通道和潼关关隘语义已实现，自动门禁及双尺寸/双 base 浏览器复验完成；尚未 commit/push，PHASE2-04 未启动 |
+| `PHASE2-03` | `COMPLETED` | `fd8aa92` | 四组候选获批；现代流向、现代低地概览、解释性通道和潼关关隘语义已实现，自动门禁及双尺寸/双 base 浏览器复验完成；用户确认并推送，PHASE2-04 未启动 |
 
 提交 `0394d7e` 只删除旧版文档归档 `history-map-docs.zip`，不代表新的 MVP 阶段。
 
@@ -595,7 +596,7 @@ Codex 随后独立对照当前源码、构建产物、服务请求日志、浏�
 - 浏览器只记录实际范围：Codex 应用内浏览器的上述四个视口/路径，没有宣称 Safari/Firefox/Chrome/Edge 版本矩阵。额外枚举 Performance Resource URL 的只读调用因上下文不提供该全局对象而立即停止，不把它写成资源请求全表；资源闭包依据静态校验、`ready` 状态、0 console 错误和已取得的服务器 200 日志。
 - 产品负责人于 2026-08-04 根据最终视觉证据明确确认 PHASE2-02，并授权提交和推送；提交 `ab3ac2dbc84b23e66bc4266ad4fdd7bcfd7b791e` 已通过 Git SSH 快进推送至 GitHub `master`，远端回读一致。该确认只关闭 PHASE2-02，不代表 PHASE2-03 或整个第二期完成。
 
-## 16. PHASE2-03 提交前证据
+## 16. PHASE2-03 完成证据
 
 - 开始时独立 worktree 为 detached `HEAD` 且干净；`HEAD`、本地 `origin/master` 与 GitHub `master` 均现场核对为 `5ec340bf6e2cf659c50290254b6a786b6dd053ab`，其父提交为 `ab3ac2dbc84b23e66bc4266ad4fdd7bcfd7b791e`。仓库没有 `.codegraph/`，因此按规则跳过 CodeGraph。
 - Node `24.18.0` / npm `11.16.0` 下，修改前 `npm --prefix frontend ci` 和完整 `check` 通过；正式 JSON SHA-256 为 `34927c09eb03f37e2b7d884afb34172dc9990bc3549a6c1638813ddc251beee6`，lockfile SHA-256 为 `d2aa04cb6893326b206629ad8f8b3e3db573d1632fc847451aa5db888e9c7f22`。
@@ -610,7 +611,7 @@ Codex 随后独立对照当前源码、构建产物、服务请求日志、浏�
 
 ## 17. 下一步边界
 
-1. PHASE2-03 实现与提交前验证已完成，但尚未 commit/push；只有用户审阅本节证据并明确确认后，才可使用中文提交信息和 Git SSH 提交、推送。
+1. 用户已审阅本节真实差异、门禁、许可、浏览器证据和未决风险，并于 2026-08-04 明确回复“确认提交并推送 PHASE2-03”；实施提交 `fd8aa92` 与本状态收口已使用中文提交信息和 Git SSH 推送至 GitHub `master`。
 2. PHASE2-04 保持未启动：不增加路线箭头、不计算相邻节点距离、不重画历史路线，也不重构路线点击的方向/约束说明。
 3. 当前四组批准只覆盖本次 display-only 表达；原有 `PENDING_*` / `REJECTED` 记录不得因此提升、发布或改写。
 4. 第二期 P-003 路线方向、P-005 距离、P-007 页面大重排和最终产品/内容签字仍未完成，不得把 PHASE2-03 工程通过写成整期完成。
