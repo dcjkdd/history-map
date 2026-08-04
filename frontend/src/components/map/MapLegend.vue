@@ -16,8 +16,10 @@
       <p>地形与现代定位</p>
       <ul>
         <li><span class="legend-terrain"></span>高程分层 + hillshade</li>
-        <li><span class="legend-line legend-line--river"></span>河流</li>
-        <li><span class="legend-area legend-area--mountain"></span>山地 / 通道</li>
+        <li><span class="legend-line legend-line--river"></span>现代河流概览</li>
+        <li><span class="legend-flow">➤</span>现代总体流向</li>
+        <li><span class="legend-area legend-area--mountain"></span>秦岭相关山地</li>
+        <li><span class="legend-corridor"></span>东入关中解释性通道</li>
         <li><span class="legend-line legend-line--province"></span>今省界</li>
       </ul>
     </div>
@@ -37,7 +39,10 @@
       外圈表示 LOW、DISPUTED 或 UNKNOWN；虚线路线保持 INFERENCE / LOW，只是宏观节点间的解释性示意，不应理解为精确历史坐标或行军轨迹。
     </p>
       <p class="map-legend__uncertainty">
-        河南、陕西边界与“今”标签仅用于现代方位，不表示唐代边界；秦岭文字锚点仅用于显示，未写入正式历史 JSON。
+        河南、陕西边界、流向箭头与低地标签仅用于现代概览；秦岭、低地文字锚点只为显示，均未写入正式历史 JSON。
+      </p>
+      <p class="map-legend__uncertainty">
+        赭金通道带复用灵宝—潼关两个争议代表点，固定 22px 仅为屏幕表达；不是唐代道路、真实宽度或军队路线。
       </p>
     </div>
   </details>

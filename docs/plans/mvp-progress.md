@@ -6,8 +6,8 @@
 - `PHASE2-02` 实施提交：`ab3ac2dbc84b23e66bc4266ad4fdd7bcfd7b791e`（已推送至 GitHub `master`）
 - 最近完成并推送提交：`PHASE2-02` 地形基底与基本定位（`ab3ac2d`）
 - MVP-11 结论：内容映射、工程门禁和浏览器回归已完成并提交；2026-08-02 产品复核确认当前二维原型缺少地形解释力，因此产品最终签字暂停，不得标为整期产品完成
-- 当前阶段：`PHASE2-02` 已完成（工程、资产、浏览器复验、产品视觉确认、提交和推送均已完成）
-- 下一动作：在新的独立任务和 worktree 中从实时 GitHub `master` 启动 `PHASE2-03`；先核对内容候选与人工审核门禁，不得直接发布视觉推断或未经审核的几何/事实
+- 当前阶段：`PHASE2-03` 已完成四组候选的人工批准、实现、自动门禁和双尺寸/双 base 浏览器复验；当前状态为 `IMPLEMENTED_AWAITING_COMMIT_PUSH_CONFIRMATION`
+- 下一动作：汇报真实 diff、命令、内容状态、资产/许可、浏览器证据和未决风险，等待用户明确确认后才可 commit/push；不得提前进入 `PHASE2-04`
 
 ## 1. 文档定位
 
@@ -38,6 +38,7 @@
 | `PHASE2-00` | `COMPLETED` | `5baf7bf` | ADR-0002、地形优先 scope/tasks/acceptance 和文档权威同步已完成并推送 |
 | `PHASE2-01` | `COMPLETED` | `a88fbd2` | GLO-90、geoBoundaries、Natural Earth 来源/许可/体积审计与真实视觉试验已完成；产品负责人选择方案 A |
 | `PHASE2-02` | `COMPLETED` | `ab3ac2d` | 默认俯视地形、现代豫陕定位、署名、降级/恢复、资产闭包、自动测试和双尺寸/双 base 浏览器复验完成；产品视觉确认及 GitHub `master` 推送完成 |
+| `PHASE2-03` | `IMPLEMENTED_AWAITING_COMMIT_PUSH_CONFIRMATION` | — | 四组候选获批；现代流向、现代低地概览、解释性通道和潼关关隘语义已实现，自动门禁及双尺寸/双 base 浏览器复验完成；尚未 commit/push，PHASE2-04 未启动 |
 
 提交 `0394d7e` 只删除旧版文档归档 `history-map-docs.zip`，不代表新的 MVP 阶段。
 
@@ -594,10 +595,23 @@ Codex 随后独立对照当前源码、构建产物、服务请求日志、浏�
 - 浏览器只记录实际范围：Codex 应用内浏览器的上述四个视口/路径，没有宣称 Safari/Firefox/Chrome/Edge 版本矩阵。额外枚举 Performance Resource URL 的只读调用因上下文不提供该全局对象而立即停止，不把它写成资源请求全表；资源闭包依据静态校验、`ready` 状态、0 console 错误和已取得的服务器 200 日志。
 - 产品负责人于 2026-08-04 根据最终视觉证据明确确认 PHASE2-02，并授权提交和推送；提交 `ab3ac2dbc84b23e66bc4266ad4fdd7bcfd7b791e` 已通过 Git SSH 快进推送至 GitHub `master`，远端回读一致。该确认只关闭 PHASE2-02，不代表 PHASE2-03 或整个第二期完成。
 
-## 16. 下一步边界
+## 16. PHASE2-03 提交前证据
 
-1. PHASE2-02 已关闭；PHASE2-03 尚未开始，不得把本节完成证据沿用为 PHASE2-03 验收。
-2. PHASE2-03 必须在新的独立任务和 worktree 中从实时 GitHub `master` 开始，重新核对 `HEAD`、本地/远端 refs、任务范围和内容审核状态。
-3. 先审计黄河/渭河流向、山地/平原、东入关中通道和潼关解释所需候选内容；未经人工审核的古道、通道几何、历史河道、军事作用或事实 Claim 不得进入正式数据。
-4. PHASE2-03 不得改写第一期已批准内容及其 `APPROVED`、`PENDING_*`、`REJECTED`、`DISPUTED`、`APPROXIMATE`、`INFERENCE / LOW` 历史；实现与内容批准继续分开。
-5. PHASE2-03 提交和推送前仍须汇报真实 diff、内容/许可/资产边界、完整门禁、浏览器证据和未决风险，并等待用户明确确认；继续使用中文提交信息和 Git SSH，不安装 `gh`、不创建 PR。
+- 开始时独立 worktree 为 detached `HEAD` 且干净；`HEAD`、本地 `origin/master` 与 GitHub `master` 均现场核对为 `5ec340bf6e2cf659c50290254b6a786b6dd053ab`，其父提交为 `ab3ac2dbc84b23e66bc4266ad4fdd7bcfd7b791e`。仓库没有 `.codegraph/`，因此按规则跳过 CodeGraph。
+- Node `24.18.0` / npm `11.16.0` 下，修改前 `npm --prefix frontend ci` 和完整 `check` 通过；正式 JSON SHA-256 为 `34927c09eb03f37e2b7d884afb34172dc9990bc3549a6c1638813ddc251beee6`，lockfile SHA-256 为 `d2aa04cb6893326b206629ad8f8b3e3db573d1632fc847451aa5db888e9c7f22`。
+- 用户于 2026-08-04 明确批准现代河流流向、现代低地标签、两点解释性通道和潼关三条短说明四组候选；资料笔记和审核表逐项保留来源、几何处理、边界、审核人及日期。
+- 正式 JSON 与 lockfile 未修改；原有关中通道 Geography 的 `PENDING_SOURCE`、对应 Claim 的 `PENDING_REVIEW` 以及黄河/秦岭历史作用候选的 `REJECTED` 保持不变。5 个 `DISPUTED` 代表点、3 个 Geography、3 个 `INFERENCE / LOW` RouteSegment 和 6 个 `APPROXIMATE` 事件保持不变。
+- 新显示 source 只在运行时从既有正式几何派生：黄河/渭河流向箭头、`[109.68, 34.40]` 低地标签锚点、反向复用 `route-tang-advance-01` 的两点通道及 `22px` 屏幕带；没有新增历史 Polygon、古道、正式路线或真实宽度 Claim。
+- 潼关继续使用正式 `PASS / DISPUTED / LOW` 代表点和不确定性圆，改用与城市和战场形状不同的菱形符号；选择潼关后显示三条既有已批准短说明。
+- 新增内容门禁、图层顺序/幂等、四组开关恢复、流向与路线区分、PASS 语义、双 base/worker/地形闭包测试；完整自动测试为 19 个文件、121 项。
+- 根路径和 `/history-map/` 各自在 `1024×768`、`1440×900` 的 Codex 应用内浏览器复核：地形正常、单一 Map/Canvas、无横向 overflow、console 0 warning/error，署名可展开且与 overlay 矩形交集为 0。另验证事件状态下水系/地理关闭与恢复、潼关选择和三条短说明。
+- 没有新增二进制或下载数据集；PHASE2-02 地形仍为 80 个资产、78 张瓦片和 `9,572,150 bytes`。新增政府网页只用于内容判断和署名链接，不被下载或打包；详细记录见 [PHASE2-03 军事地理展示与来源记录](../data/phase2-03-military-geography.md)。
+- 上述浏览器证据只覆盖真实执行的两个尺寸和两个 base，不宣称完整浏览器品牌矩阵，也不代替第二期最终产品/内容签字。
+
+## 17. 下一步边界
+
+1. PHASE2-03 实现与提交前验证已完成，但尚未 commit/push；只有用户审阅本节证据并明确确认后，才可使用中文提交信息和 Git SSH 提交、推送。
+2. PHASE2-04 保持未启动：不增加路线箭头、不计算相邻节点距离、不重画历史路线，也不重构路线点击的方向/约束说明。
+3. 当前四组批准只覆盖本次 display-only 表达；原有 `PENDING_*` / `REJECTED` 记录不得因此提升、发布或改写。
+4. 第二期 P-003 路线方向、P-005 距离、P-007 页面大重排和最终产品/内容签字仍未完成，不得把 PHASE2-03 工程通过写成整期完成。
+5. 不安装 `gh`、不创建 PR；完成 PHASE2-03 提交与推送后停止。

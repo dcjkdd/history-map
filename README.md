@@ -6,13 +6,14 @@
 
 ## 当前执行基线
 
-MVP-01—MVP-11 已形成可运行、可审计的二维静态技术原型，但它没有证明产品核心价值。PHASE2-01 已完成真实数据源审计和视觉试验，产品负责人选择 Copernicus GLO-90 区域静态派生，并确认默认采用俯视分层设色 + hillshade。**PHASE2-02 地形基底与基本定位** 已在提交 `ab3ac2d` 完成、推送并取得产品负责人视觉确认；PHASE2-03 尚未启动，PHASE2-02 的通过也不代表整个第二期产品已完成。
+MVP-01—MVP-11 已形成可运行、可审计的二维静态技术原型，但它没有证明产品核心价值。PHASE2-01 已完成真实数据源审计和视觉试验，产品负责人选择 Copernicus GLO-90 区域静态派生，并确认默认采用俯视分层设色 + hillshade。**PHASE2-02 地形基底与基本定位** 已在提交 `ab3ac2d` 完成、推送并取得产品负责人视觉确认。**PHASE2-03 山河、平原、通道与关隘表达** 已在当前独立 worktree 完成内容批准、实现、自动门禁和双尺寸/双 base 浏览器复验，正在等待提交/推送前确认；这不代表 PHASE2-04 已启动或整个第二期产品已完成。
 
 - [第二期地形优先范围](docs/plans/phase-2-terrain-scope.md)
 - [第二期开发任务](docs/plans/phase-2-terrain-tasks.md)
 - [第二期验收标准](docs/plans/phase-2-terrain-acceptance.md)
 - [ADR-0002：地形优先二期产品纠偏](docs/decisions/0002-地形优先二期产品纠偏.md)
 - [PHASE2-02 地形资产来源与再生成记录](docs/data/phase2-02-terrain-assets.md)
+- [PHASE2-03 军事地理展示与来源记录](docs/data/phase2-03-military-geography.md)
 
 下列文档保留为已完成技术原型的实施记录，不再定义当前产品是否成立：
 

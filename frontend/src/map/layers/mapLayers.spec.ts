@@ -11,6 +11,15 @@ import {
   setLayerVisibility,
 } from './geographyLayer'
 import {
+  addMilitaryGeographyBaseLayers,
+  addMilitaryGeographyOverlayLayers,
+  buildMilitaryGeographyGuides,
+  EAST_GUANZHONG_CORRIDOR_SCREEN_WIDTH_PX,
+  GUANZHONG_LOWLAND_LABEL_ANCHOR,
+  MILITARY_GEOGRAPHY_LAYER_IDS,
+  MILITARY_GEOGRAPHY_SOURCE_ID,
+} from './militaryGeographyLayer'
+import {
   addPlaceLayers,
   applyRelatedPlaceState,
   PLACE_LAYER_IDS,
@@ -59,6 +68,54 @@ const routeSegments: MvpDataset['routeSegments'] = {
   features: [],
 }
 
+const guideGeography = {
+  type: 'FeatureCollection',
+  features: [
+    {
+      type: 'Feature',
+      geometry: {
+        type: 'LineString',
+        coordinates: [[109.9, 34.7], [111.2, 34.8]],
+      },
+      properties: {
+        id: 'geography-yellow-river',
+        name: '黄河',
+        geographyType: 'RIVER',
+      },
+    },
+    {
+      type: 'Feature',
+      geometry: {
+        type: 'LineString',
+        coordinates: [[108.9, 34.4], [110.3, 34.6]],
+      },
+      properties: {
+        id: 'geography-wei-river',
+        name: '渭河',
+        geographyType: 'RIVER',
+      },
+    },
+  ],
+} as unknown as MvpDataset['geography']
+
+const guideRouteSegments = {
+  type: 'FeatureCollection',
+  features: [
+    {
+      type: 'Feature',
+      geometry: {
+        type: 'LineString',
+        coordinates: [[110.29, 34.6], [110.87, 34.62]],
+      },
+      properties: {
+        id: 'route-tang-advance-01',
+        fromPlaceId: 'place-tongguan',
+        toPlaceId: 'place-lingbao',
+      },
+    },
+  ],
+} as unknown as MvpDataset['routeSegments']
+
 const derivedState: DerivedMapState = {
   visibleRouteSegmentIds: ['route-yan-01', 'route-tang-01'],
   activeRouteSegmentIds: ['route-tang-01'],
@@ -68,24 +125,32 @@ const derivedState: DerivedMapState = {
 }
 
 describe('MVP map layers', () => {
-  it('分别建立 geography、route 与 place GeoJSON source/layer 且重复调用幂等', () => {
+  it('分别建立军事地理、geography、route 与 place source/layer 且重复调用幂等', () => {
     const mapMock = createMapMock()
     const map = mapMock as unknown as MapLibreMap
 
+    addMilitaryGeographyBaseLayers(map, geography, routeSegments)
     addGeographyLayers(map, geography)
+    addMilitaryGeographyOverlayLayers(map)
     addRouteLayers(map, routeSegments)
     addPlaceLayers(map, places)
+    addMilitaryGeographyBaseLayers(map, geography, routeSegments)
     addGeographyLayers(map, geography)
+    addMilitaryGeographyOverlayLayers(map)
     addRouteLayers(map, routeSegments)
     addPlaceLayers(map, places)
 
-    expect(mapMock.addSource).toHaveBeenCalledTimes(4)
+    expect(mapMock.addSource).toHaveBeenCalledTimes(5)
+    expect(mapMock.sources.has(MILITARY_GEOGRAPHY_SOURCE_ID)).toBe(true)
     expect(mapMock.sources.has(GEOGRAPHY_SOURCE_ID)).toBe(true)
     expect(mapMock.sources.has(GEOGRAPHY_DISPLAY_LABEL_SOURCE_ID)).toBe(true)
     expect(mapMock.sources.has(PLACE_SOURCE_ID)).toBe(true)
     expect(mapMock.sources.has(ROUTE_SOURCE_ID)).toBe(true)
     expect(mapMock.addLayer).toHaveBeenCalledTimes(
-      GEOGRAPHY_LAYER_IDS.length + ROUTE_LAYER_IDS.length + PLACE_LAYER_IDS.length,
+      GEOGRAPHY_LAYER_IDS.length +
+        ROUTE_LAYER_IDS.length +
+        PLACE_LAYER_IDS.length +
+        MILITARY_GEOGRAPHY_LAYER_IDS.length,
     )
     expect(mapMock.layers.get('mvp-geography-river')).toMatchObject({
       source: GEOGRAPHY_SOURCE_ID,
@@ -95,9 +160,12 @@ describe('MVP map layers', () => {
       source: PLACE_SOURCE_ID,
       type: 'circle',
     })
-    expect(mapMock.layers.get('mvp-places-pass-outer')).toMatchObject({
+    expect(mapMock.layers.get('mvp-places-pass-symbol')).toMatchObject({
       source: PLACE_SOURCE_ID,
-      type: 'circle',
+      type: 'symbol',
+      layout: {
+        'text-field': '◆',
+      },
     })
     expect(mapMock.layers.get('mvp-places-pass-label')).toMatchObject({
       source: PLACE_SOURCE_ID,
@@ -122,6 +190,20 @@ describe('MVP map layers', () => {
     expect(mapMock.layers.get('mvp-geography-area-outline')).toMatchObject({
       paint: {
         'line-dasharray': [2, 1.5],
+      },
+    })
+    expect(mapMock.layers.get('phase2-river-flow-arrows')).toMatchObject({
+      type: 'symbol',
+      source: MILITARY_GEOGRAPHY_SOURCE_ID,
+      layout: {
+        'text-field': ['get', 'arrowText'],
+        'text-keep-upright': false,
+      },
+    })
+    expect(mapMock.layers.get('phase2-east-guanzhong-corridor-band')).toMatchObject({
+      type: 'line',
+      paint: {
+        'line-width': EAST_GUANZHONG_CORRIDOR_SCREEN_WIDTH_PX,
       },
     })
     expect(mapMock.layers.get('mvp-routes-tang')).toMatchObject({
@@ -162,20 +244,36 @@ describe('MVP map layers', () => {
     ).toEqual(ROUTE_LAYER_IDS)
   })
 
-  it('独立切换 geography/place/routes 可见性', () => {
+  it('独立切换 hydrography/geography/place/routes 可见性', () => {
     const mapMock = createMapMock()
     const map = mapMock as unknown as MapLibreMap
 
+    addMilitaryGeographyBaseLayers(map, geography, routeSegments)
     addGeographyLayers(map, geography)
+    addMilitaryGeographyOverlayLayers(map)
     addRouteLayers(map, routeSegments)
     addPlaceLayers(map, places)
+    setLayerVisibility(map, 'hydrography', false)
     setLayerVisibility(map, 'geography', false)
     setLayerVisibility(map, 'places', false)
 
     setLayerVisibility(map, 'routes', false)
 
     expect(mapMock.setLayoutProperty).toHaveBeenCalledTimes(
-      GEOGRAPHY_LAYER_IDS.length + PLACE_LAYER_IDS.length + ROUTE_LAYER_IDS.length,
+      GEOGRAPHY_LAYER_IDS.length +
+        MILITARY_GEOGRAPHY_LAYER_IDS.length +
+        PLACE_LAYER_IDS.length +
+        ROUTE_LAYER_IDS.length,
+    )
+    expect(mapMock.setLayoutProperty).toHaveBeenCalledWith(
+      'phase2-river-flow-arrows',
+      'visibility',
+      'none',
+    )
+    expect(mapMock.setLayoutProperty).toHaveBeenCalledWith(
+      'phase2-east-guanzhong-corridor-band',
+      'visibility',
+      'none',
     )
     expect(mapMock.setLayoutProperty).toHaveBeenCalledWith(
       'mvp-geography-river',
@@ -193,6 +291,42 @@ describe('MVP map layers', () => {
       'visibility',
       'none',
     )
+  })
+
+  it('从已批准正式几何派生流向、低地锚点和两点解释性通道，不写历史宽度', () => {
+    const guides = buildMilitaryGeographyGuides(
+      guideGeography,
+      guideRouteSegments,
+    )
+    const flowFeatures = guides.features.filter(
+      (feature) => feature.properties.featureKind === 'modernRiverFlowGuide',
+    )
+    const corridor = guides.features.find(
+      (feature) => feature.properties.featureKind === 'displayOnlyCorridor',
+    )
+    const lowland = guides.features.find(
+      (feature) => feature.properties.featureKind === 'modernLowlandLabel',
+    )
+
+    expect(flowFeatures).toHaveLength(2)
+    expect(flowFeatures.map((feature) => feature.properties.sourceFeatureId)).toEqual([
+      'geography-yellow-river',
+      'geography-wei-river',
+    ])
+    expect(corridor?.geometry).toEqual({
+      type: 'LineString',
+      coordinates: [[110.87, 34.62], [110.29, 34.6]],
+    })
+    expect(corridor?.properties).toMatchObject({
+      screenWidthPx: 22,
+      sourceFeatureId: 'route-tang-advance-01',
+    })
+    expect(corridor?.properties.displayBoundary).toContain('not a historical road')
+    expect(lowland?.geometry).toEqual({
+      type: 'Point',
+      coordinates: [...GUANZHONG_LOWLAND_LABEL_ANCHOR],
+    })
+    expect(lowland?.properties.displayBoundary).toContain('no historical plain polygon')
   })
 
   it('只在选择高亮层存在时更新地点过滤条件', () => {

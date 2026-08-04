@@ -2,7 +2,7 @@
 
 本目录是“潼关防线、灵宝出战与长安失守”专题的可运行静态前端。它是 Vue 3、TypeScript、Vite 与 MapLibre GL JS 构成的只读单页应用；生产构建只包含静态 HTML、CSS、JavaScript、MapLibre worker、本地区域地形、地图样式和版本化 JSON，不需要 Go、PostgreSQL/PostGIS、Redis、Docker、云服务或运行时外网。
 
-> 产品状态：PHASE2-02 已在提交 `ab3ac2d` 接入默认俯视分层设色 + hillshade 与现代豫陕定位，完整自动门禁和双尺寸/双 base 浏览器复验已通过，产品负责人已根据最终视觉证据确认并完成推送。PHASE2-03 尚未启动；降级背景或单独的工程通过仍不能算后续阶段的产品验收。
+> 产品状态：PHASE2-02 已在提交 `ab3ac2d` 接入默认俯视分层设色 + hillshade 与现代豫陕定位并完成推送。PHASE2-03 已在当前独立 worktree 完成获批的现代流向、现代低地概览、解释性通道和潼关关隘表达，以及完整自动门禁和双尺寸/双 base 浏览器复验；当前尚未 commit/push，且不构成 PHASE2-04 或第二期最终产品验收。
 
 ## 环境与安装
 
@@ -36,6 +36,7 @@ npm --prefix frontend run dev -- --host 127.0.0.1 --port 5173
 npm --prefix frontend run typecheck
 npm --prefix frontend run validate:data
 npm --prefix frontend run audit:content
+npm --prefix frontend run verify:phase2-03-content
 npm --prefix frontend run verify:terrain-assets
 npm --prefix frontend run test
 npm --prefix frontend run build
@@ -44,7 +45,7 @@ npm --prefix frontend run check
 
 `audit:content` 从正式 JSON 反向枚举 Place、Event、Geography、实际 RouteSegment、运行时 Claim、Citation 和 Source，逐项核对资料笔记与内容审核表中的唯一 `APPROVED` 行、Claim 字段/引用映射、Citation 定位和空间来源许可记录。它会明确列出范围外候选；不会删除、批准这些候选，也不会代替最终人工签字。
 
-`check` 依次执行 `typecheck`、`validate:data`、`audit:content`、`test`、`build`，最后校验 MapLibre worker 和构建后的地形资产闭包。`build` 会在 Vite 构建前再次执行类型、正式数据和源地形资产校验；最终视觉与人工签字仍是独立发布门禁。
+`verify:phase2-03-content` 固定核对正式 JSON 与 lockfile SHA、四组获批候选、原有 `PENDING_*` / `REJECTED` 状态、不确定性数量、潼关 `PASS / DISPUTED` 语义及通道输入几何。`check` 依次执行 `typecheck`、`validate:data`、`audit:content`、`verify:phase2-03-content`、`test`、`build`，最后校验 MapLibre worker 和构建后的地形资产闭包。`build` 会在 Vite 构建前再次执行类型、正式数据、PHASE2-03 内容门禁和源地形资产校验；最终视觉与人工签字仍是独立发布门禁。
 
 也可以在已有根路径构建产物上单独复核 worker：
 
@@ -69,6 +70,15 @@ worker 校验不能省略：Vite 构建成功只证明入口完成打包，不�
 - 来源、SHA-256、许可、署名、体积和再生成命令见 [地形资产记录](../docs/data/phase2-02-terrain-assets.md) 与目录内 `manifest.json`。
 - 默认俯视分层设色和 hillshade 始终从当前 Vite base 加载；河南、陕西边界和名称只作现代方位。
 - 比例尺、指北和 attribution 由同一个 MapLibre 实例提供。没有加入 3D/倾斜开关。
+
+## PHASE2-03 军事地理显示
+
+- 黄河、渭河沿正式 Geography 线显示现代概览箭头；箭头与正式行动路线的虚线、颜色和图层类型不同，不表示唐代精确河道。
+- “关中东部低地（现代地貌概览）”只有显示锚点，不发布历史平原 Polygon。
+- “东入关中解释性通道”将现有两点解释性路线反向复用为显示骨架；`22px` 只表示屏幕带宽，不是真实地面宽度、古道或行动路线。
+- 潼关使用独立菱形 `PASS` 符号，继续保留正式数据中的 `DISPUTED` 代表点和不确定性圆；三条地图短说明复用既有已批准 Claim。
+- 水系、山地/低地/通道、地点和路线有四组独立开关；样式重载后按既定层序幂等恢复。
+- 来源、审核决定、运行时几何、许可与停止边界见 [PHASE2-03 军事地理记录](../docs/data/phase2-03-military-geography.md)。
 
 `VITE_MAP_STYLE_URL` 是可选的 MapLibre Style JSON URL。可以在不提交的 `frontend/.env.local` 中配置：
 
@@ -142,7 +152,7 @@ python3 -m http.server 4174 --bind 127.0.0.1 --directory "$DEPLOY_ROOT"
 - 仅提供较窄窗口下的最小堆叠，不是完整手机布局。
 - 没有用户状态持久化、深链接或 URL 状态同步；刷新后回到数据集默认事件。
 - 没有后端、数据库、登录、在线编辑或内容审核工作流。
-- 正式离线地形只覆盖当前区域和 z5—9；没有全国范围、3D 倾斜、PHASE2-03 通道/平原几何或 PHASE2-04 距离/路线重画。
+- 正式离线地形只覆盖当前区域和 z5—9；PHASE2-03 只增加显示锚点与两点解释性通道，没有历史平原/古道几何，也没有全国范围、3D 倾斜或 PHASE2-04 距离/路线重画。
 - 外部地图样式仍是可选项；即使外部样式失败，应用也会尝试恢复本地画布、地形与历史层。
 
 工程门禁通过只说明代码、数据结构和静态构建可运行，不等于 MVP-11 的历史内容发布签字已经完成。

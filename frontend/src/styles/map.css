@@ -15,7 +15,7 @@
 }
 
 .history-map .maplibregl-ctrl-bottom-left {
-  bottom: 9rem;
+  bottom: 11rem;
 }
 
 .history-map__actions {
@@ -92,7 +92,7 @@
 }
 
 .map-legend {
-  top: 10.25rem;
+  top: 12.75rem;
   right: 1rem;
   width: min(18rem, calc(100% - 2rem));
   padding: 0;
@@ -156,8 +156,12 @@
 }
 
 .legend-symbol--pass {
-  border: 3px double #49372b;
-  background: rgb(255 253 247 / 60%);
+  width: 0.68rem;
+  height: 0.68rem;
+  border: 2px solid #49372b;
+  border-radius: 0.06rem;
+  background: #fffdf7;
+  transform: rotate(45deg);
 }
 
 .legend-symbol--other {
@@ -201,10 +205,31 @@
   border-top: 3px solid #4f8191;
 }
 
+.legend-flow {
+  display: inline-block;
+  flex: none;
+  width: 1.2rem;
+  color: #0d5f91;
+  font-size: 0.9rem;
+  font-weight: 800;
+  line-height: 0.7rem;
+  text-align: center;
+}
+
 .legend-area--mountain {
   height: 0.65rem;
   border: 1px dashed #756343;
   background: rgb(138 118 84 / 22%);
+}
+
+.legend-corridor {
+  display: inline-block;
+  flex: none;
+  width: 1.2rem;
+  height: 0.65rem;
+  border-top: 2px dashed #745027;
+  border-bottom: 2px dashed #745027;
+  background: rgb(199 152 71 / 28%);
 }
 
 .legend-route {
@@ -244,7 +269,8 @@
 .history-map__message,
 .history-map__warning,
 .history-map__terrain-ready,
-.history-map__terrain-degraded {
+.history-map__terrain-degraded,
+.history-map__tongguan-note {
   position: absolute;
   z-index: 3;
   left: 1rem;
@@ -257,6 +283,22 @@
   color: #434a43;
   font-size: 0.875rem;
   line-height: 1.45;
+}
+
+.history-map__tongguan-note {
+  top: 4.75rem;
+  max-width: min(24rem, calc(100% - 22rem));
+  color: #4b3324;
+}
+
+.history-map__tongguan-note strong {
+  color: #3d2618;
+}
+
+.history-map__tongguan-note ul {
+  margin: 0.35rem 0 0;
+  padding-left: 1.15rem;
+  font-size: 0.75rem;
 }
 
 .history-map__message {
@@ -322,6 +364,11 @@
   }
 
   .history-map__terrain-degraded {
+    right: 1rem;
+    max-width: none;
+  }
+
+  .history-map__tongguan-note {
     right: 1rem;
     max-width: none;
   }

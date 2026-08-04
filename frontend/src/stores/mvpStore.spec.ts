@@ -39,10 +39,11 @@ describe('mvpStore', () => {
     setActivePinia(createPinia())
   })
 
-  it('默认显示三组图层并可独立切换', () => {
+  it('默认显示四组图层并可独立切换', () => {
     const store = useMvpStore()
 
     expect(store.layerVisibility).toEqual({
+      hydrography: true,
       geography: true,
       places: true,
       routes: true,
@@ -51,6 +52,7 @@ describe('mvpStore', () => {
     store.toggleLayer('places')
 
     expect(store.layerVisibility).toEqual({
+      hydrography: true,
       geography: true,
       places: false,
       routes: true,

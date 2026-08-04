@@ -22,6 +22,10 @@ import {
   setLayerVisibility,
 } from '../../map/layers/geographyLayer'
 import {
+  addMilitaryGeographyBaseLayers,
+  addMilitaryGeographyOverlayLayers,
+} from '../../map/layers/militaryGeographyLayer'
+import {
   addPlaceLayers,
   applyRelatedPlaceState,
   PLACE_INTERACTIVE_LAYER_IDS,
@@ -129,6 +133,7 @@ function focusPlace(placeId: string): void {
 
 function applyLayerVisibility(map: MapLibreMap): void {
   for (const layerGroup of [
+    'hydrography',
     'geography',
     'places',
     'routes',
@@ -143,7 +148,9 @@ function applyLayerVisibility(map: MapLibreMap): void {
 
 function syncHistoryLayers(map: MapLibreMap): void {
   addTerrainLayers(map)
+  addMilitaryGeographyBaseLayers(map, props.geography, props.routeSegments)
   addGeographyLayers(map, props.geography)
+  addMilitaryGeographyOverlayLayers(map)
   addRouteLayers(map, props.routeSegments)
   addPlaceLayers(map, props.places)
   applyLayerVisibility(map)
@@ -174,6 +181,7 @@ function toggleLayer(layerGroup: LayerGroup): void {
 
 watch(
   () => [
+    store.layerVisibility.hydrography,
     store.layerVisibility.geography,
     store.layerVisibility.places,
     store.layerVisibility.routes,
@@ -322,6 +330,20 @@ defineExpose({ fitToTopic, focusCurrentEvent, focusPlace })
     />
 
     <MapLegend />
+
+    <aside
+      v-if="store.selectedPlaceId === 'place-tongguan'"
+      class="history-map__tongguan-note"
+      aria-label="潼关军事地理说明"
+      data-map-note="tongguan"
+    >
+      <strong>◆ 潼关 · 关隘代表点</strong>
+      <ul>
+        <li>陕郡以西、进入关中的关键防御节点。</li>
+        <li>失守改变长安方向的防务条件。</li>
+        <li>当前点为现代旧城遗址代表点；唐代关城位置仍有争议。</li>
+      </ul>
+    </aside>
 
     <p
       v-if="mapInitializationError"

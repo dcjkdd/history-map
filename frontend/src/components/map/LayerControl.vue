@@ -14,7 +14,8 @@ const layers: ReadonlyArray<{
   label: string
   note?: string
 }> = [
-  { id: 'geography', label: '地理要素' },
+  { id: 'hydrography', label: '水系与流向', note: '现代概览' },
+  { id: 'geography', label: '山地、低地与通道' },
   { id: 'places', label: '历史地点' },
   { id: 'routes', label: '行动路线', note: '解释性示意' },
 ]

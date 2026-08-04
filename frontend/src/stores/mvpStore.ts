@@ -17,6 +17,7 @@ interface MvpStoreState extends SelectionState {
 export const useMvpStore = defineStore('mvp', {
   state: (): MvpStoreState => ({
     layerVisibility: {
+      hydrography: true,
       geography: true,
       places: true,
       routes: true,

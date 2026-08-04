@@ -5,6 +5,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import HistoryMap from '../components/map/HistoryMap.vue'
 import type { Event, InitialView, MvpDataset } from '../domain/mvpTypes'
 import { GEOGRAPHY_LAYER_IDS } from '../map/layers/geographyLayer'
+import {
+  MILITARY_GEOGRAPHY_LAYER_IDS,
+} from '../map/layers/militaryGeographyLayer'
 import { PLACE_LAYER_IDS } from '../map/layers/placeLayer'
 import { ROUTE_LAYER_IDS } from '../map/layers/routeLayer'
 import {
@@ -126,9 +129,10 @@ const emptyHistoryMapProps = {
   places: emptyPlaces,
   routeSegments: emptyRouteSegments,
 }
-const historySourceCount = 4 + TERRAIN_SOURCE_IDS.length
+const historySourceCount = 5 + TERRAIN_SOURCE_IDS.length
 const historyLayerCount =
   GEOGRAPHY_LAYER_IDS.length +
+  MILITARY_GEOGRAPHY_LAYER_IDS.length +
   PLACE_LAYER_IDS.length +
   ROUTE_LAYER_IDS.length +
   TERRAIN_LAYER_IDS.length
@@ -542,15 +546,25 @@ describe('useMapLibre', () => {
     instance.emit('style.load')
     await nextTick()
 
-    const geographyToggle = host.querySelector<HTMLInputElement>(
-      '.layer-control input',
+    const hydrographyToggle = host.querySelector<HTMLInputElement>(
+      '.layer-control input[data-layer-group="hydrography"]',
     )
+    const geographyToggle = host.querySelector<HTMLInputElement>(
+      '.layer-control input[data-layer-group="geography"]',
+    )
+    hydrographyToggle?.dispatchEvent(new Event('change'))
     geographyToggle?.dispatchEvent(new Event('change'))
     await nextTick()
 
+    expect(store.layerVisibility.hydrography).toBe(false)
     expect(store.layerVisibility.geography).toBe(false)
     expect(instance.setLayoutProperty).toHaveBeenCalledWith(
       'mvp-geography-river',
+      'visibility',
+      'none',
+    )
+    expect(instance.setLayoutProperty).toHaveBeenCalledWith(
+      'phase2-east-guanzhong-corridor-band',
       'visibility',
       'none',
     )
@@ -567,6 +581,12 @@ describe('useMapLibre', () => {
       ['get', 'id'],
       'place-tongguan',
     ])
+    expect(host.querySelector('[data-map-note="tongguan"]')?.textContent).toContain(
+      '进入关中的关键防御节点',
+    )
+    expect(host.querySelector('[data-map-note="tongguan"]')?.textContent).toContain(
+      '唐代关城位置仍有争议',
+    )
 
     instance.sources.clear()
     instance.layers.clear()
@@ -661,6 +681,7 @@ describe('useMapLibre', () => {
     document.body.append(host)
     const pinia = createPinia()
     const store = useMvpStore(pinia)
+    store.toggleLayer('hydrography')
     store.toggleLayer('geography')
     store.toggleLayer('routes')
     store.initializeTimeline(routeEvents, secondEvent.id)
@@ -696,6 +717,13 @@ describe('useMapLibre', () => {
     expect(instance.addSource).toHaveBeenCalledTimes(historySourceCount)
     expect(instance.addLayer).toHaveBeenCalledTimes(historyLayerCount)
     for (const layerId of GEOGRAPHY_LAYER_IDS) {
+      expect(instance.setLayoutProperty).toHaveBeenCalledWith(
+        layerId,
+        'visibility',
+        'none',
+      )
+    }
+    for (const layerId of MILITARY_GEOGRAPHY_LAYER_IDS) {
       expect(instance.setLayoutProperty).toHaveBeenCalledWith(
         layerId,
         'visibility',

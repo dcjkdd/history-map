@@ -1,6 +1,10 @@
 import type { Map as MapLibreMap } from 'maplibre-gl'
 
 import type { LayerGroup, MvpDataset } from '../../domain/mvpTypes'
+import {
+  MILITARY_HYDROGRAPHY_LAYER_IDS,
+  MILITARY_LAND_GEOGRAPHY_LAYER_IDS,
+} from './militaryGeographyLayer'
 import { PLACE_LAYER_IDS } from './placeLayer'
 import { ROUTE_LAYER_IDS } from './routeLayer'
 
@@ -39,7 +43,19 @@ const DISPLAY_ONLY_GEOGRAPHY_LABELS = {
 }
 
 const LAYER_IDS_BY_GROUP: Record<LayerGroup, readonly string[]> = {
-  geography: GEOGRAPHY_LAYER_IDS,
+  hydrography: [
+    GEOGRAPHY_LAYER_IDS[2],
+    GEOGRAPHY_LAYER_IDS[3],
+    GEOGRAPHY_LAYER_IDS[5],
+    ...MILITARY_HYDROGRAPHY_LAYER_IDS,
+  ],
+  geography: [
+    GEOGRAPHY_LAYER_IDS[0],
+    GEOGRAPHY_LAYER_IDS[1],
+    GEOGRAPHY_LAYER_IDS[4],
+    GEOGRAPHY_LAYER_IDS[6],
+    ...MILITARY_LAND_GEOGRAPHY_LAYER_IDS,
+  ],
   places: PLACE_LAYER_IDS,
   routes: ROUTE_LAYER_IDS,
 }

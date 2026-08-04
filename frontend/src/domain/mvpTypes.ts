@@ -283,9 +283,10 @@ export interface MvpDataset {
   citations: Citation[]
 }
 
-export type LayerGroup = 'geography' | 'places' | 'routes'
+export type LayerGroup = 'hydrography' | 'geography' | 'places' | 'routes'
 
 export interface LayerVisibility {
+  hydrography: boolean
   geography: boolean
   places: boolean
   routes: boolean

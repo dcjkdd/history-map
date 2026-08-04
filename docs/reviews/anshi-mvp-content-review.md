@@ -223,3 +223,29 @@ NOT_APPLICABLE   本项不适用
 - 结论（批准 / 不批准并说明）：
 
 产品、内容、开发三方负责人填写真实姓名、日期并明确批准后，才可把整期 MVP 标记为完成。当前工程通过、行级 `APPROVED` 和 HTTP 200 均不自动满足本节。
+
+## PHASE2-03 候选人工审核门（未签字）
+
+本节对应资料笔记第 9 节，只登记 PHASE2-03 的非发布候选。`candidateType` 不属于 MVP-11 的正式 `entityType`，因此当前 `audit:content` 不会把这些行误算为正式批准记录。任何 `PENDING_REVIEW` 行都不得进入地图资产、运行时代码或正式 JSON。
+
+| candidateType | candidateId | 工作标签 | factReviewed | geometryReviewed | citationReviewed | sourceVersionReviewed | licenseReviewed | certaintyReviewed | reviewer | reviewDate | status | notes |
+|---|---|---|---:|---:|---:|---:|---:|---:|---|---|---|---|
+| Phase2Source | PHASE2-SRC-YELLOW-FLOW-01 | 自然资源部潼关外业测量公开网页 | 是 | 不适用 | 是 | 是 | 是 | 是 | banq | 2026-08-04 | APPROVED | 政府固定 HTML 已完整打开；只批准潼关处黄河折向东流的少量现代事实归纳，不支持唐代河道、河宽或军事作用；不打包网页资产 |
+| Phase2Source | PHASE2-SRC-WEI-FLOW-01 | 武山县山洪灾害防御预案公开网页 | 是 | 不适用 | 是 | 是 | 是 | 是 | banq | 2026-08-04 | APPROVED | 政府固定 HTML 已完整打开；只批准渭河由西向东并在潼关注入黄河的少量现代事实归纳，不支持唐代河道、航运或军事作用；不打包网页资产 |
+| Phase2Source | PHASE2-SRC-GUANZHONG-LOWLAND-01 | 陕西省生态功能区划公开网页 | 是 | 不适用 | 是 | 是 | 是 | 是 | banq | 2026-08-04 | APPROVED | 政府固定 HTML 已完整打开且网页标记效力状态有效；只批准关中现代平原/盆地、渭河冲积洪积平原及秦岭相对关系，不支持历史边界或战时可通行性；不打包网页资产 |
+| Phase2Claim | PHASE2-CLAIM-YELLOW-FLOW-01 | 黄河现代概览流向 | 是 | 不适用 | 是 | 是 | 不适用 | 是 | banq | 2026-08-04 | APPROVED | 只批准潼关附近总体向东和蓝色 display-only 箭头；不批准唐代河道、河宽或军事作用 |
+| Phase2Claim | PHASE2-CLAIM-WEI-FLOW-01 | 渭河现代概览流向 | 是 | 不适用 | 是 | 是 | 不适用 | 是 | banq | 2026-08-04 | APPROVED | 只批准总体由西向东、潼关入黄和蓝色 display-only 箭头；不批准唐代河道、航运或军事作用 |
+| Phase2Claim | PHASE2-CLAIM-GUANZHONG-LOWLAND-01 | 关中东部低地现代标签 | 是 | 是 | 是 | 是 | 不适用 | 是 | banq | 2026-08-04 | APPROVED | 只增加 display-only 标签，锚点 `[109.68, 34.40]`；不生成或批准历史平原 Polygon |
+| Phase2Geometry | PHASE2-GEOMETRY-EAST-GUANZHONG-01 | 灵宝—潼关东入关中解释性通道 | 是 | 是 | 是 | 不适用 | 不适用 | 是 | banq | 2026-08-04 | APPROVED | 复用既有两点几何，按灵宝→潼关表达，固定 22px 视觉宽度；不升级原 PENDING Geography/Claim，不表示古道、真实宽度或军队路线 |
+| Phase2Claim | PHASE2-CLAIM-EAST-GUANZHONG-01 | 通道地图内短说明 | 是 | 是 | 是 | 不适用 | 不适用 | 是 | banq | 2026-08-04 | APPROVED | 只使用“南近山、北临黄河的狭窄通道”相对关系，并明确两点带状连接不是唐代道路或边界 |
+| Phase2Presentation | PHASE2-PRESENTATION-TONGGUAN-01 | 潼关地图内 3 条短说明 | 是 | 不适用 | 是 | 是 | 是 | 是 | banq | 2026-08-04 | APPROVED | 只拆分既有潼关战略作用和争议代表点 Claim，不增加“控制河谷”“唯一门户”等新事实；内容负责人已确认展示方式 |
+
+### 内容负责人 PHASE2-03 候选决定
+
+- [x] 批准黄河、渭河两条现代总体流向说明及 display-only 蓝色箭头；不改变原 Geography 与历史作用状态。
+- [x] 批准“关中东部低地（现代地貌概览）”标签；不批准历史平原 Polygon。
+- [x] 批准灵宝—潼关两点、固定 `22px` 的解释性通道带及短说明；原 `geography-guanzhong-corridor` 与对应 Claim 继续保持 `PENDING_SOURCE` / `PENDING_REVIEW`。
+- [x] 确认潼关 3 条短说明只复用既有已批准文字。
+- 签字姓名：banq
+- 签字日期：2026-08-04
+- 结论（批准 / 修改后批准 / 不批准并说明）：批准上述四项候选，按推荐方案继续 PHASE2-03；保持原 PENDING/REJECTED 状态不变。

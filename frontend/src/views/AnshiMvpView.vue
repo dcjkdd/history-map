@@ -131,8 +131,8 @@ onBeforeUnmount(() => {
       >
         <div class="map-panel__heading">
           <div>
-            <p class="section-label">PHASE2-02</p>
-            <h2 id="map-panel-title">地形基底与历史叠加</h2>
+            <p class="section-label">PHASE2-03</p>
+            <h2 id="map-panel-title">山河、通道与关隘</h2>
           </div>
           <p class="map-panel__hint">拖动浏览后可主动定位当前事件</p>
         </div>

@@ -9,8 +9,7 @@ export const PLACE_LAYER_IDS = [
   'mvp-places-uncertain',
   'mvp-places-other',
   'mvp-places-city',
-  'mvp-places-pass-outer',
-  'mvp-places-pass-inner',
+  'mvp-places-pass-symbol',
   'mvp-places-related',
   'mvp-places-selected',
   'mvp-places-label',
@@ -20,7 +19,7 @@ export const PLACE_LAYER_IDS = [
 export const PLACE_INTERACTIVE_LAYER_IDS = [
   'mvp-places-other',
   'mvp-places-city',
-  'mvp-places-pass-outer',
+  'mvp-places-pass-symbol',
 ] as const
 
 const UNCERTAIN_CERTAINTIES = ['LOW', 'DISPUTED', 'UNKNOWN']
@@ -91,14 +90,19 @@ export function addPlaceLayers(
   if (!map.getLayer(PLACE_LAYER_IDS[3])) {
     map.addLayer({
       id: PLACE_LAYER_IDS[3],
-      type: 'circle',
+      type: 'symbol',
       source: PLACE_SOURCE_ID,
       filter: ['==', ['get', 'placeType'], 'PASS'],
+      layout: {
+        'text-field': '◆',
+        'text-size': 20,
+        'text-allow-overlap': true,
+        'text-ignore-placement': true,
+      },
       paint: {
-        'circle-radius': 8,
-        'circle-color': 'rgba(255, 253, 247, 0.6)',
-        'circle-stroke-color': '#49372b',
-        'circle-stroke-width': 2.5,
+        'text-color': '#49372b',
+        'text-halo-color': '#fffdf7',
+        'text-halo-width': 2.2,
       },
     })
   }
@@ -106,19 +110,6 @@ export function addPlaceLayers(
   if (!map.getLayer(PLACE_LAYER_IDS[4])) {
     map.addLayer({
       id: PLACE_LAYER_IDS[4],
-      type: 'circle',
-      source: PLACE_SOURCE_ID,
-      filter: ['==', ['get', 'placeType'], 'PASS'],
-      paint: {
-        'circle-radius': 2.5,
-        'circle-color': '#49372b',
-      },
-    })
-  }
-
-  if (!map.getLayer(PLACE_LAYER_IDS[5])) {
-    map.addLayer({
-      id: PLACE_LAYER_IDS[5],
       type: 'circle',
       source: PLACE_SOURCE_ID,
       filter: ['==', ['get', 'id'], ''],
@@ -132,9 +123,9 @@ export function addPlaceLayers(
     })
   }
 
-  if (!map.getLayer(PLACE_LAYER_IDS[6])) {
+  if (!map.getLayer(PLACE_LAYER_IDS[5])) {
     map.addLayer({
-      id: PLACE_LAYER_IDS[6],
+      id: PLACE_LAYER_IDS[5],
       type: 'circle',
       source: PLACE_SOURCE_ID,
       filter: ['==', ['get', 'id'], ''],
@@ -147,9 +138,9 @@ export function addPlaceLayers(
     })
   }
 
-  if (!map.getLayer(PLACE_LAYER_IDS[7])) {
+  if (!map.getLayer(PLACE_LAYER_IDS[6])) {
     map.addLayer({
-      id: PLACE_LAYER_IDS[7],
+      id: PLACE_LAYER_IDS[6],
       type: 'symbol',
       source: PLACE_SOURCE_ID,
       filter: ['!=', ['get', 'placeType'], 'PASS'],
@@ -169,9 +160,9 @@ export function addPlaceLayers(
     })
   }
 
-  if (!map.getLayer(PLACE_LAYER_IDS[8])) {
+  if (!map.getLayer(PLACE_LAYER_IDS[7])) {
     map.addLayer({
-      id: PLACE_LAYER_IDS[8],
+      id: PLACE_LAYER_IDS[7],
       type: 'symbol',
       source: PLACE_SOURCE_ID,
       filter: ['==', ['get', 'placeType'], 'PASS'],
@@ -196,7 +187,7 @@ export function applyRelatedPlaceState(
   map: MapLibreMap,
   derivedState: DerivedMapState,
 ): void {
-  const relatedLayerId = PLACE_LAYER_IDS[5]
+  const relatedLayerId = PLACE_LAYER_IDS[4]
 
   if (!map.getLayer(relatedLayerId)) {
     return
@@ -217,7 +208,7 @@ export function setSelectedPlace(
   map: MapLibreMap,
   placeId: string | undefined,
 ): void {
-  const selectedLayerId = PLACE_LAYER_IDS[6]
+  const selectedLayerId = PLACE_LAYER_IDS[5]
 
   if (!map.getLayer(selectedLayerId)) {
     return

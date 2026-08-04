@@ -459,3 +459,47 @@ node scripts/prepare-anshi-spatial-candidates.mjs \
 - 可以搭建前端骨架、数据契约和空白地图。
 - 可以创建明确标记为非发布数据的测试 fixture。
 - 不得生成声称正式可发布的安史之乱内容数据。
+
+## 9. PHASE2-03 内容与来源门禁候选（未批准、未发布）
+
+本节只为 PHASE2-03 建立人工确认入口，不属于既有 MVP-11 正式 Source、Citation、Claim 或 Geography 表；候选 ID 故意使用 `PHASE2-*` 前缀，当前自动审计不会把它们误算为已发布记录。只有内容负责人明确确认后，才能把选定记录转为正式可审计行、发布资产或地图说明。
+
+### 9.1 现场结论
+
+- 已有 `APPROVED` 足以支持：黄河、渭河、秦岭的现代概览几何和年代边界；潼关继续为独立 `PASS`、`DISPUTED` 现代旧城遗址代表点；“陕郡以西、进入关中的关键防御节点”“失守改变长安方向防务条件”；灵宝西原方向“南近山、北临黄河的狭窄通道”这一限定相对关系。
+- 已有记录不足以直接支持：把 Natural Earth 坐标顺序当作水文流向；把 GLO-90 颜色或高程阈值当作历史平原边界；把 `geography-guanzhong-corridor` 或其 Claim 从 `PENDING_*` 自动升级；把任意视觉带宽解释为真实通道宽度。
+- 2026-08-04 已完整打开并核对下表三份政府公开 HTML 的相关段落；它们只支持现代总体流向和现代地貌概览，不支持唐代精确河道、古道、军事作用或通道宽度。此前还尝试核对生态环境部约 38MB 的治理环评 PDF、陕西省水利厅规划环评 PDF 和灵宝市政府公开报告，但分别受网页体积上限或 15 秒下载超时影响；按 `phase2-01-execution-log.md` 的单次失败停止规则未重试，也不把这些未完整取得的 PDF 列为本次候选批准依据。三份 HTML 不作为项目资产再分发，因此不产生本地文件 SHA-256；只保留稳定 URL、网页内定位和少量事实归纳。
+
+### 9.2 Source 与 Citation 候选
+
+| phase2CandidateId | 类型 | 资料名与提供方 | 版本或稳定定位 | URL / 访问日期 | 许可与使用边界 | 候选用途 | 当前核对状态 | 状态 |
+|---|---|---|---|---|---|---|---|---|
+| PHASE2-SRC-YELLOW-FLOW-01 | 政府公开网页 | 《自然资源部青年干部“根在基层”调研实践活动综述》；自然资源部来源，新疆维吾尔自治区自然资源厅转载 | 2025-01-14；“挺膺担当，全力守护黄河”中 2024 年 9 月潼关外业测量段 | [自然资源厅固定 HTML](https://zrzyt.xinjiang.gov.cn/xjgtzy/mtxc/202501/c9797502c012491680e9727c3eea8cb1.shtml)；访问日期 2026-08-04 | 未发现开放再分发许可；只归纳潼关处黄河折向东流的现代总体方向，不复制图片、长段正文或把当代河势扩展为唐代河道 | 黄河现代概览流向候选 | 网页标题、来源、日期和正文定位已完整打开核对；不打包网页资产 | APPROVED |
+| PHASE2-CIT-YELLOW-FLOW-01 | 候选 Citation | PHASE2-SRC-YELLOW-FLOW-01 | “2024 年 9 月，调研团来到陕西潼关外业测量现场”及其下一段 | 同上 | 只支持潼关附近总体折向东流，不支持历史河道、河宽复原、军事作用或精确箭头位置 | 黄河箭头方向核对 | 2026-08-04 内容负责人批准 display-only 用途 | APPROVED |
+| PHASE2-SRC-WEI-FLOW-01 | 政府公开预案网页 | 《武山县人民政府关于印发〈武山县山洪灾害防御预案〉的通知》；武山县人民政府 | 固定 HTML；第 2.1.3 节“水文气象”及第 2.1.4 节“河流水系” | [武山县人民政府固定 HTML](https://www.wushan.gov.cn/info/2791/1463412.htm)；访问日期 2026-08-04 | 未发现开放再分发许可；只作渭河现代总体流向与潼关汇入黄河的少量归纳，不复制长段正文 | 渭河现代概览流向候选 | 网页标题、章节和正文定位已完整打开核对；不打包网页资产 | APPROVED |
+| PHASE2-CIT-WEI-FLOW-01 | 候选 Citation | PHASE2-SRC-WEI-FLOW-01 | 第 2.1.4 节“（一）渭河”首段 | 同上 | 只支持渭河现代总体由西向东及潼关汇入黄河，不支持唐代精确河道、航运或军事作用 | 渭河箭头方向核对 | 2026-08-04 内容负责人批准 display-only 用途 | APPROVED |
+| PHASE2-SRC-GUANZHONG-LOWLAND-01 | 政府公开区划网页 | 《陕西省人民政府办公厅关于印发陕西省生态功能区划的通知》；陕西省人民政府办公厅 | 陕政办发〔2004〕115 号，当前效力状态“有效”；第二章第 1.1.1 节“地质、地貌” | [陕西省人民政府固定 HTML](https://www.shaanxi.gov.cn/zfxxgk/fdzdgknr/zcwj/nszfbgtwj/szbf/202208/t20220808_2234281.html)；访问日期 2026-08-04 | 未发现开放再分发许可；只作现代自然地理少量归纳，不复制长段正文，不作为历史边界、古道或军事作用证据 | 关中现代平原/盆地、渭河冲积洪积平原与秦岭相对关系候选 | 网页文号、效力、章节和正文定位已完整打开核对；不打包网页资产 | APPROVED |
+| PHASE2-CIT-GUANZHONG-LOWLAND-01 | 候选 Citation | PHASE2-SRC-GUANZHONG-LOWLAND-01 | 第二章第 1.1.1 节“陕西省地势南北高，中间低”至关中盆地地貌分区段 | 同上 | 只支持现代地貌概览；不支持历史平原边界、通道宽度或战时可通行性 | “关中东部低地（现代地貌概览）”标签候选 | 2026-08-04 内容负责人批准 display-only 用途 | APPROVED |
+
+### 9.3 Claim、几何和展示候选
+
+| phase2CandidateId | 候选展示位置 | 候选文字或处理方法 | 证据 / 输入 | 不确定性与禁止扩展 | 推荐决定 | 状态 |
+|---|---|---|---|---|---|---|
+| PHASE2-CLAIM-YELLOW-FLOW-01 | 黄河流向说明 | 潼关附近黄河总体折向东流；地图蓝色箭头只表示现代概览线的下游方向。 | PHASE2-CIT-YELLOW-FLOW-01；既有 `CIT-NE50-RIVERS-MVP` | 不表示唐代精确河道、古水文状态、河宽或军事作用 | 批准为 display-only 现代方向说明 | APPROVED |
+| PHASE2-CLAIM-WEI-FLOW-01 | 渭河流向说明 | 渭河总体由西向东横贯关中，并在潼关注入黄河；地图蓝色箭头只表示现代概览线的下游方向。 | PHASE2-CIT-WEI-FLOW-01；既有 `CIT-NE50-RIVERS-MVP` | 不表示唐代精确河道、航运、路线或军事作用 | 批准为 display-only 现代方向说明 | APPROVED |
+| PHASE2-CLAIM-GUANZHONG-LOWLAND-01 | 地貌标签 | `关中东部低地（现代地貌概览）`。底图继续使用已批准 GLO-90 分层设色；只新增标签，不描绘历史平原边界。 | PHASE2-CIT-GUANZHONG-LOWLAND-01；PHASE2-02 GLO-90 manifest | 标签锚点 `[109.68, 34.40]` 只为排版；不进入正式历史 JSON，不生成 Polygon，不表示唐代地表或可通行范围 | 批准标签与现代边界措辞；锚点记录为 display-only | APPROVED |
+| PHASE2-GEOMETRY-EAST-GUANZHONG-01 | 东入关中解释性通道 | 复用既有 `route-tang-advance-01` 的两个已批准但 `DISPUTED` 的现代代表点，按“灵宝→潼关”反向形成同一条两点中心线；地图以固定 `22px` 半透明赭金带和虚线边缘表达。`22px` 只是屏幕视觉宽度，不换算公里，不表示真实通道边界。 | `claim-place-lingbao-scope-modern-01`、`claim-route-tang-advance-segment-01-inference-01`、`CIT-ZZTJ218-R1996147-P02`、`CIT-ANSHI25-CH09-P015-P020` | 不增加中间点、不路由、不描现代道路；不改写或遮代正式 RouteSegment；不得称为唐代古道中心线、实际宽度、战场边界或军队路线 | 批准这一最小、可复现的 display-only 通道方法；不批准原 `geography-guanzhong-corridor` 升级 | APPROVED |
+| PHASE2-CLAIM-EAST-GUANZHONG-01 | 通道短说明 | 灵宝西原方向现有材料只支持“南近山、北临黄河的狭窄通道”这一相对关系；图中带状表达只是两个现代争议代表点之间的解释性视觉连接，不是唐代道路或通道边界。 | 同 PHASE2-GEOMETRY-EAST-GUANZHONG-01 | 不写历史道路名称、军事作用扩展、真实宽度、距离或流向 | 批准为地图内短说明 | APPROVED |
+| PHASE2-PRESENTATION-TONGGUAN-01 | 选中潼关时的地图内 3 条短说明 | 1. 陕郡以西、进入关中的关键防御节点；2. 失守改变长安方向的防务条件；3. 当前点为现代旧城遗址代表点，唐代关城位置仍有争议。 | 既有 `claim-place-tongguan-strategic-role-modern-01`、`claim-place-tongguan-site-dispute-modern-01`、`claim-place-tongguan-coordinate-candidate-01` | 只拆分和压缩已批准文字；不增加“控制河谷”“唯一门户”等新事实 | 允许直接复用既有 APPROVED，不新建正式 Claim | APPROVED |
+
+### 9.4 推荐人工决定
+
+1. 批准两条现代河流总体方向说明，但维持黄河/渭河原 Geography 和历史作用状态不变；箭头只作为 display-only 图层。
+2. 批准“关中东部低地（现代地貌概览）”标签，不批准历史平原 Polygon；标签锚点必须写入处理记录。
+3. 批准 `PHASE2-GEOMETRY-EAST-GUANZHONG-01` 的两点、固定屏幕宽度方案，只作为解释性通道；继续保留原 `geography-guanzhong-corridor=PENDING_SOURCE` 与 `claim-geography-guanzhong-corridor-modern-01=PENDING_REVIEW`，不提升、不写入正式 `mvp-v1.json`。
+4. 潼关短说明只复用既有已批准文字；不采用两条 `REJECTED` Geography 历史作用候选，也不采用 `PENDING_REVIEW` 的战术、部署、兵力或地方叙事。
+
+### 9.5 人工批准记录
+
+- 2026-08-04，内容负责人 `banq` 明确回复：“批准上述四项候选，按推荐方案继续 PHASE2-03；保持原 PENDING/REJECTED 状态不变。”
+- 本次批准只覆盖第 9.4 节四项 display-only 展示和既有潼关文字复用；不把候选写入正式 `mvp-v1.json`，不升级 `geography-guanzhong-corridor` 或其 Claim，也不恢复两条 `REJECTED` 历史作用候选。
