@@ -1,0 +1,254 @@
+:root {
+  color: #17231d;
+  background: #e8e3d6;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", sans-serif;
+  font-synthesis: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+.spike-shell {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+.spike-shell {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.spike-header {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  min-height: 76px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 10px 20px;
+  color: #f8f3e5;
+  background: #17251f;
+  border-bottom: 1px solid #6f7c61;
+}
+
+.spike-header h1 {
+  margin: 2px 0 0;
+  font-family: "Songti SC", "STSong", serif;
+  font-size: clamp(18px, 2vw, 27px);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.eyebrow {
+  margin: 0;
+  color: #d8c99f;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.mode-switch {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 6px;
+  padding: 4px;
+  border: 1px solid rgb(255 255 255 / 28%);
+  border-radius: 9px;
+  background: rgb(0 0 0 / 18%);
+}
+
+.mode-switch button {
+  min-height: 38px;
+  padding: 7px 13px;
+  color: #efe8d2;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mode-switch button:hover,
+.mode-switch button:focus-visible {
+  outline: 2px solid #e5ca7a;
+  outline-offset: 1px;
+}
+
+.mode-switch button.is-active {
+  color: #14211b;
+  background: #e4c873;
+}
+
+.map-stage,
+#map {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#map {
+  background: #dfddca;
+}
+
+.reading-card {
+  position: absolute;
+  z-index: 2;
+  top: 16px;
+  left: 16px;
+  width: min(290px, calc(100vw - 32px));
+  padding: 13px 14px 12px;
+  color: #17231d;
+  background: rgb(250 247 237 / 93%);
+  border: 1px solid rgb(38 54 43 / 35%);
+  border-radius: 9px;
+  box-shadow: 0 5px 20px rgb(25 34 28 / 18%);
+  backdrop-filter: blur(5px);
+}
+
+.reading-card strong {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.reading-card p,
+.reading-card ul {
+  margin: 6px 0;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.reading-card ul {
+  display: grid;
+  gap: 3px;
+  padding: 7px 0;
+  list-style: none;
+  border-top: 1px solid rgb(38 54 43 / 18%);
+  border-bottom: 1px solid rgb(38 54 43 / 18%);
+}
+
+.swatch,
+.river-key,
+.route-key {
+  display: inline-block;
+  width: 22px;
+  height: 7px;
+  margin-right: 7px;
+  border-radius: 2px;
+  vertical-align: middle;
+}
+
+.swatch.low {
+  background: #d8d8a7;
+}
+
+.swatch.high {
+  background: #876f5c;
+}
+
+.river-key {
+  height: 3px;
+  background: #236f9b;
+}
+
+.route-key {
+  height: 0;
+  border-top: 3px dashed #a12622;
+}
+
+.boundary-note {
+  color: #5f3e2c;
+  font-weight: 650;
+}
+
+.corridor-note {
+  position: absolute;
+  z-index: 2;
+  top: 16px;
+  left: 50%;
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  transform: translateX(-50%);
+  padding: 7px 11px;
+  color: #fcf7e8;
+  background: rgb(40 48 38 / 78%);
+  border: 1px solid rgb(255 255 255 / 30%);
+  border-radius: 999px;
+  box-shadow: 0 2px 12px rgb(0 0 0 / 22%);
+  font-size: 12px;
+  font-weight: 750;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.corridor-arrow {
+  color: #f2d277;
+  letter-spacing: 0.08em;
+}
+
+.runtime-status {
+  position: absolute;
+  z-index: 2;
+  top: 12px;
+  right: 52px;
+  max-width: min(360px, calc(100vw - 24px));
+  padding: 6px 9px;
+  color: #f7f2df;
+  background: rgb(28 37 31 / 82%);
+  border-radius: 5px;
+  font-size: 11px;
+  pointer-events: none;
+}
+
+.maplibregl-ctrl-attrib {
+  max-width: min(680px, calc(100vw - 20px));
+  font-size: 10px;
+}
+
+.maplibregl-ctrl-scale {
+  color: #111a16;
+  background: rgb(255 255 255 / 78%);
+}
+
+@media (max-width: 1100px) {
+  .spike-header {
+    min-height: 70px;
+    padding: 8px 12px;
+  }
+
+  .spike-header h1 {
+    max-width: 530px;
+    font-size: 18px;
+  }
+
+  .mode-switch button {
+    padding-inline: 9px;
+    font-size: 12px;
+  }
+
+  .reading-card {
+    top: 12px;
+    left: 12px;
+    width: 250px;
+  }
+
+  .corridor-note {
+    top: 12px;
+    bottom: auto;
+    left: 50%;
+  }
+
+  .runtime-status {
+    top: 56px;
+    right: 7px;
+  }
+}

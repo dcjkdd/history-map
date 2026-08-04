@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PHASE2-01 地形视觉试验</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="./vendor/maplibre-gl.css" />
+    <link rel="stylesheet" href="./spike.css?v=phase2-01-20260803-4" />
+  </head>
+  <body>
+    <main class="spike-shell">
+      <header class="spike-header">
+        <div>
+          <p class="eyebrow">PHASE2-01 · 隔离视觉试验 · 非正式产品实现</p>
+          <h1>洛阳—潼关—长安：地形是否能直接解释通道？</h1>
+        </div>
+        <div class="mode-switch" role="group" aria-label="地形视觉方案">
+          <button id="mode-topdown" class="is-active" type="button" aria-pressed="true">
+            A · 俯视分层设色
+          </button>
+          <button id="mode-terrain" type="button" aria-pressed="false">
+            B · 倾斜 3D terrain
+          </button>
+        </div>
+      </header>
+
+      <section class="map-stage" aria-label="地形视觉试验地图">
+        <div id="map"></div>
+        <aside class="reading-card" aria-label="地图判读目标">
+          <strong id="mode-title">方案 A · 俯视 hillshade + 分层设色</strong>
+          <p id="mode-note">先看低地与山地，再看黄河、渭河、秦岭和潼关。</p>
+          <ul>
+            <li><span class="swatch low"></span>浅黄绿：低地 / 平原视觉辅助</li>
+            <li><span class="swatch high"></span>褐灰：较高山地</li>
+            <li><span class="river-key"></span>现代河流概览</li>
+            <li><span class="route-key"></span>既有 INFERENCE / LOW 路线</li>
+          </ul>
+          <p class="boundary-note">现代地形不代表唐代地表；地点仍为 DISPUTED 代表点。</p>
+        </aside>
+        <div class="corridor-note" aria-label="通道方向提示">
+          <span>西 · 长安</span>
+          <span class="corridor-arrow">← 东西通道 →</span>
+          <span>洛阳 · 东</span>
+        </div>
+        <div id="runtime-status" class="runtime-status" aria-live="polite">正在加载本地试验资产…</div>
+      </section>
+    </main>
+    <script type="module" src="./spike.js?v=phase2-01-20260803-4"></script>
+  </body>
+</html>
