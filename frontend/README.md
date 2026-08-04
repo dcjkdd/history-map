@@ -2,7 +2,7 @@
 
 本目录是“潼关防线、灵宝出战与长安失守”专题的可运行静态前端。它是 Vue 3、TypeScript、Vite 与 MapLibre GL JS 构成的只读单页应用；生产构建只包含静态 HTML、CSS、JavaScript、MapLibre worker、本地区域地形、地图样式和版本化 JSON，不需要 Go、PostgreSQL/PostGIS、Redis、Docker、云服务或运行时外网。
 
-> 产品状态：PHASE2-02 已接入默认俯视分层设色 + hillshade 与现代豫陕定位，完整自动门禁和双尺寸/双 base 浏览器复验已通过；仍等待产品负责人视觉签字和提交确认。降级背景或工程通过不能算产品验收。
+> 产品状态：PHASE2-02 已在提交 `ab3ac2d` 接入默认俯视分层设色 + hillshade 与现代豫陕定位，完整自动门禁和双尺寸/双 base 浏览器复验已通过，产品负责人已根据最终视觉证据确认并完成推送。PHASE2-03 尚未启动；降级背景或单独的工程通过仍不能算后续阶段的产品验收。
 
 ## 环境与安装
 
