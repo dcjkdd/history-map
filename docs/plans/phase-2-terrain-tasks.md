@@ -102,7 +102,7 @@
 
 ## PHASE2-04：地形约束路线、方向与距离
 
-实施状态（2026-08-07）：`IMPLEMENTATION_COMPLETE_PUSH_AUTHORIZED`。方向、距离方法、路线短说明和燕军地形约束来源分两轮获得用户明确批准；正式 JSON 未修改，三段路线继续为两点 `INFERENCE / LOW`。运行时已实现单个路线 `▶`、方向/距离标签、路线点击详情、事件回退显隐和 `style.load` 状态恢复；完整自动门禁以及根路径、`/history-map/` 的 `1024×768` / `1440×900` 浏览器复核均通过。用户已明确确认提交并推送；PHASE2-05 未启动。详细证据见 [PHASE2-04 路线记录](../data/phase2-04-route-direction-distance.md)。
+实施状态（2026-08-07）：`COMPLETED`。方向、距离方法、路线短说明和燕军地形约束来源分两轮获得用户明确批准；正式 JSON 未修改，三段路线继续为两点 `INFERENCE / LOW`。运行时已实现单个路线 `▶`、方向/距离标签、路线点击详情、事件回退显隐和 `style.load` 状态恢复；完整自动门禁以及根路径、`/history-map/` 的 `1024×768` / `1440×900` 浏览器复核均通过。用户已明确确认提交并推送，实施提交 `0210e65` 已推送至 GitHub `master`；PHASE2-05 未启动。详细证据见 [PHASE2-04 路线记录](../data/phase2-04-route-direction-distance.md)。
 
 ### 目标
 
