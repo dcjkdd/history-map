@@ -132,12 +132,12 @@ describe('MVP map layers', () => {
     addMilitaryGeographyBaseLayers(map, geography, routeSegments)
     addGeographyLayers(map, geography)
     addMilitaryGeographyOverlayLayers(map)
-    addRouteLayers(map, routeSegments)
+    addRouteLayers(map, routeSegments, places)
     addPlaceLayers(map, places)
     addMilitaryGeographyBaseLayers(map, geography, routeSegments)
     addGeographyLayers(map, geography)
     addMilitaryGeographyOverlayLayers(map)
-    addRouteLayers(map, routeSegments)
+    addRouteLayers(map, routeSegments, places)
     addPlaceLayers(map, places)
 
     expect(mapMock.addSource).toHaveBeenCalledTimes(5)
@@ -200,6 +200,36 @@ describe('MVP map layers', () => {
         'text-keep-upright': false,
       },
     })
+    expect(mapMock.layers.get('mvp-route-direction-arrows')).toMatchObject({
+      type: 'symbol',
+      source: ROUTE_SOURCE_ID,
+      layout: {
+        'symbol-placement': 'line-center',
+        'text-field': ['get', 'arrowText'],
+        'text-keep-upright': false,
+        'text-rotation-alignment': 'map',
+      },
+    })
+    expect(mapMock.layers.get('mvp-route-direction-labels')).toMatchObject({
+      type: 'symbol',
+      source: ROUTE_SOURCE_ID,
+      layout: {
+        'symbol-placement': 'line-center',
+        'text-field': [
+          'concat',
+          ['get', 'directionLabel'],
+          '\n',
+          ['get', 'distanceLabel'],
+        ],
+      },
+    })
+    expect(
+      mapMock.layers.get('mvp-route-direction-arrows')?.layout,
+    ).not.toMatchObject({
+      'symbol-placement': 'line',
+      'symbol-spacing': 150,
+      'text-field': ['get', 'arrowText'],
+    })
     expect(mapMock.layers.get('phase2-east-guanzhong-corridor-band')).toMatchObject({
       type: 'line',
       paint: {
@@ -240,7 +270,11 @@ describe('MVP map layers', () => {
     expect(
       mapMock.addLayer.mock.calls
         .map(([layer]) => layer.id)
-        .filter((layerId) => layerId.startsWith('mvp-routes-')),
+        .filter((layerId) =>
+          ROUTE_LAYER_IDS.includes(
+            layerId as (typeof ROUTE_LAYER_IDS)[number],
+          ),
+        ),
     ).toEqual(ROUTE_LAYER_IDS)
   })
 
@@ -251,7 +285,7 @@ describe('MVP map layers', () => {
     addMilitaryGeographyBaseLayers(map, geography, routeSegments)
     addGeographyLayers(map, geography)
     addMilitaryGeographyOverlayLayers(map)
-    addRouteLayers(map, routeSegments)
+    addRouteLayers(map, routeSegments, places)
     addPlaceLayers(map, places)
     setLayerVisibility(map, 'hydrography', false)
     setLayerVisibility(map, 'geography', false)
@@ -356,9 +390,9 @@ describe('MVP map layers', () => {
     const mapMock = createMapMock()
     const map = mapMock as unknown as MapLibreMap
 
-    addRouteLayers(map, routeSegments)
+    addRouteLayers(map, routeSegments, places)
     addPlaceLayers(map, places)
-    applyRouteState(map, derivedState)
+    applyRouteState(map, derivedState, 'route-tang')
     applyRelatedPlaceState(map, derivedState)
     setSelectedPlace(map, derivedState.selectedPlaceId)
 
@@ -388,6 +422,23 @@ describe('MVP map layers', () => {
       '==',
       ['get', 'id'],
       'place-tongguan',
+    ])
+    expect(mapMock.setFilter).toHaveBeenCalledWith(
+      'mvp-route-direction-arrows',
+      [
+        'in',
+        ['get', 'id'],
+        ['literal', ['route-yan-01', 'route-tang-01']],
+      ],
+    )
+    expect(mapMock.setFilter).toHaveBeenCalledWith('mvp-routes-selected', [
+      'all',
+      ['==', ['get', 'routeId'], 'route-tang'],
+      [
+        'in',
+        ['get', 'id'],
+        ['literal', ['route-yan-01', 'route-tang-01']],
+      ],
     ])
   })
 })

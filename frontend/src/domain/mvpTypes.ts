@@ -295,6 +295,7 @@ export interface LayerVisibility {
 export interface SelectionState {
   selectedEventId?: string
   selectedPlaceId?: string
+  selectedRouteId?: string
 }
 
 export type LoadState = 'idle' | 'loading' | 'ready' | 'error'

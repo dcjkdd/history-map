@@ -216,6 +216,16 @@
   text-align: center;
 }
 
+.legend-route-direction {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 1.2rem;
+  color: #9d3f32;
+  font-size: 0.9rem;
+  font-weight: 850;
+}
+
 .legend-area--mountain {
   height: 0.65rem;
   border: 1px dashed #756343;

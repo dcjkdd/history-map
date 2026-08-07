@@ -72,6 +72,29 @@ describe('mvpStore', () => {
     expect(store.selectedEventId).toBe('event-01')
   })
 
+  it('地点与路线选择互斥，关闭路线不改变事件或四组图层状态', () => {
+    const store = useMvpStore()
+    store.selectedEventId = 'event-03'
+    store.toggleLayer('hydrography')
+
+    store.selectPlace('place-tongguan')
+    store.selectRoute('route-tang-advance')
+
+    expect(store.selectedPlaceId).toBeUndefined()
+    expect(store.selectedRouteId).toBe('route-tang-advance')
+    expect(store.selectedEventId).toBe('event-03')
+    expect(store.layerVisibility.hydrography).toBe(false)
+
+    store.clearSelectedRoute()
+    expect(store.selectedRouteId).toBeUndefined()
+    expect(store.selectedEventId).toBe('event-03')
+
+    store.selectRoute('route-yan-westward')
+    store.selectPlace('place-shanzhou')
+    expect(store.selectedRouteId).toBeUndefined()
+    expect(store.selectedPlaceId).toBe('place-shanzhou')
+  })
+
   it('重复选择和重复关闭地点详情保持幂等且不改变时间轴或图层状态', () => {
     const store = useMvpStore()
     const events = [makeEvent('event-first', 1), makeEvent('event-second', 2)]
@@ -104,6 +127,8 @@ describe('mvpStore', () => {
     expect(store.selectedSequence).toBe(2)
     expect(store.hasPrevious).toBe(true)
     expect(store.hasNext).toBe(true)
+    expect(store.selectedPlaceId).toBeUndefined()
+    expect(store.selectedRouteId).toBeUndefined()
   })
 
   it('在首尾边界禁用对应方向并可往返切换', () => {

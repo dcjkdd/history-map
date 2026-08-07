@@ -17,6 +17,7 @@ import {
 } from '../../domain/mapFocus'
 import type { MapFocusTarget } from '../../domain/mapFocus'
 import type { InitialView, LayerGroup, MvpDataset } from '../../domain/mvpTypes'
+import { routeIdIsVisible } from '../../domain/routePresentation'
 import {
   addGeographyLayers,
   setLayerVisibility,
@@ -34,6 +35,7 @@ import {
 import {
   addRouteLayers,
   applyRouteState,
+  ROUTE_INTERACTIVE_LAYER_IDS,
 } from '../../map/layers/routeLayer'
 import {
   addTerrainLayers,
@@ -151,10 +153,10 @@ function syncHistoryLayers(map: MapLibreMap): void {
   addMilitaryGeographyBaseLayers(map, props.geography, props.routeSegments)
   addGeographyLayers(map, props.geography)
   addMilitaryGeographyOverlayLayers(map)
-  addRouteLayers(map, props.routeSegments)
+  addRouteLayers(map, props.routeSegments, props.places)
   addPlaceLayers(map, props.places)
   applyLayerVisibility(map)
-  applyRouteState(map, derivedMapState.value)
+  applyRouteState(map, derivedMapState.value, store.selectedRouteId)
   applyRelatedPlaceState(map, derivedMapState.value)
   setSelectedPlace(map, derivedMapState.value.selectedPlaceId)
 }
@@ -195,11 +197,31 @@ watch(
 
 watch(derivedMapState, (nextDerivedMapState) => {
   if (mapInstance) {
-    applyRouteState(mapInstance, nextDerivedMapState)
+    if (
+      store.selectedRouteId &&
+      !routeIdIsVisible(
+        props.routeSegments,
+        store.selectedRouteId,
+        nextDerivedMapState.visibleRouteSegmentIds,
+      )
+    ) {
+      store.clearSelectedRoute()
+    }
+
+    applyRouteState(mapInstance, nextDerivedMapState, store.selectedRouteId)
     applyRelatedPlaceState(mapInstance, nextDerivedMapState)
     setSelectedPlace(mapInstance, nextDerivedMapState.selectedPlaceId)
   }
 })
+
+watch(
+  () => store.selectedRouteId,
+  (selectedRouteId) => {
+    if (mapInstance) {
+      applyRouteState(mapInstance, derivedMapState.value, selectedRouteId)
+    }
+  },
+)
 
 watch(mapStyleState, (nextMapStyleState) => {
   if (nextMapStyleState === 'degraded' && terrainLoadState.value === 'loading') {
@@ -249,14 +271,34 @@ onMounted(() => {
       const interactiveLayerIds = PLACE_INTERACTIVE_LAYER_IDS.filter(
         (layerId) => mapInstance?.getLayer(layerId),
       )
-      const feature = interactiveLayerIds.length
+      const placeFeature = interactiveLayerIds.length
         ? mapInstance.queryRenderedFeatures(event.point, {
             layers: interactiveLayerIds,
           })[0]
         : undefined
-      const placeId = feature?.properties.id
+      const placeId = placeFeature?.properties.id
 
-      store.selectPlace(typeof placeId === 'string' ? placeId : undefined)
+      if (typeof placeId === 'string') {
+        store.selectPlace(placeId)
+        return
+      }
+
+      const routeLayerIds = ROUTE_INTERACTIVE_LAYER_IDS.filter(
+        (layerId) => mapInstance?.getLayer(layerId),
+      )
+      const routeFeature = routeLayerIds.length
+        ? mapInstance.queryRenderedFeatures(event.point, {
+            layers: routeLayerIds,
+          })[0]
+        : undefined
+      const routeId = routeFeature?.properties.routeId
+
+      if (typeof routeId === 'string') {
+        store.selectRoute(routeId)
+        return
+      }
+
+      store.clearMapSelection()
     }
 
     mapInstance.on('style.load', onHistoryStyleLoad)

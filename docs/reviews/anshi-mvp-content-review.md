@@ -249,3 +249,54 @@ NOT_APPLICABLE   本项不适用
 - 签字姓名：banq
 - 签字日期：2026-08-04
 - 结论（批准 / 修改后批准 / 不批准并说明）：批准上述四项候选，按推荐方案继续 PHASE2-03；保持原 PENDING/REJECTED 状态不变。
+
+## PHASE2-04 路线方向、距离与点击说明人工审核门（两轮均已签字）
+
+本节对应资料笔记第 10 节。下列候选不属于正式历史 JSON，也不受既有 RoutePlan 或 PHASE2-03 批准自动覆盖。`PENDING_REVIEW` 只能表示候选已具备可复核输入，`PENDING_SOURCE` 表示仍缺直接依据；两者都不得进入用户可见运行时代码。
+
+| candidateType | candidateId | 工作标签 | factReviewed | geometryOrMethodReviewed | citationOrInputReviewed | certaintyReviewed | reviewer | reviewDate | status | notes |
+|---|---|---|---:|---:|---:|---:|---|---|---|---|
+| Phase2Direction | PHASE2-04-DIRECTION-YAN-01 | 燕军洛阳→陕州→潼关向西方向 | 是 | 是 | 是 | 是 | banq | 2026-08-04 | APPROVED | 只从已批准节点顺序和正式 RouteSegment 坐标顺序派生；不增加路线几何、道路、渡口、速度或攻关点 |
+| Phase2Direction | PHASE2-04-DIRECTION-TANG-01 | 唐军潼关→灵宝向东出关方向 | 是 | 是 | 是 | 是 | banq | 2026-08-04 | APPROVED | 只从已批准节点顺序派生；不扩展陕州、洛阳或撤退线 |
+| Phase2Presentation | PHASE2-04-PRESENTATION-DIRECTION-SEMANTICS-01 | 河流、路线与通道方向语义分离 | 是 | 是 | 是 | 是 | banq | 2026-08-04 | APPROVED | 河流为蓝色实线重复 `➤`；路线为主体色虚线、单个 `▶` 与中文方向文字；赭金 22px 通道无箭头，三者分别随既有开关控制 |
+| Phase2DistanceMethod | PHASE2-04-METHOD-DISTANCE-01 | 现代代表点间约略直线距离方法 | 是 | 是 | 是 | 是 | banq | 2026-08-04 | APPROVED | 正式端点；平均地球半径 6371.0088 km；Haversine；公里；最近 5 km；固定声明不等于唐代道路或历史行军里程 |
+| Phase2Distance | PHASE2-04-DISTANCE-YAN-01 | 洛阳→陕州约 120 公里 | 是 | 是 | 是 | 是 | banq | 2026-08-04 | APPROVED | 原始结果 119.995101 km；输入为两个 `DISPUTED` 现代代表点 |
+| Phase2Distance | PHASE2-04-DISTANCE-YAN-02 | 陕州→潼关约 80 公里 | 是 | 是 | 是 | 是 | banq | 2026-08-04 | APPROVED | 原始结果 81.167887 km；输入为两个 `DISPUTED` 现代代表点 |
+| Phase2Distance | PHASE2-04-DISTANCE-TANG-01 | 潼关→灵宝约 55 公里 | 是 | 是 | 是 | 是 | banq | 2026-08-04 | APPROVED | 原始结果 53.246055 km；输入为两个 `DISPUTED` 现代代表点；灵宝残余 CRS 不确定性继续保留 |
+| Phase2Presentation | PHASE2-04-PRESENTATION-YAN-01 | 燕军路线三句短说明 | 是 | 是 | 是 | 是 | banq | 2026-08-04 | APPROVED | 仅覆盖主体/向西、潼关关隘、现代代表点直连非道路；不能代替北河/南山/通道约束句 |
+| Phase2Gap | PHASE2-04-GAP-YAN-CONSTRAINT-01 | 燕军路线地形约束来源缺口 | 是 | 不适用 | 是 | 是 | banq | 2026-08-06 | APPROVED | 只在 PHASE2-04 display-only 路线说明范围内关闭；不改变任何正式 PENDING/REJECTED 项 |
+| Phase2Presentation | PHASE2-04-PRESENTATION-TANG-01 | 唐军路线四句短说明 | 是 | 是 | 是 | 是 | banq | 2026-08-04 | APPROVED | 覆盖主体/向东、南山北河狭道、潼关争议、非道路/战场/撤退线；只复用既有已批准 Claim 与 PHASE2-03 display-only 边界 |
+| Phase2Source | PHASE2-04-SRC-XIAOHAN-SCOPE-01 | 洛阳—潼关范围与隘口背景来源 | 是 | 不适用 | 是 | 是 | banq | 2026-08-06 | APPROVED | 三门峡市人民政府固定 HTML；只支持古代洛阳至潼关间道路统称及沿线因地理形成多个隘口 |
+| Phase2Citation | PHASE2-04-CIT-XIAOHAN-SCOPE-01 | 洛阳—潼关范围与隘口段落 | 是 | 不适用 | 是 | 是 | banq | 2026-08-06 | APPROVED | 不支持单一路线中心线、燕军具体道路、里程或新增中间节点 |
+| Phase2Source | PHASE2-04-SRC-XIAOHAN-WEST-TERRAIN-01 | 陕州—潼关西段南山北河来源 | 是 | 不适用 | 是 | 是 | banq | 2026-08-06 | APPROVED | 灵宝市人民政府固定 HTML；页面兼有旅游宣传，只采用范围、相对地形和考古工作概况 |
+| Phase2Citation | PHASE2-04-CIT-XIAOHAN-WEST-TERRAIN-01 | 陕州—潼关西段南依崤山、北临黄河段落 | 是 | 不适用 | 是 | 是 | banq | 2026-08-06 | APPROVED | 不把西段关系扩展为洛阳—陕州，不证明燕军使用具体古道或路基 |
+| Phase2Source | PHASE2-04-SRC-XIAOHAN-TANG-CONTEXT-01 | 崤函区域山河关系与唐代交通背景来源 | 是 | 不适用 | 是 | 是 | banq | 2026-08-06 | APPROVED | 《光明日报》2024-03-03 第 11 版；只作区域山河与唐代适用背景交叉核对 |
+| Phase2Citation | PHASE2-04-CIT-XIAOHAN-TANG-CONTEXT-01 | 崤山、黄河与唐代两京交通段落 | 是 | 不适用 | 是 | 是 | banq | 2026-08-06 | APPROVED | 不证明燕军沿古道、驿站、漕运线或考古路基行军 |
+| Phase2Presentation | PHASE2-04-PRESENTATION-YAN-CONSTRAINT-01 | 燕军路线第 4 句区域地形约束 | 是 | 不适用 | 是 | 是 | banq | 2026-08-06 | APPROVED | 洛阳—潼关只概括山地、黄河和隘口格局；南依崤山、北临黄河严格限定陕州—潼关西段；不新增路线几何或节点 |
+
+### 内容负责人 PHASE2-04 候选决定
+
+- [x] 批准燕军、唐军两组方向候选，只表达既有宏观节点顺序。
+- [x] 批准平均地球半径 `6371.0088 km` 的 Haversine 方法、最近 `5 km` 取整、固定 UI 边界及 `120 / 80 / 55 公里` 三项候选结果。
+- [x] 批准唐军四句路线说明和燕军前三句路线说明，继续保留所有正式 Citation 入口与 `INFERENCE / LOW` 边界。
+- [x] 批准河流、路线、无方向通道三类箭头/线型/文字/开关的视觉语义区分规则。
+- [x] 已为燕军北河/南山/通道约束补充并批准直接 Source/Citation；或明确选择只显示“当前资料不足”，并接受 P-003 暂不完全通过。
+- 签字姓名：banq
+- 签字日期：2026-08-04
+- 结论（批准 / 修改后批准 / 不批准并说明）：批准当前 PHASE2-04 候选；继续补充燕军地形约束来源，补齐并再次批准前不实现。
+
+第 1—4 项已经明确批准；第 5 项仍为二次人工确认门。在燕军地形约束新 Source/Citation 与候选句再次获批前，不修改正式 `mvp-v1.json`，不实现面向用户的路线方向、距离或点击说明，也不进入 PHASE2-05。
+
+### 燕军地形约束二次审核入口
+
+- [x] 批准 `PHASE2-04-SRC/CIT-XIAOHAN-SCOPE-01`：只支持洛阳—潼关范围与地理形成多处隘口。
+- [x] 批准 `PHASE2-04-SRC/CIT-XIAOHAN-WEST-TERRAIN-01`：只支持陕州—潼关西段南依崤山、北临黄河。
+- [x] 批准 `PHASE2-04-SRC/CIT-XIAOHAN-TANG-CONTEXT-01`：只作区域山河关系与唐代交通背景交叉核对。
+- [x] 批准燕军第 4 句：`地形约束：洛阳—潼关的崤函区域受山地与黄河影响，沿线因地理形成多处隘口；其中陕州—潼关西段南依崤山、北临黄河。`
+- [x] 接受禁止扩展：不证明燕军走具体古道/支线/路基，不新增函谷关等节点，不将西段南山北河关系扩展到洛阳—陕州，不重画路线或复原历史河道。
+- [x] 在上述五项明确批准后，关闭 `PHASE2-04-GAP-YAN-CONSTRAINT-01`；正式 `geography-guanzhong-corridor` / 对应 Claim 与两条 `REJECTED` 候选状态保持不变。
+- 二次签字姓名：banq
+- 二次签字日期：2026-08-06
+- 二次结论（批准 / 修改后批准 / 不批准并说明）：批准第 10.7 节全部来源、候选第四句及禁止扩展边界。
+
+二次签字已关闭 PHASE2-04 的燕军 display-only 来源缺口，允许按已批准边界开始 PHASE2-04 实现；不得改变正式 PENDING/REJECTED 历史，不得进入 PHASE2-05。

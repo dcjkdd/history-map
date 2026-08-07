@@ -40,6 +40,10 @@ function locatorDetails(citation: Citation): string[] {
     (value): value is string => Boolean(value),
   )
 }
+
+function sourceUrl(source: Source): string | undefined {
+  return source.provenance?.url ?? undefined
+}
 </script>
 
 <template>
@@ -56,7 +60,17 @@ function locatorDetails(citation: Citation): string[] {
       >
         <header class="citation-card__header">
           <div>
-            <p class="citation-card__source">{{ source.title }}</p>
+            <p class="citation-card__source">
+              <a
+                v-if="sourceUrl(source)"
+                :href="sourceUrl(source)"
+                target="_blank"
+                rel="noopener"
+              >
+                {{ source.title }}
+              </a>
+              <span v-else>{{ source.title }}</span>
+            </p>
             <p
               v-if="sourceDetails(source).length"
               class="citation-card__bibliography"

@@ -242,11 +242,17 @@ h1 {
 .detail-precision,
 .detail-normalized-date,
 .detail-modern-name,
-.detail-place-type {
+.detail-place-type,
+.detail-route-direction {
   margin-bottom: 0.25rem;
   color: #6b6259;
   font-size: 0.82rem;
   line-height: 1.5;
+}
+
+.detail-route-direction {
+  color: #7c3f24;
+  font-weight: 800;
 }
 
 .detail-close,
@@ -299,6 +305,64 @@ h1 {
   margin-top: 1.25rem;
   padding-top: 1.25rem;
   border-top: 1px solid rgb(32 35 31 / 12%);
+}
+
+.route-detail__notes ol,
+.route-detail__distances ul,
+.route-detail__supplemental-sources ul {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.route-detail .detail-article__header {
+  flex-direction: column;
+}
+
+.route-detail .detail-article__actions {
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.route-detail__notes li,
+.route-detail__distances li,
+.route-detail__supplemental-sources li {
+  line-height: 1.6;
+}
+
+.route-detail__distances li,
+.route-detail__supplemental-sources li {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.route-detail__distances strong {
+  color: #523b2d;
+}
+
+.route-detail__distances span,
+.route-detail__supplemental-sources span,
+.route-detail__supplemental-sources small {
+  color: #6b6259;
+}
+
+.route-detail__method,
+.route-detail__source-boundary {
+  margin: 0.9rem 0 0;
+  padding: 0.7rem;
+  border-left: 3px solid #a06b43;
+  background: rgb(242 229 210 / 72%);
+  color: #634b39;
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.route-detail__supplemental-sources a,
+.citation-card__source a {
+  color: #236785;
+  font-weight: 750;
+  text-underline-offset: 0.18em;
 }
 
 .detail-claim__heading {

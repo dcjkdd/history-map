@@ -5,10 +5,12 @@ import {
   getSelectedEvent,
   getSelectedPlace,
 } from '../../domain/mvpSelectors'
+import { getRoutePresentation } from '../../domain/routePresentation'
 import type { MvpDataset, SelectionState } from '../../domain/mvpTypes'
 import EmptyDetail from './EmptyDetail.vue'
 import EventDetail from './EventDetail.vue'
 import PlaceDetail from './PlaceDetail.vue'
+import RouteDetail from './RouteDetail.vue'
 
 const props = defineProps<{
   dataset: MvpDataset
@@ -17,6 +19,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   clearPlace: []
+  clearRoute: []
   focusPlace: [placeId: string]
   selectPlace: [placeId: string]
 }>()
@@ -27,10 +30,19 @@ const selectedPlace = computed(() =>
 const selectedEvent = computed(() =>
   getSelectedEvent(props.dataset, props.selection),
 )
+const selectedRoute = computed(() =>
+  props.selection.selectedRouteId
+    ? getRoutePresentation(props.dataset, props.selection.selectedRouteId)
+    : undefined,
+)
 const detailPanel = ref<HTMLElement | null>(null)
 
 watch(
-  () => [props.selection.selectedEventId, props.selection.selectedPlaceId],
+  () => [
+    props.selection.selectedEventId,
+    props.selection.selectedPlaceId,
+    props.selection.selectedRouteId,
+  ],
   () => {
     if (detailPanel.value) {
       detailPanel.value.scrollTop = 0
@@ -44,11 +56,19 @@ watch(
   <aside
     ref="detailPanel"
     class="detail-panel"
-    aria-label="事件与地点详情"
-    :data-detail-mode="selectedPlace ? 'PLACE' : selectedEvent ? 'EVENT' : 'EMPTY'"
+    aria-label="事件、地点与路线详情"
+    :data-detail-mode="
+      selectedRoute ? 'ROUTE' : selectedPlace ? 'PLACE' : selectedEvent ? 'EVENT' : 'EMPTY'
+    "
   >
+    <RouteDetail
+      v-if="selectedRoute"
+      :dataset="dataset"
+      :presentation="selectedRoute"
+      @close="emit('clearRoute')"
+    />
     <PlaceDetail
-      v-if="selectedPlace"
+      v-else-if="selectedPlace"
       :dataset="dataset"
       :place="selectedPlace"
       @close="emit('clearPlace')"

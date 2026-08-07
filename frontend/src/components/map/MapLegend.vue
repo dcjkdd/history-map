@@ -25,12 +25,13 @@
     </div>
 
     <div class="map-legend__section">
-      <p>行动路线（虚线与粗细区分主体）</p>
+      <p>行动路线（虚线、单个箭头与文字区分主体）</p>
       <ul>
         <li><span class="legend-route legend-route--tang"></span>唐军</li>
         <li><span class="legend-route legend-route--yan"></span>燕军</li>
         <li><span class="legend-route legend-route--court"></span>朝廷转移</li>
         <li><span class="legend-route legend-route--active"></span>首现加粗</li>
+        <li><span class="legend-route-direction">▶</span>路线方向（单个）</li>
       </ul>
     </div>
 
@@ -43,6 +44,9 @@
       </p>
       <p class="map-legend__uncertainty">
         赭金通道带复用灵宝—潼关两个争议代表点，固定 22px 仅为屏幕表达；不是唐代道路、真实宽度或军队路线。
+      </p>
+      <p class="map-legend__uncertainty">
+        路线使用主体色虚线、单个 ▶ 与中文方向/距离；现代河流仍是蓝色实线上的重复 ➤，赭金通道没有箭头。
       </p>
     </div>
   </details>

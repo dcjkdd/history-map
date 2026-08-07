@@ -26,6 +26,7 @@ export const useMvpStore = defineStore('mvp', {
     defaultEventId: undefined,
     selectedEventId: undefined,
     selectedPlaceId: undefined,
+    selectedRouteId: undefined,
   }),
   getters: {
     selectedSequence(state): number | undefined {
@@ -52,6 +53,8 @@ export const useMvpStore = defineStore('mvp', {
         defaultEventId && this.orderedEventIds.includes(defaultEventId)
           ? defaultEventId
           : undefined
+      this.selectedPlaceId = undefined
+      this.selectedRouteId = undefined
       this.resetToDefaultEvent()
     },
     selectEvent(eventId: string): void {
@@ -92,9 +95,25 @@ export const useMvpStore = defineStore('mvp', {
     },
     selectPlace(placeId: string | undefined): void {
       this.selectedPlaceId = placeId
+      if (placeId) {
+        this.selectedRouteId = undefined
+      }
     },
     clearSelectedPlace(): void {
       this.selectedPlaceId = undefined
+    },
+    selectRoute(routeId: string | undefined): void {
+      this.selectedRouteId = routeId
+      if (routeId) {
+        this.selectedPlaceId = undefined
+      }
+    },
+    clearSelectedRoute(): void {
+      this.selectedRouteId = undefined
+    },
+    clearMapSelection(): void {
+      this.selectedPlaceId = undefined
+      this.selectedRouteId = undefined
     },
   },
 })

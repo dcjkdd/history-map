@@ -63,7 +63,37 @@ const dataset: MvpDataset = {
     ],
   },
   geography: { type: 'FeatureCollection', features: [] },
-  routeSegments: { type: 'FeatureCollection', features: [] },
+  routeSegments: {
+    type: 'FeatureCollection',
+    features: [
+      {
+        type: 'Feature',
+        geometry: {
+          type: 'LineString',
+          coordinates: [[0, 0], [0, 0]],
+        },
+        properties: {
+          id: 'route-yan-test-01',
+          routeId: 'route-yan-westward',
+          routeName: '燕军测试路线（示意）',
+          segmentNo: 1,
+          side: 'YAN',
+          actionType: 'ADVANCE',
+          appearAtEventId: 'event-test',
+          fromPlaceId: 'place-test',
+          toPlaceId: 'place-test',
+          certainty: 'LOW',
+          summary: claim(
+            'claim-route-test',
+            '只表达宏观节点顺序，不是历史道路。',
+            'LOW',
+            ['citation-one', 'citation-two'],
+          ),
+          citationIds: ['citation-one'],
+        },
+      },
+    ],
+  },
   events: [
     {
       id: 'event-test',
@@ -90,7 +120,19 @@ const dataset: MvpDataset = {
       publisher: null,
       publishYear: null,
       sourceType: '合成资料',
-      provenance: null,
+      provenance: {
+        url: 'https://example.test/source-one',
+        accessDate: '2026-08-06',
+        licenseName: null,
+        licenseUrl: null,
+        attribution: null,
+        usageRestrictions: null,
+        dataVersion: null,
+        originalCrs: null,
+        coverage: null,
+        processingNotes: null,
+        outputId: null,
+      },
     },
     {
       id: 'source-two',
@@ -149,6 +191,12 @@ function mountDetail(initialSelection: SelectionState) {
             selection.value = {
               ...selection.value,
               selectedPlaceId: undefined,
+            }
+          },
+          onClearRoute: () => {
+            selection.value = {
+              ...selection.value,
+              selectedRouteId: undefined,
             }
           },
           onFocusPlace: focusPlace,
@@ -299,6 +347,46 @@ describe('MVP-08 detail components', () => {
     expect(
       host.querySelector('[data-citation-id="citation-two"]')?.textContent,
     ).not.toContain('null')
+
+    expect(
+      host.querySelector<HTMLAnchorElement>(
+        '[data-citation-id="citation-one"] .citation-card__source a',
+      )?.href,
+    ).toBe('https://example.test/source-one')
+
+    app.unmount()
+  })
+
+  it('路线选择优先显示获批四句、距离边界、正式引用与补充来源入口', async () => {
+    const { app, host, selection } = mountDetail({
+      selectedEventId: 'event-test',
+      selectedRouteId: 'route-yan-westward',
+    })
+
+    expect(host.querySelector('.detail-panel')?.getAttribute('data-detail-mode')).toBe(
+      'ROUTE',
+    )
+    expect(host.querySelector('.route-detail')?.getAttribute('data-route-id')).toBe(
+      'route-yan-westward',
+    )
+    expect(host.querySelectorAll('[data-route-note]')).toHaveLength(4)
+    expect(host.textContent).toContain('燕军 · 向西')
+    expect(host.textContent).toContain('现代代表点间直线距离约 0 公里')
+    expect(host.textContent).toContain('不等于唐代道路或历史行军里程')
+    expect(host.querySelectorAll('[data-phase2-source-id]')).toHaveLength(3)
+    expect(
+      host.querySelector<HTMLAnchorElement>(
+        '[data-phase2-source-id="PHASE2-04-SRC-XIAOHAN-SCOPE-01"] a',
+      )?.href,
+    ).toBe('https://www.smx.gov.cn/4036/616951008/1869004.html')
+    expect(host.querySelectorAll('.route-detail .citation-card')).toHaveLength(2)
+
+    host.querySelector<HTMLButtonElement>('.route-detail .detail-close')?.click()
+    await nextTick()
+
+    expect(selection.value.selectedRouteId).toBeUndefined()
+    expect(selection.value.selectedEventId).toBe('event-test')
+    expect(host.querySelector('.event-detail')).not.toBeNull()
 
     app.unmount()
   })
