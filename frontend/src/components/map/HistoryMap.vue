@@ -4,7 +4,7 @@ import type {
   Map as MapLibreMap,
   MapMouseEvent,
 } from 'maplibre-gl'
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 import {
   EMPTY_MAP_STYLE_URL,
@@ -60,6 +60,7 @@ const mapInitializationError = ref<string | null>(null)
 const mapReady = ref(false)
 const terrainLoadState = ref<'loading' | 'ready' | 'degraded'>('loading')
 const terrainLoadReason = ref<string | null>(null)
+const activeToolbarPanel = ref<'layers' | 'legend' | null>(null)
 let mapInstance: MapLibreMap | null = null
 let onHistoryStyleLoad: (() => void) | null = null
 let onMapClick: ((event: MapMouseEvent) => void) | null = null
@@ -179,6 +180,11 @@ function retryTerrain(): void {
 
 function toggleLayer(layerGroup: LayerGroup): void {
   store.toggleLayer(layerGroup)
+}
+
+function toggleToolbarPanel(panel: 'layers' | 'legend'): void {
+  activeToolbarPanel.value = activeToolbarPanel.value === panel ? null : panel
+  void nextTick(() => mapInstance?.resize())
 }
 
 watch(
@@ -353,82 +359,103 @@ defineExpose({ fitToTopic, focusCurrentEvent, focusPlace })
       !mapInitializationError
     "
   >
-    <div ref="mapContainer" class="history-map__canvas"></div>
+    <div class="history-map__toolbar">
+      <div class="history-map__toolbar-row" role="toolbar" aria-label="地图阅读工具">
+        <div class="history-map__actions" role="group" aria-label="地图定位控制">
+          <button
+            type="button"
+            :disabled="!mapReady || !currentEventFocusTarget"
+            aria-label="定位当前事件"
+            @click="focusCurrentEvent"
+          >
+            定位当前事件
+          </button>
+        </div>
 
-    <div class="history-map__actions" role="group" aria-label="地图定位控制">
-      <button
-        type="button"
-        :disabled="!mapReady || !currentEventFocusTarget"
-        aria-label="定位当前事件"
-        @click="focusCurrentEvent"
+        <p
+          v-if="mapInitializationError"
+          class="history-map__message history-map__message--error"
+          role="alert"
+        >
+          {{ mapInitializationError }}
+        </p>
+        <p
+          v-else-if="mapStyleState === 'loading' || terrainLoadState === 'loading'"
+          class="history-map__message"
+          role="status"
+          data-terrain-status="loading"
+        >
+          地形加载中…
+        </p>
+        <p
+          v-else-if="terrainLoadState === 'ready'"
+          class="history-map__terrain-ready"
+          role="status"
+          data-terrain-status="ready"
+        >
+          地形已加载 · 俯视
+        </p>
+        <div
+          v-else-if="terrainLoadState === 'degraded'"
+          class="history-map__terrain-degraded"
+          role="alert"
+          data-terrain-status="degraded"
+        >
+          <strong>地形未加载 / 已降级</strong>
+          <span>历史地点、路线与事件仍可阅读。{{ terrainLoadReason }}</span>
+          <button type="button" @click="retryTerrain">重试地形</button>
+        </div>
+
+        <div class="history-map__toolbar-toggles" role="group" aria-label="地图说明面板">
+          <button
+            type="button"
+            :aria-expanded="activeToolbarPanel === 'layers'"
+            aria-controls="map-layer-panel"
+            @click="toggleToolbarPanel('layers')"
+          >
+            图层
+          </button>
+          <button
+            type="button"
+            :aria-expanded="activeToolbarPanel === 'legend'"
+            aria-controls="map-legend-panel"
+            @click="toggleToolbarPanel('legend')"
+          >
+            图例与不确定性
+          </button>
+        </div>
+      </div>
+
+      <div
+        v-if="activeToolbarPanel === 'layers'"
+        id="map-layer-panel"
+        class="history-map__toolbar-panel"
       >
-        定位当前事件
-      </button>
+        <LayerControl
+          :visibility="store.layerVisibility"
+          @toggle="toggleLayer"
+        />
+      </div>
+
+      <div
+        v-else-if="activeToolbarPanel === 'legend'"
+        id="map-legend-panel"
+        class="history-map__toolbar-panel"
+      >
+        <MapLegend />
+      </div>
     </div>
 
-    <LayerControl
-      :visibility="store.layerVisibility"
-      @toggle="toggleLayer"
-    />
+    <div class="history-map__viewport">
+      <div ref="mapContainer" class="history-map__canvas"></div>
 
-    <MapLegend />
-
-    <aside
-      v-if="store.selectedPlaceId === 'place-tongguan'"
-      class="history-map__tongguan-note"
-      aria-label="潼关军事地理说明"
-      data-map-note="tongguan"
-    >
-      <strong>◆ 潼关 · 关隘代表点</strong>
-      <ul>
-        <li>陕郡以西、进入关中的关键防御节点。</li>
-        <li>失守改变长安方向的防务条件。</li>
-        <li>当前点为现代旧城遗址代表点；唐代关城位置仍有争议。</li>
-      </ul>
-    </aside>
-
-    <p
-      v-if="mapInitializationError"
-      class="history-map__message history-map__message--error"
-      role="alert"
-    >
-      {{ mapInitializationError }}
-    </p>
-    <p
-      v-else-if="mapStyleState === 'loading' || terrainLoadState === 'loading'"
-      class="history-map__message"
-      role="status"
-      data-terrain-status="loading"
-    >
-      地形加载中…
-    </p>
-
-    <p
-      v-else-if="terrainLoadState === 'ready'"
-      class="history-map__terrain-ready"
-      role="status"
-      data-terrain-status="ready"
-    >
-      地形已加载 · 俯视
-    </p>
-
-    <div
-      v-else-if="terrainLoadState === 'degraded'"
-      class="history-map__terrain-degraded"
-      role="alert"
-      data-terrain-status="degraded"
-    >
-      <strong>地形未加载 / 已降级</strong>
-      <span>历史地点、路线与事件仍可阅读。{{ terrainLoadReason }}</span>
-      <button type="button" @click="retryTerrain">重试地形</button>
+      <p
+        v-if="mapStyleWarning"
+        class="history-map__warning"
+        role="status"
+      >
+        {{ mapStyleWarning }}
+      </p>
     </div>
-
-    <p
-      v-if="mapStyleWarning"
-      class="history-map__warning"
-      role="status"
-    >
-      {{ mapStyleWarning }}
-    </p>
   </section>
 </template>

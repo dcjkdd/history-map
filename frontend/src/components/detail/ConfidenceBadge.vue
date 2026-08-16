@@ -3,6 +3,7 @@ import type { Certainty } from '../../domain/mvpTypes'
 
 const props = defineProps<{
   certainty: Certainty
+  compact?: boolean
 }>()
 
 const confidenceCopy: Record<
@@ -35,9 +36,12 @@ const confidenceCopy: Record<
 <template>
   <span
     class="confidence-badge"
-    :class="`confidence-badge--${props.certainty.toLowerCase()}`"
+    :class="[
+      `confidence-badge--${props.certainty.toLowerCase()}`,
+      { 'confidence-badge--compact': compact },
+    ]"
   >
     <strong>{{ confidenceCopy[props.certainty].label }}</strong>
-    <span>{{ confidenceCopy[props.certainty].description }}</span>
+    <span v-if="!compact">{{ confidenceCopy[props.certainty].description }}</span>
   </span>
 </template>

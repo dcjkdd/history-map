@@ -5,6 +5,7 @@ import {
   getCitationBundle,
   getPlaceById,
 } from '../../domain/mvpSelectors'
+import { getRoutePresentation } from '../../domain/routePresentation'
 import type { Event, MvpDataset } from '../../domain/mvpTypes'
 import CitationList from './CitationList.vue'
 import ConfidenceBadge from './ConfidenceBadge.vue'
@@ -17,6 +18,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   selectPlace: [placeId: string]
+  selectRoute: [routeId: string]
 }>()
 
 const timePrecisionLabels = {
@@ -33,6 +35,21 @@ const relatedPlaces = computed(() =>
   }),
 )
 
+const relatedRoutes = computed(() => {
+  const routeIds = new Set(
+    props.dataset.routeSegments.features
+      .filter(
+        (segment) => segment.properties.appearAtEventId === props.event.id,
+      )
+      .map((segment) => segment.properties.routeId),
+  )
+
+  return [...routeIds].flatMap((routeId) => {
+    const presentation = getRoutePresentation(props.dataset, routeId)
+    return presentation ? [presentation] : []
+  })
+})
+
 const eventCitations = computed(() =>
   getCitationBundle(props.dataset, props.event.citationIds),
 )
@@ -41,6 +58,12 @@ const summaryCitations = computed(() =>
 )
 const importanceCitations = computed(() =>
   getCitationBundle(props.dataset, props.event.whyItMatters.citationIds),
+)
+const citationRelationshipCount = computed(
+  () =>
+    eventCitations.value.length +
+    summaryCitations.value.length +
+    importanceCitations.value.length,
 )
 </script>
 
@@ -58,7 +81,7 @@ const importanceCitations = computed(() =>
           标准化日期：{{ event.normalizedDate }}
         </p>
       </div>
-      <ConfidenceBadge :certainty="event.certainty" />
+      <ConfidenceBadge :certainty="event.certainty" compact />
     </header>
 
     <section class="detail-claim" :data-claim-id="event.summary.claimId">
@@ -69,11 +92,10 @@ const importanceCitations = computed(() =>
             kind="claim"
             :viewpoint-type="event.summary.viewpointType"
           />
-          <ConfidenceBadge :certainty="event.summary.certainty" />
+          <ConfidenceBadge :certainty="event.summary.certainty" compact />
         </div>
       </div>
       <p>{{ event.summary.text }}</p>
-      <CitationList :citations="summaryCitations" label="事件摘要引用" />
     </section>
 
     <section class="detail-claim" :data-claim-id="event.whyItMatters.claimId">
@@ -84,11 +106,10 @@ const importanceCitations = computed(() =>
             kind="claim"
             :viewpoint-type="event.whyItMatters.viewpointType"
           />
-          <ConfidenceBadge :certainty="event.whyItMatters.certainty" />
+          <ConfidenceBadge :certainty="event.whyItMatters.certainty" compact />
         </div>
       </div>
       <p>{{ event.whyItMatters.text }}</p>
-      <CitationList :citations="importanceCitations" label="重要性说明引用" />
     </section>
 
     <section v-if="relatedPlaces.length" class="detail-related">
@@ -106,17 +127,52 @@ const importanceCitations = computed(() =>
       </ul>
     </section>
 
-    <section v-if="event.actorLabels.length" class="detail-actors">
-      <h3>参与者</h3>
+    <section v-if="relatedRoutes.length" class="detail-related">
+      <h3>相关路线</h3>
       <ul>
-        <li v-for="actor in event.actorLabels" :key="actor">{{ actor }}</li>
+        <li v-for="route in relatedRoutes" :key="route.routeId">
+          <button
+            type="button"
+            :data-related-route-id="route.routeId"
+            @click="emit('selectRoute', route.routeId)"
+          >
+            {{ route.directionLabel }}
+          </button>
+        </li>
       </ul>
     </section>
 
-    <CitationList
-      :citations="eventCitations"
-      :heading-level="3"
-      label="事件时间与身份依据"
-    />
+    <details class="detail-disclosure">
+      <summary>
+        完整引用与不确定性（{{ citationRelationshipCount }} 条引用关系）
+      </summary>
+      <div class="detail-disclosure__content">
+        <section class="detail-disclosure__certainty" aria-label="事件不确定性说明">
+          <h3>不确定性说明</h3>
+          <ConfidenceBadge :certainty="event.certainty" />
+          <ConfidenceBadge :certainty="event.summary.certainty" />
+          <ConfidenceBadge :certainty="event.whyItMatters.certainty" />
+        </section>
+
+        <section v-if="event.actorLabels.length" class="detail-actors">
+          <h3>参与者</h3>
+          <ul>
+            <li v-for="actor in event.actorLabels" :key="actor">{{ actor }}</li>
+          </ul>
+        </section>
+
+        <div :data-claim-evidence-id="event.summary.claimId">
+          <CitationList :citations="summaryCitations" label="事件摘要引用" />
+        </div>
+        <div :data-claim-evidence-id="event.whyItMatters.claimId">
+          <CitationList :citations="importanceCitations" label="重要性说明引用" />
+        </div>
+        <CitationList
+          :citations="eventCitations"
+          :heading-level="3"
+          label="事件时间与身份依据"
+        />
+      </div>
+    </details>
   </article>
 </template>

@@ -36,7 +36,7 @@ const citations = computed(() =>
         <p class="detail-route-direction">{{ presentation.directionLabel }}</p>
       </div>
       <div class="detail-article__actions">
-        <ConfidenceBadge :certainty="presentation.certainty" />
+        <ConfidenceBadge :certainty="presentation.certainty" compact />
         <button type="button" class="detail-close" @click="$emit('close')">
           关闭路线详情
         </button>
@@ -68,37 +68,49 @@ const citations = computed(() =>
           <span>{{ segment.distanceLabel }}</span>
         </li>
       </ul>
-      <p class="route-detail__method">{{ ROUTE_DISTANCE_METHOD_NOTE }}</p>
     </section>
 
-    <section
-      v-if="presentation.supplementalSources.length"
-      class="detail-claim route-detail__supplemental-sources"
-      aria-label="燕军区域地形补充来源"
-    >
-      <h3>区域地形补充来源</h3>
-      <ul>
-        <li
-          v-for="source in presentation.supplementalSources"
-          :key="source.id"
-          :data-phase2-source-id="source.id"
+    <details class="detail-disclosure">
+      <summary>
+        完整引用、方法与不确定性（{{ citations.length }} 条引用关系）
+      </summary>
+      <div class="detail-disclosure__content">
+        <section class="detail-disclosure__certainty" aria-label="路线不确定性说明">
+          <h3>不确定性说明</h3>
+          <ConfidenceBadge :certainty="presentation.certainty" />
+          <p class="route-detail__method">{{ ROUTE_DISTANCE_METHOD_NOTE }}</p>
+        </section>
+
+        <section
+          v-if="presentation.supplementalSources.length"
+          class="detail-claim route-detail__supplemental-sources"
+          aria-label="燕军区域地形补充来源"
         >
-          <a :href="source.url" target="_blank" rel="noopener">
-            {{ source.title }}
-          </a>
-          <span>{{ source.provider }}</span>
-          <small>{{ source.scope }}</small>
-        </li>
-      </ul>
-      <p class="route-detail__source-boundary">
-        这些来源只支持区域地形与唐代交通背景，不证明燕军使用具体古道、支线、路基、驿站或渡口。
-      </p>
-    </section>
+          <h3>区域地形补充来源</h3>
+          <ul>
+            <li
+              v-for="source in presentation.supplementalSources"
+              :key="source.id"
+              :data-phase2-source-id="source.id"
+            >
+              <a :href="source.url" target="_blank" rel="noopener">
+                {{ source.title }}
+              </a>
+              <span>{{ source.provider }}</span>
+              <small>{{ source.scope }}</small>
+            </li>
+          </ul>
+          <p class="route-detail__source-boundary">
+            这些来源只支持区域地形与唐代交通背景，不证明燕军使用具体古道、支线、路基、驿站或渡口。
+          </p>
+        </section>
 
-    <CitationList
-      :citations="citations"
-      :heading-level="3"
-      label="路线节点、几何与历史关系依据"
-    />
+        <CitationList
+          :citations="citations"
+          :heading-level="3"
+          label="路线节点、几何与历史关系依据"
+        />
+      </div>
+    </details>
   </article>
 </template>

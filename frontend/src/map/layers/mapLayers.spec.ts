@@ -223,6 +223,14 @@ describe('MVP map layers', () => {
         ],
       },
     })
+    expect(mapMock.layers.get('mvp-routes-hit-area')).toMatchObject({
+      type: 'line',
+      source: ROUTE_SOURCE_ID,
+      paint: {
+        'line-color': 'rgba(255, 255, 255, 0.001)',
+        'line-width': 22,
+      },
+    })
     expect(
       mapMock.layers.get('mvp-route-direction-arrows')?.layout,
     ).not.toMatchObject({
@@ -431,6 +439,11 @@ describe('MVP map layers', () => {
         ['literal', ['route-yan-01', 'route-tang-01']],
       ],
     )
+    expect(mapMock.setFilter).toHaveBeenCalledWith('mvp-routes-hit-area', [
+      'in',
+      ['get', 'id'],
+      ['literal', ['route-yan-01', 'route-tang-01']],
+    ])
     expect(mapMock.setFilter).toHaveBeenCalledWith('mvp-routes-selected', [
       'all',
       ['==', ['get', 'routeId'], 'route-tang'],

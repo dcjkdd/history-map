@@ -1,6 +1,6 @@
 <template>
-  <details class="map-legend">
-    <summary>图例与不确定性</summary>
+  <section class="map-legend" aria-label="图例与不确定性">
+    <h3 class="map-legend__title">图例与不确定性</h3>
     <div class="map-legend__content">
 
     <div class="map-legend__section">
@@ -49,5 +49,5 @@
         路线使用主体色虚线、单个 ▶ 与中文方向/距离；现代河流仍是蓝色实线上的重复 ➤，赭金通道没有箭头。
       </p>
     </div>
-  </details>
+  </section>
 </template>

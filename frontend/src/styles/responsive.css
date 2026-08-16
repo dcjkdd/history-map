@@ -64,13 +64,31 @@
   }
 
   .timeline-controls {
+    grid-column: 1;
     grid-template-columns: 1fr 1fr;
     gap: 0.65rem;
   }
 
-  .timeline-controls__position {
+  .timeline-controls__current {
     grid-column: 1 / -1;
     grid-row: 1;
+  }
+
+  .timeline-panel {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .timeline-panel__heading {
+    grid-row: auto;
+  }
+
+  .timeline-panel__heading > p {
+    max-width: none;
+  }
+
+  .event-timeline {
+    grid-column: 1;
+    gap: 0.25rem;
   }
 
   .detail-claim__metadata,

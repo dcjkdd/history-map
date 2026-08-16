@@ -4,6 +4,8 @@ import { nextTick, ref } from 'vue'
 const props = defineProps<{
   hasPrevious: boolean
   hasNext: boolean
+  currentTitle?: string
+  currentDateLabel?: string
   selectedSequence?: number
   total: number
 }>()
@@ -48,9 +50,17 @@ function selectNext(): void {
       上一事件
     </button>
 
-    <p class="timeline-controls__position" aria-live="polite">
-      第 {{ selectedSequence ?? '—' }} / {{ total }} 个事件
-    </p>
+    <div class="timeline-controls__current" aria-live="polite">
+      <p class="timeline-controls__position">
+        第 {{ selectedSequence ?? '—' }} / {{ total }} 个事件
+      </p>
+      <p v-if="currentDateLabel" class="timeline-controls__date">
+        {{ currentDateLabel }}
+      </p>
+      <strong v-if="currentTitle" class="timeline-controls__title">
+        {{ currentTitle }}
+      </strong>
+    </div>
 
     <button
       ref="nextButton"

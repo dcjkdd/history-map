@@ -49,6 +49,13 @@ const coordinateCitations = computed(() =>
       )
     : [],
 )
+const citationRelationshipCount = computed(
+  () =>
+    placeCitations.value.length +
+    summaryCitations.value.length +
+    strategicRoleCitations.value.length +
+    coordinateCitations.value.length,
+)
 </script>
 
 <template>
@@ -82,7 +89,7 @@ const coordinateCitations = computed(() =>
       </div>
     </header>
 
-    <ConfidenceBadge :certainty="place.properties.certainty" />
+    <ConfidenceBadge :certainty="place.properties.certainty" compact />
 
     <section
       class="detail-claim"
@@ -95,11 +102,10 @@ const coordinateCitations = computed(() =>
             kind="claim"
             :viewpoint-type="place.properties.summary.viewpointType"
           />
-          <ConfidenceBadge :certainty="place.properties.summary.certainty" />
+          <ConfidenceBadge :certainty="place.properties.summary.certainty" compact />
         </div>
       </div>
       <p>{{ place.properties.summary.text }}</p>
-      <CitationList :citations="summaryCitations" label="地点说明引用" />
     </section>
 
     <section
@@ -115,14 +121,11 @@ const coordinateCitations = computed(() =>
           />
           <ConfidenceBadge
             :certainty="place.properties.strategicRole.certainty"
+            compact
           />
         </div>
       </div>
       <p>{{ place.properties.strategicRole.text }}</p>
-      <CitationList
-        :citations="strategicRoleCitations"
-        label="战略作用引用"
-      />
     </section>
 
     <section
@@ -139,17 +142,47 @@ const coordinateCitations = computed(() =>
           />
           <ConfidenceBadge
             :certainty="place.properties.coordinateNote.certainty"
+            compact
           />
         </div>
       </div>
       <p>{{ place.properties.coordinateNote.text }}</p>
-      <CitationList :citations="coordinateCitations" label="坐标说明引用" />
     </section>
 
-    <CitationList
-      :citations="placeCitations"
-      :heading-level="3"
-      label="地点与代表点依据"
-    />
+    <details class="detail-disclosure">
+      <summary>
+        完整引用与不确定性（{{ citationRelationshipCount }} 条引用关系）
+      </summary>
+      <div class="detail-disclosure__content">
+        <section class="detail-disclosure__certainty" aria-label="地点不确定性说明">
+          <h3>不确定性说明</h3>
+          <ConfidenceBadge :certainty="place.properties.certainty" />
+          <ConfidenceBadge :certainty="place.properties.summary.certainty" />
+          <ConfidenceBadge :certainty="place.properties.strategicRole.certainty" />
+          <ConfidenceBadge
+            v-if="place.properties.coordinateNote"
+            :certainty="place.properties.coordinateNote.certainty"
+          />
+        </section>
+
+        <div :data-claim-evidence-id="place.properties.summary.claimId">
+          <CitationList :citations="summaryCitations" label="地点说明引用" />
+        </div>
+        <div :data-claim-evidence-id="place.properties.strategicRole.claimId">
+          <CitationList :citations="strategicRoleCitations" label="战略作用引用" />
+        </div>
+        <div
+          v-if="place.properties.coordinateNote"
+          :data-claim-evidence-id="place.properties.coordinateNote.claimId"
+        >
+          <CitationList :citations="coordinateCitations" label="坐标说明引用" />
+        </div>
+        <CitationList
+          :citations="placeCitations"
+          :heading-level="3"
+          label="地点与代表点依据"
+        />
+      </div>
+    </details>
   </article>
 </template>

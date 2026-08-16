@@ -21,12 +21,14 @@ export const ROUTE_LAYER_IDS = [
   'mvp-routes-yan-active',
   'mvp-routes-court-active',
   'mvp-routes-other-active',
+  'mvp-routes-hit-area',
   'mvp-routes-selected',
   'mvp-route-direction-arrows',
   'mvp-route-direction-labels',
 ] as const
 
 export const ROUTE_INTERACTIVE_LAYER_IDS = [
+  'mvp-routes-hit-area',
   'mvp-route-direction-arrows',
   'mvp-route-direction-labels',
   'mvp-routes-selected',
@@ -144,6 +146,23 @@ export function addRouteLayers(
     addRouteLayer(map, side, ROUTE_STYLES[side], true)
   }
 
+  if (!map.getLayer('mvp-routes-hit-area')) {
+    map.addLayer({
+      id: 'mvp-routes-hit-area',
+      type: 'line',
+      source: ROUTE_SOURCE_ID,
+      filter: ['in', ['get', 'id'], ['literal', []]],
+      layout: {
+        'line-cap': 'round',
+        'line-join': 'round',
+      },
+      paint: {
+        'line-color': 'rgba(255, 255, 255, 0.001)',
+        'line-width': 22,
+      },
+    })
+  }
+
   if (!map.getLayer('mvp-routes-selected')) {
     map.addLayer({
       id: 'mvp-routes-selected',
@@ -258,6 +277,14 @@ export function applyRouteState(
         routeFilter(side, derivedState.activeRouteSegmentIds),
       )
     }
+  }
+
+  if (map.getLayer('mvp-routes-hit-area')) {
+    map.setFilter('mvp-routes-hit-area', [
+      'in',
+      ['get', 'id'],
+      ['literal', derivedState.visibleRouteSegmentIds],
+    ])
   }
 
   for (const layerId of [

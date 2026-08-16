@@ -34,6 +34,7 @@ const maplibreMock = vi.hoisted(() => {
     readonly getZoom = vi.fn(() => 6.5)
     readonly jumpTo = vi.fn()
     readonly remove = vi.fn()
+    readonly resize = vi.fn()
     readonly setFilter = vi.fn()
     readonly setLayoutProperty = vi.fn()
     readonly queryRenderedFeatures = vi.fn(
@@ -546,6 +547,19 @@ describe('useMapLibre', () => {
     instance.emit('style.load')
     await nextTick()
 
+    const layerPanelButton = host.querySelector<HTMLButtonElement>(
+      '[aria-controls="map-layer-panel"]',
+    )
+    const legendPanelButton = host.querySelector<HTMLButtonElement>(
+      '[aria-controls="map-legend-panel"]',
+    )
+    expect(layerPanelButton?.getAttribute('aria-expanded')).toBe('false')
+    expect(host.querySelector('#map-layer-panel')).toBeNull()
+    layerPanelButton?.click()
+    await nextTick()
+    expect(layerPanelButton?.getAttribute('aria-expanded')).toBe('true')
+    expect(host.querySelector('#map-layer-panel')).not.toBeNull()
+
     const hydrographyToggle = host.querySelector<HTMLInputElement>(
       '.layer-control input[data-layer-group="hydrography"]',
     )
@@ -569,6 +583,13 @@ describe('useMapLibre', () => {
       'none',
     )
 
+    legendPanelButton?.click()
+    await nextTick()
+    expect(host.querySelector('#map-layer-panel')).toBeNull()
+    expect(host.querySelector('#map-legend-panel')).not.toBeNull()
+    expect(legendPanelButton?.getAttribute('aria-expanded')).toBe('true')
+    expect(instance.resize).toHaveBeenCalledTimes(2)
+
     instance.queryRenderedFeatures.mockReturnValue([
       { properties: { id: 'place-tongguan' } },
     ])
@@ -581,12 +602,7 @@ describe('useMapLibre', () => {
       ['get', 'id'],
       'place-tongguan',
     ])
-    expect(host.querySelector('[data-map-note="tongguan"]')?.textContent).toContain(
-      '进入关中的关键防御节点',
-    )
-    expect(host.querySelector('[data-map-note="tongguan"]')?.textContent).toContain(
-      '唐代关城位置仍有争议',
-    )
+    expect(host.querySelector('[data-map-note="tongguan"]')).toBeNull()
 
     instance.sources.clear()
     instance.layers.clear()

@@ -12,6 +12,18 @@
   box-sizing: border-box;
 }
 
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
 body {
   min-width: 320px;
   min-height: 100vh;
@@ -34,7 +46,7 @@ select {
 
 .topic-label,
 .section-label {
-  margin: 0 0 0.75rem;
+  margin: 0 0 0.35rem;
   color: #7c3f24;
   font-size: 0.8rem;
   font-weight: 700;
@@ -70,7 +82,7 @@ h1 {
   align-items: center;
   justify-content: space-between;
   gap: 2rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .map-panel h2 {
@@ -79,11 +91,10 @@ h1 {
 }
 
 .timeline-panel__heading {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 2rem;
-  margin-bottom: 1rem;
+  display: block;
+  grid-row: 1 / span 2;
+  align-self: center;
+  margin: 0;
 }
 
 .timeline-panel__heading h2,
@@ -92,23 +103,25 @@ h1 {
 }
 
 .timeline-panel__heading > p {
-  max-width: 34rem;
+  max-width: 10rem;
+  margin-top: 0.25rem;
   color: #6b6259;
-  font-size: 0.82rem;
-  line-height: 1.55;
-  text-align: right;
+  font-size: 0.68rem;
+  line-height: 1.35;
+  text-align: left;
 }
 
 .timeline-controls {
   display: grid;
-  grid-template-columns: minmax(8rem, auto) 1fr minmax(8rem, auto);
+  grid-column: 2;
+  grid-template-columns: minmax(6.5rem, auto) 1fr minmax(6.5rem, auto);
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  gap: 0.75rem;
+  margin: 0;
 }
 
 .timeline-controls button {
-  min-height: 2.7rem;
+  min-height: 2.35rem;
   border: 1px solid #7c3f24;
   border-radius: 999px;
   background: #fffdf7;
@@ -130,35 +143,75 @@ h1 {
   text-align: center;
 }
 
-.event-timeline {
+.timeline-controls__current {
   display: grid;
-  grid-auto-columns: minmax(9.5rem, 1fr);
-  grid-auto-flow: column;
-  gap: 0.75rem;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.05rem 0.55rem;
+  min-width: 0;
+  text-align: center;
+}
+
+.timeline-controls__date,
+.timeline-controls__title {
+  min-width: 0;
   margin: 0;
-  padding: 0.15rem 0.15rem 0.75rem;
-  overflow-x: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.timeline-controls__date {
+  color: #705d50;
+  font-size: 0.68rem;
+}
+
+.timeline-controls__title {
+  grid-column: 1 / -1;
+  color: #3f3026;
+  font-family: "Songti SC", "STSong", serif;
+  font-size: 0.88rem;
+}
+
+.event-timeline {
+  position: relative;
+  display: grid;
+  grid-column: 2;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.15rem 0;
   list-style: none;
-  scroll-snap-type: x proximity;
+}
+
+.event-timeline::before {
+  position: absolute;
+  top: 50%;
+  right: 4%;
+  left: 4%;
+  height: 1px;
+  background: rgb(124 63 36 / 30%);
+  content: "";
 }
 
 .event-timeline li {
   min-width: 0;
-  scroll-snap-align: start;
+  position: relative;
 }
 
 .event-timeline__node {
   display: grid;
-  grid-template-columns: auto 1fr;
+  place-items: center;
   width: 100%;
-  min-height: 7.5rem;
-  padding: 0.8rem;
+  min-height: 2rem;
+  padding: 0.15rem;
   border: 1px solid rgb(61 54 45 / 20%);
   border-radius: 0.75rem;
   background: rgb(255 253 247 / 72%);
   color: #37362f;
   cursor: pointer;
-  text-align: left;
+  text-align: center;
 }
 
 .event-timeline__node:hover {
@@ -173,31 +226,14 @@ h1 {
 
 .event-timeline__sequence {
   display: grid;
-  grid-row: 1 / span 2;
   place-items: center;
-  width: 1.75rem;
-  height: 1.75rem;
-  margin-right: 0.6rem;
+  width: 1.45rem;
+  height: 1.45rem;
   border-radius: 50%;
   background: #7c3f24;
   color: #fffdf7;
   font-size: 0.75rem;
   font-weight: 800;
-}
-
-.event-timeline__date {
-  color: #705d50;
-  font-size: 0.72rem;
-  line-height: 1.35;
-}
-
-.event-timeline__title {
-  align-self: start;
-  margin-top: 0.4rem;
-  font-family: "Songti SC", "STSong", serif;
-  font-size: 1rem;
-  font-weight: 700;
-  line-height: 1.35;
 }
 
 .timeline-controls button:focus-visible,
@@ -207,8 +243,8 @@ h1 {
 }
 
 .detail-panel {
-  margin-top: 1.25rem;
-  padding: clamp(1rem, 2.5vw, 1.5rem);
+  margin-top: 0;
+  padding: 0.85rem;
   border: 1px solid rgb(32 35 31 / 16%);
   border-radius: 0.85rem;
   background: rgb(255 253 247 / 82%);
@@ -218,7 +254,7 @@ h1 {
 .empty-detail h2 {
   margin-bottom: 0.55rem;
   font-family: "Songti SC", "STSong", serif;
-  font-size: clamp(1.35rem, 2.5vw, 1.8rem);
+  font-size: clamp(1.2rem, 2vw, 1.55rem);
 }
 
 .detail-article h3,
@@ -298,12 +334,17 @@ h1 {
   color: #674934;
 }
 
+.confidence-badge--compact {
+  padding: 0.28rem 0.45rem;
+  font-size: 0.68rem;
+}
+
 .detail-claim,
 .detail-related,
 .detail-actors,
 .citation-list {
-  margin-top: 1.25rem;
-  padding-top: 1.25rem;
+  margin-top: 0.85rem;
+  padding-top: 0.85rem;
   border-top: 1px solid rgb(32 35 31 / 12%);
 }
 
@@ -373,9 +414,15 @@ h1 {
   margin-bottom: 0.65rem;
 }
 
+.detail-claim__heading h3 {
+  flex: none;
+  white-space: nowrap;
+}
+
 .detail-claim__metadata {
   display: flex;
   align-items: flex-start;
+  flex-wrap: wrap;
   justify-content: flex-end;
   gap: 0.5rem;
 }
@@ -393,7 +440,53 @@ h1 {
   max-width: 72ch;
   margin-bottom: 0;
   color: #45433d;
-  line-height: 1.72;
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.detail-disclosure {
+  position: sticky;
+  z-index: 2;
+  bottom: 0;
+  margin-top: 0.9rem;
+  border: 1px solid rgb(124 63 36 / 28%);
+  border-radius: 0.65rem;
+  background: rgb(255 253 247 / 70%);
+  box-shadow: 0 -0.35rem 1rem rgb(75 61 45 / 10%);
+}
+
+.detail-disclosure[open] {
+  position: relative;
+  bottom: auto;
+}
+
+.detail-disclosure > summary {
+  padding: 0.7rem 0.75rem;
+  color: #6b351f;
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.detail-disclosure[open] > summary {
+  border-bottom: 1px solid rgb(124 63 36 / 18%);
+}
+
+.detail-disclosure__content {
+  padding: 0 0.75rem 0.75rem;
+}
+
+.detail-disclosure__certainty {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 0.75rem;
+}
+
+.detail-disclosure__certainty h3 {
+  margin-bottom: 0.1rem;
+  color: #523b2d;
+  font-size: 0.9rem;
 }
 
 .detail-related ul,

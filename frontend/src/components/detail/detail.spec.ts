@@ -203,6 +203,9 @@ function mountDetail(initialSelection: SelectionState) {
           onSelectPlace: (placeId: string) => {
             selection.value = { ...selection.value, selectedPlaceId: placeId }
           },
+          onSelectRoute: (routeId: string) => {
+            selection.value = { ...selection.value, selectedRouteId: routeId }
+          },
         })
     },
   })
@@ -274,14 +277,23 @@ describe('MVP-08 detail components', () => {
     ).toContain('结论类型：项目推断')
     expect(
       host.querySelector(
-        '[data-claim-id="claim-event-summary"] [data-citation-id="citation-one"] .viewpoint-badge--citation',
+        '[data-claim-evidence-id="claim-event-summary"] [data-citation-id="citation-one"] .viewpoint-badge--citation',
       )?.textContent,
     ).toContain('资料观点：原始记载')
     expect(host.textContent).toContain('甲方')
     expect(host.textContent).toContain('乙方')
     expect(
-      host.querySelectorAll('[data-claim-id="claim-event-summary"] .citation-card'),
+      host.querySelectorAll(
+        '[data-claim-evidence-id="claim-event-summary"] .citation-card',
+      ),
     ).toHaveLength(2)
+    const disclosure = host.querySelector<HTMLDetailsElement>(
+      '.event-detail > .detail-disclosure',
+    )
+    expect(disclosure?.open).toBe(false)
+    expect(disclosure?.querySelector('summary')?.textContent).toContain(
+      '完整引用与不确定性',
+    )
     expect(host.textContent).toContain('测试作者 · 固定测试版本')
     expect(host.textContent).toContain('第 10—12 页')
 
@@ -290,6 +302,38 @@ describe('MVP-08 detail components', () => {
       ?.click()
     await nextTick()
     expect(selection.value.selectedPlaceId).toBe('place-test')
+
+    app.unmount()
+  })
+
+  it('切换当前对象时回到短解释并收起完整引用', async () => {
+    const { app, host, selection } = mountDetail({
+      selectedEventId: 'event-test',
+    })
+    const disclosure = host.querySelector<HTMLDetailsElement>(
+      '.event-detail > .detail-disclosure',
+    )
+    if (disclosure) {
+      disclosure.open = true
+    }
+
+    selection.value = {
+      selectedEventId: 'event-test',
+      selectedPlaceId: 'place-test',
+    }
+    await nextTick()
+
+    expect(
+      host.querySelector<HTMLDetailsElement>('.place-detail > .detail-disclosure')
+        ?.open,
+    ).toBe(false)
+
+    selection.value = { selectedEventId: 'event-test' }
+    await nextTick()
+    expect(
+      host.querySelector<HTMLDetailsElement>('.event-detail > .detail-disclosure')
+        ?.open,
+    ).toBe(false)
 
     app.unmount()
   })
@@ -306,8 +350,14 @@ describe('MVP-08 detail components', () => {
     expect(host.textContent).toContain('不是精确历史坐标')
     expect(host.textContent).not.toContain('null')
     expect(
-      host.querySelector('.place-detail > .citation-list > h3')?.textContent,
+      host.querySelector(
+        '.place-detail > .detail-disclosure [aria-label="地点与代表点依据"] > h3',
+      )?.textContent,
     ).toContain('地点与代表点依据')
+    expect(
+      host.querySelector<HTMLDetailsElement>('.place-detail > .detail-disclosure')
+        ?.open,
+    ).toBe(false)
 
     const focusButton = host.querySelector<HTMLButtonElement>(
       '[aria-label="在地图上定位此地点"]',
@@ -380,6 +430,13 @@ describe('MVP-08 detail components', () => {
       )?.href,
     ).toBe('https://www.smx.gov.cn/4036/616951008/1869004.html')
     expect(host.querySelectorAll('.route-detail .citation-card')).toHaveLength(2)
+    expect(
+      host.querySelector<HTMLDetailsElement>('.route-detail > .detail-disclosure')
+        ?.open,
+    ).toBe(false)
+    expect(
+      host.querySelector('.route-detail > .detail-disclosure > summary')?.textContent,
+    ).toContain('完整引用、方法与不确定性')
 
     host.querySelector<HTMLButtonElement>('.route-detail .detail-close')?.click()
     await nextTick()
@@ -387,6 +444,25 @@ describe('MVP-08 detail components', () => {
     expect(selection.value.selectedRouteId).toBeUndefined()
     expect(selection.value.selectedEventId).toBe('event-test')
     expect(host.querySelector('.event-detail')).not.toBeNull()
+
+    app.unmount()
+  })
+
+  it('事件详情提供可键盘操作的相关路线入口', async () => {
+    const { app, host, selection } = mountDetail({
+      selectedEventId: 'event-test',
+    })
+
+    const routeButton = host.querySelector<HTMLButtonElement>(
+      '[data-related-route-id="route-yan-westward"]',
+    )
+    expect(routeButton?.textContent).toContain('燕军 · 向西')
+
+    routeButton?.click()
+    await nextTick()
+
+    expect(selection.value.selectedRouteId).toBe('route-yan-westward')
+    expect(host.querySelector('.route-detail')).not.toBeNull()
 
     app.unmount()
   })

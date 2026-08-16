@@ -66,8 +66,8 @@ function handleKeydown(keyboardEvent: KeyboardEvent, eventIndex: number): void {
         <span class="event-timeline__sequence" aria-hidden="true">
           {{ event.sequence }}
         </span>
-        <span class="event-timeline__date">{{ event.dateLabel }}</span>
-        <span class="event-timeline__title">{{ event.title }}</span>
+        <span class="event-timeline__date visually-hidden">{{ event.dateLabel }}</span>
+        <span class="event-timeline__title visually-hidden">{{ event.title }}</span>
       </button>
     </li>
   </ol>

@@ -130,6 +130,8 @@ describe('MVP-06 timeline components', () => {
     const app = createApp(TimelineControls, {
       hasPrevious: false,
       hasNext: true,
+      currentTitle: '测试事件 1',
+      currentDateLabel: '相对时间 1',
       selectedSequence: 1,
       total: 2,
       onPrevious,
@@ -142,6 +144,8 @@ describe('MVP-06 timeline components', () => {
     expect(buttons[0]?.disabled).toBe(true)
     expect(buttons[1]?.disabled).toBe(false)
     expect(host.textContent).toContain('第 1 / 2 个事件')
+    expect(host.textContent).toContain('相对时间 1')
+    expect(host.textContent).toContain('测试事件 1')
 
     buttons[0]?.click()
     buttons[1]?.click()

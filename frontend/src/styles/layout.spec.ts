@@ -13,20 +13,30 @@ const responsiveCss = readFileSync(
   resolve(process.cwd(), 'src/styles/responsive.css'),
   'utf8',
 )
+const mapCss = readFileSync(
+  resolve(process.cwd(), 'src/styles/map.css'),
+  'utf8',
+)
 
 describe('MVP-09 desktop layout contract', () => {
-  it('宽屏和 1024px 桌面使用地图/时间轴加可滚动详情侧栏', () => {
+  it('PHASE2-05 宽屏和 1024px 桌面使用地图、短详情与跨列紧凑时间轴', () => {
     expect(layoutCss).toContain('"map detail"')
-    expect(layoutCss).toContain('"timeline detail"')
-    expect(layoutCss).toContain('grid-template-columns: minmax(0, 1fr) minmax(18rem, 22rem)')
-    expect(layoutCss).toContain('max-height: calc(100vh - 2rem)')
+    expect(layoutCss).toContain('"timeline timeline"')
+    expect(layoutCss).toContain(
+      'grid-template-columns: minmax(0, 1fr) clamp(17.5rem, 22vw, 20rem)',
+    )
+    expect(layoutCss).toContain(
+      'grid-template-rows: clamp(35rem, calc(100dvh - 12.875rem), 41.25rem) auto',
+    )
+    expect(layoutCss).toContain('grid-template-columns: minmax(8.5rem, 10rem) minmax(0, 1fr)')
+    expect(layoutCss).toContain('height: 100%')
     expect(layoutCss).toContain('overflow-y: auto')
     expect(responsiveCss).toContain('@media (max-width: 63rem)')
   })
 
-  it('地图保留桌面最小高度，较窄窗口才切换为单列', () => {
-    expect(layoutCss).toContain('grid-template-rows: auto minmax(34rem, 1fr)')
-    expect(layoutCss).toContain('min-height: 34rem')
+  it('地图在桌面首屏使用动态高度，较窄窗口才切换为单列', () => {
+    expect(layoutCss).toContain('grid-template-rows: auto minmax(0, 1fr)')
+    expect(layoutCss).toContain('min-height: 0')
     expect(responsiveCss).toContain('"map"')
     expect(responsiveCss).toContain('"timeline"')
     expect(responsiveCss).toContain('"detail"')
@@ -36,6 +46,18 @@ describe('MVP-09 desktop layout contract', () => {
     expect(layoutCss).toContain('button:focus-visible')
     expect(layoutCss).toContain('input:focus-visible')
     expect(layoutCss).toContain('a:focus-visible')
+    expect(layoutCss).toContain('summary:focus-visible')
     expect(layoutCss).toContain('outline: 3px solid #236785')
+  })
+
+  it('地图说明进入外置工具条，署名展开与比例尺保留水平避让带', () => {
+    expect(mapCss).toContain('.history-map__toolbar-row')
+    expect(mapCss).toContain('.history-map__toolbar-panel')
+    expect(mapCss).toContain('grid-template-rows: auto minmax(0, 1fr)')
+    expect(mapCss).toContain('.history-map .maplibregl-ctrl-bottom-right')
+    expect(mapCss).toContain('left: 6rem')
+    expect(mapCss).toContain('max-height: 8rem')
+    expect(mapCss).not.toContain('bottom: 11rem')
+    expect(mapCss).not.toContain('.history-map__tongguan-note')
   })
 })

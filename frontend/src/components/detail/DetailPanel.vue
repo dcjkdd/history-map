@@ -22,6 +22,7 @@ const emit = defineEmits<{
   clearRoute: []
   focusPlace: [placeId: string]
   selectPlace: [placeId: string]
+  selectRoute: [routeId: string]
 }>()
 
 const selectedPlace = computed(() =>
@@ -46,6 +47,11 @@ watch(
   () => {
     if (detailPanel.value) {
       detailPanel.value.scrollTop = 0
+      detailPanel.value
+        .querySelectorAll<HTMLDetailsElement>('details[open]')
+        .forEach((details) => {
+          details.open = false
+        })
     }
   },
   { flush: 'post' },
@@ -79,6 +85,7 @@ watch(
       :dataset="dataset"
       :event="selectedEvent"
       @select-place="emit('selectPlace', $event)"
+      @select-route="emit('selectRoute', $event)"
     />
     <EmptyDetail v-else />
   </aside>

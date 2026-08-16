@@ -34,6 +34,10 @@ const orderedEvents = computed(() => {
   })
 })
 
+const selectedEvent = computed(() =>
+  orderedEvents.value.find((event) => event.id === store.selectedEventId),
+)
+
 let isActive = true
 let loadAttemptId = 0
 
@@ -131,8 +135,8 @@ onBeforeUnmount(() => {
       >
         <div class="map-panel__heading">
           <div>
-            <p class="section-label">PHASE2-04</p>
-            <h2 id="map-panel-title">山河、路线方向与距离</h2>
+            <p class="section-label">PHASE2-05</p>
+            <h2 id="map-panel-title">山河、路线与当前解释</h2>
           </div>
           <p class="map-panel__hint">拖动浏览后可主动定位当前事件</p>
         </div>
@@ -162,6 +166,8 @@ onBeforeUnmount(() => {
         <TimelineControls
           :has-next="store.hasNext"
           :has-previous="store.hasPrevious"
+          :current-date-label="selectedEvent?.dateLabel"
+          :current-title="selectedEvent?.title"
           :selected-sequence="store.selectedSequence"
           :total="orderedEvents.length"
           @next="store.selectNextEvent()"
@@ -185,6 +191,7 @@ onBeforeUnmount(() => {
         @clear-route="store.clearSelectedRoute()"
         @focus-place="focusPlace"
         @select-place="selectAndFocusPlace"
+        @select-route="store.selectRoute"
       />
     </div>
   </main>
