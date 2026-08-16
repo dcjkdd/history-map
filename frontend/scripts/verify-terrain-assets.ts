@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto'
 import { readFile, readdir, stat } from 'node:fs/promises'
 import { resolve, relative } from 'node:path'
+import { pathToFileURL } from 'node:url'
 
 const EXPECTED_TILE_COUNTS = new Map([
   [5, 2],
@@ -143,5 +144,17 @@ export async function verifyTerrainAssets(assetRoot: string): Promise<void> {
   )
 }
 
-const target = process.argv[2] ?? 'public/terrain/phase2-02'
-await verifyTerrainAssets(target)
+const isDirectExecution =
+  process.argv[1] !== undefined &&
+  import.meta.url === pathToFileURL(resolve(process.argv[1])).href
+
+if (isDirectExecution) {
+  const target = process.argv[2] ?? 'public/terrain/phase2-02'
+  try {
+    await verifyTerrainAssets(target)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+    console.error(`[ERROR] INVALID_TERRAIN_ASSETS: ${message}`)
+    process.exitCode = 1
+  }
+}

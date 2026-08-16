@@ -2,7 +2,7 @@
 
 本目录是“潼关防线、灵宝出战与长安失守”专题的可运行静态前端。它是 Vue 3、TypeScript、Vite 与 MapLibre GL JS 构成的只读单页应用；生产构建只包含静态 HTML、CSS、JavaScript、MapLibre worker、本地区域地形、地图样式和版本化 JSON，不需要 Go、PostgreSQL/PostGIS、Redis、Docker、云服务或运行时外网。
 
-> 产品状态：PHASE2-02 已在提交 `ab3ac2d` 接入默认俯视分层设色 + hillshade 与现代豫陕定位并完成推送。PHASE2-03 已在提交 `fd8aa92` 完成现代流向、现代低地概览、解释性通道和潼关关隘表达并推送。PHASE2-04 已在提交 `0210e65` 完成获批的路线方向、现代代表点间距离、路线点击短说明、完整自动门禁和双尺寸/双 base 浏览器复验，并经用户确认推送；这不构成 PHASE2-05 或第二期最终产品验收。
+> 产品状态：PHASE2-05 已在提交 `32a6acd` 完成地图优先页面重排并推送。PHASE2-06 已按批准方案 A 完成 2 条空间来源、10 条发布记录、86 项映射与 F01—F14 工程门禁，当前尚未提交；正式数据、地形资产和 UI 未改。这不构成 PHASE2-07 或第二期最终产品验收。
 
 ## 环境与安装
 
@@ -37,6 +37,8 @@ npm --prefix frontend run typecheck
 npm --prefix frontend run validate:data
 npm --prefix frontend run audit:content
 npm --prefix frontend run verify:phase2-03-content
+npm --prefix frontend run verify:phase2-04-content
+npm --prefix frontend run verify:phase2-06-release
 npm --prefix frontend run verify:terrain-assets
 npm --prefix frontend run test
 npm --prefix frontend run build
@@ -45,16 +47,19 @@ npm --prefix frontend run check
 
 `audit:content` 从正式 JSON 反向枚举 Place、Event、Geography、实际 RouteSegment、运行时 Claim、Citation 和 Source，逐项核对资料笔记与内容审核表中的唯一 `APPROVED` 行、Claim 字段/引用映射、Citation 定位和空间来源许可记录。它会明确列出范围外候选；不会删除、批准这些候选，也不会代替最终人工签字。
 
-`verify:phase2-03-content` 固定核对正式 JSON 与 lockfile SHA、四组获批候选、原有 `PENDING_*` / `REJECTED` 状态、不确定性数量、潼关 `PASS / DISPUTED` 语义及通道输入几何。`check` 依次执行 `typecheck`、`validate:data`、`audit:content`、`verify:phase2-03-content`、`test`、`build`，最后校验 MapLibre worker 和构建后的地形资产闭包。`build` 会在 Vite 构建前再次执行类型、正式数据、PHASE2-03 内容门禁和源地形资产校验；最终视觉与人工签字仍是独立发布门禁。
+`verify:phase2-03-content` 与 `verify:phase2-04-content` 固定核对已批准 display-only 内容和正式历史边界。`verify:phase2-06-release` 再把 2 条空间来源、10 条发布记录、86 项运行时映射、五项冻结 hash、许可/署名/再分发、离线依赖、PENDING/REJECTED 和高置信秘密模式联合审计。`build` 会在 Vite 构建前执行这些内容门禁；`check` 还运行全部测试、根构建、worker/terrain 闭包，并调用 `verify:phase2-06-static` 在 `/private/tmp` 建立和验证 `/history-map/` 构建及站点根 `/data/` 后清理。最终视觉、性能与三方签字仍是 PHASE2-07/08 的独立门禁。
 
 也可以在已有根路径构建产物上单独复核 worker：
 
 ```bash
 npm --prefix frontend run verify:worker-bundle
 npm --prefix frontend run verify:terrain-bundle
+npm --prefix frontend run verify:phase2-06-static
 ```
 
 worker 校验不能省略：Vite 构建成功只证明入口完成打包，不自动证明 worker 引用的全部相对模块都已随静态产物发布。
+
+`verify:phase2-06-static` 要求已有干净的根构建；它会同时扫描根构建，并在 `/private/tmp/history-map-phase2-06-*` 生成非根构建和站点根 `/data/anshi/mvp-v1.json`，核对 base、未知外网主机、秘密、worker、地形与正式 JSON 字节闭包，结束后删除临时目录。该命令是 PHASE2-06 定向静态门禁，不替代 PHASE2-07 浏览器与性能矩阵。
 
 ## 正式数据与静态 API
 

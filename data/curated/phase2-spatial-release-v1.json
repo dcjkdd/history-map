@@ -1,0 +1,376 @@
+{
+  "schemaVersion": "1.0",
+  "releaseSetId": "phase2-06-anshi-spatial-v1",
+  "review": {
+    "status": "APPROVED",
+    "reviewer": "banq",
+    "reviewDate": "2026-08-16",
+    "approvalRecord": "docs/reviews/phase2-06-release-gate-review.md#11-人工确认门"
+  },
+  "frozenArtifacts": [
+    {
+      "path": "frontend/public/data/anshi/mvp-v1.json",
+      "sha256": "34927c09eb03f37e2b7d884afb34172dc9990bc3549a6c1638813ddc251beee6"
+    },
+    {
+      "path": "frontend/package-lock.json",
+      "sha256": "d2aa04cb6893326b206629ad8f8b3e3db573d1632fc847451aa5db888e9c7f22"
+    },
+    {
+      "path": "data/curated/anshi-mvp-source-notes.md",
+      "sha256": "e252fe1ec3e7d919cf83e40b4cc470d77492fc6ad2d16d46064b3e6ffd8d943c"
+    },
+    {
+      "path": "docs/reviews/anshi-mvp-content-review.md",
+      "sha256": "16199c15c5dca0e468e2d3ebbbe7c599fca0c151d18fb21682bc582762dfe087"
+    },
+    {
+      "path": "frontend/public/terrain/phase2-02/manifest.json",
+      "sha256": "54268b52b5e4d2753296682c540aa970a47a4f65945c46265dd9a493e0a34b44"
+    }
+  ],
+  "sources": [
+    {
+      "id": "P2SRC-COPERNICUS-GLO90-2021-01",
+      "institution": "European Union Copernicus Programme / ESA",
+      "title": "Copernicus DEM GLO-90 AWS 2021 COG",
+      "version": "COP-DEM_GLO-90-DGED; AWS 2021 release",
+      "url": "https://copernicus-dem-90m.s3.eu-central-1.amazonaws.com/",
+      "accessDate": "2026-08-03",
+      "coverage": {
+        "sourceBounds": [108, 33, 113, 36],
+        "displayBounds": [108.45, 33.65, 112.8, 35.45],
+        "description": "15 fixed one-degree COG inputs covering N33-N35 and E108-E112"
+      },
+      "originalCrs": "WGS84-G1150 / EPSG:4326; vertical EGM2008 / EPSG:3855 in metres",
+      "outputCrs": "OGC:CRS84 display coordinates; Web Mercator z5-z9 tile addressing",
+      "processing": [
+        "verify 15 fixed GLO-90 COG SHA-256 values",
+        "mosaic and crop to the audited regional bounds",
+        "render an 1800x1080 hypsometric image",
+        "encode zoom 5-9 Terrarium tiles for client-side hillshade"
+      ],
+      "license": {
+        "name": "Copernicus DEM GLO-90 Full, Free and Open",
+        "url": "https://dataspace.copernicus.eu/sites/default/files/media/files/2025-06/copernicus_contributing_mission_data_access_v2_cop_dem_licenses.pdf",
+        "redistribution": "Regional derived products may be copied, distributed, modified and combined when the required credit is retained.",
+        "attribution": "produced using Copernicus WorldDEM-90 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved · The organisations in charge of the Copernicus programme by law or by delegation do not incur any liability for any use of the Copernicus WorldDEM™-90.",
+        "restrictions": "The 15 source COGs are not redistributed; modified outputs must retain the required credit and liability disclaimer."
+      },
+      "runtimeDependencies": {
+        "networkRequired": false,
+        "tokenRequired": false,
+        "externalServices": [],
+        "localOutputs": ["phase2-02-glo90-topdown"]
+      },
+      "review": {
+        "status": "APPROVED",
+        "reviewer": "banq",
+        "reviewDate": "2026-08-16"
+      }
+    },
+    {
+      "id": "P2SRC-GEOBOUNDARIES-CHN-ADM1-9469F09-01",
+      "institution": "geoBoundaries",
+      "title": "geoBoundaries gbOpen CHN ADM1",
+      "version": "CHN-ADM1-43563684; geometry commit 9469f09",
+      "url": "https://www.geoboundaries.org/api/current/gbOpen/CHN/ADM1/",
+      "accessDate": "2026-08-03",
+      "coverage": {
+        "source": "China ADM1, 34 units in the accessed metadata",
+        "publishedSubset": "Modern Henan and Shaanxi ADM1 boundaries and display labels",
+        "displayBounds": [108.45, 33.65, 112.8, 35.45]
+      },
+      "originalCrs": "GeoJSON WGS84",
+      "outputCrs": "OGC:CRS84 coordinates",
+      "processing": [
+        "pin CHN-ADM1-43563684 geometry to commit 9469f09",
+        "verify source input SHA-256 bc4afc7eacf4351ae5b3ae7a612327987ce1123cb5deb8574fb49107091c6623",
+        "extract only modern Henan and Shaanxi ADM1 boundaries",
+        "add two display-only modern province labels"
+      ],
+      "license": {
+        "name": "geoBoundaries gbOpen CC BY 4.0; upstream boundary metadata Public Domain",
+        "url": "https://www.geoboundaries.org/api.html",
+        "redistribution": "The gbOpen derivative may be redistributed under CC BY 4.0 with attribution; the accessed upstream boundary metadata separately records Public Domain.",
+        "attribution": "geoBoundaries",
+        "restrictions": "Modern province reference only; it must not be described as a Tang-dynasty boundary."
+      },
+      "runtimeDependencies": {
+        "networkRequired": false,
+        "tokenRequired": false,
+        "externalServices": [],
+        "localOutputs": ["phase2-02-glo90-topdown:provinces.geojson"]
+      },
+      "review": {
+        "status": "APPROVED",
+        "reviewer": "banq",
+        "reviewDate": "2026-08-16"
+      }
+    }
+  ],
+  "records": [
+    {
+      "id": "P2R-TERRAIN-GLO90-TOPDOWN-01",
+      "kind": "TERRAIN",
+      "sourceRefs": ["P2SRC-COPERNICUS-GLO90-2021-01"],
+      "reviewRefs": ["P2SRC-COPERNICUS-GLO90-2021-01"],
+      "coverage": "Manifest sourceBounds [108,33,113,36] and displayBounds [108.45,33.65,112.8,35.45]",
+      "crs": "WGS84-G1150 / EPSG:4326 with EGM2008 heights; OGC:CRS84 display and Web Mercator tile addressing",
+      "processing": ["Use the manifest-pinned hypsometric image and 78 z5-z9 Terrarium tiles without changing assets."],
+      "license": {
+        "sourceRefs": ["P2SRC-COPERNICUS-GLO90-2021-01"],
+        "redistribution": "INHERIT_APPROVED_SOURCE_RECORD",
+        "attribution": "INHERIT_APPROVED_SOURCE_RECORD",
+        "restrictions": "Source COGs remain uncommitted and the full required credit and disclaimer remain visible."
+      },
+      "runtimeDependencies": {
+        "networkRequired": false,
+        "tokenRequired": false,
+        "externalServices": [],
+        "localPaths": ["terrain/phase2-02/color-relief.png", "terrain/phase2-02/terrain/{z}/{x}/{y}.png"]
+      },
+      "semantics": {
+        "scope": "Modern top-down terrain tint and client-side hillshade reference.",
+        "certainty": "MODERN_REFERENCE",
+        "displayOnly": true,
+        "prohibitedInterpretations": ["Tang-dynasty terrain reconstruction", "historical passability boundary"]
+      },
+      "review": {"status": "APPROVED", "reviewer": "banq", "reviewDate": "2026-08-16"},
+      "releaseMappings": [
+        {"type": "MANIFEST", "id": "phase2-02-glo90-topdown"},
+        {"type": "ASSET", "id": "color-relief.png"},
+        {"type": "ASSET_TEMPLATE", "id": "terrain/{z}/{x}/{y}.png"},
+        {"type": "MAP_SOURCE", "id": "phase2-terrain-color-relief"},
+        {"type": "MAP_SOURCE", "id": "phase2-terrain-dem"},
+        {"type": "MAP_LAYER", "id": "phase2-terrain-color-relief"},
+        {"type": "MAP_LAYER", "id": "phase2-terrain-hillshade"}
+      ]
+    },
+    {
+      "id": "P2R-BOUNDARY-CHN-ADM1-MODERN-01",
+      "kind": "BOUNDARY",
+      "sourceRefs": ["P2SRC-GEOBOUNDARIES-CHN-ADM1-9469F09-01"],
+      "reviewRefs": ["P2SRC-GEOBOUNDARIES-CHN-ADM1-9469F09-01"],
+      "coverage": "Modern Henan and Shaanxi ADM1 subset within the audited display bounds.",
+      "crs": "GeoJSON WGS84 / OGC:CRS84",
+      "processing": ["Use the manifest-pinned two boundary and two label features without changing geometry."],
+      "license": {
+        "sourceRefs": ["P2SRC-GEOBOUNDARIES-CHN-ADM1-9469F09-01"],
+        "redistribution": "INHERIT_APPROVED_SOURCE_RECORD",
+        "attribution": "INHERIT_APPROVED_SOURCE_RECORD",
+        "restrictions": "Must remain labelled as modern province reference, not a Tang-dynasty boundary."
+      },
+      "runtimeDependencies": {"networkRequired": false, "tokenRequired": false, "externalServices": [], "localPaths": ["terrain/phase2-02/provinces.geojson"]},
+      "semantics": {"scope": "Modern province orientation and labels ending with （今）.", "certainty": "MODERN_REFERENCE", "displayOnly": true, "prohibitedInterpretations": ["Tang-dynasty administrative boundary"]},
+      "review": {"status": "APPROVED", "reviewer": "banq", "reviewDate": "2026-08-16"},
+      "releaseMappings": [
+        {"type": "ASSET", "id": "provinces.geojson"},
+        {"type": "MAP_SOURCE", "id": "phase2-modern-provinces"},
+        {"type": "MAP_LAYER", "id": "phase2-modern-provinces-fill"},
+        {"type": "MAP_LAYER", "id": "phase2-modern-provinces-outline"},
+        {"type": "MAP_LAYER", "id": "phase2-modern-provinces-label"},
+        {"type": "UI_COPY", "id": "（今）"}
+      ]
+    },
+    {
+      "id": "P2R-HYDROGRAPHY-YELLOW-RIVER-01",
+      "kind": "HYDROGRAPHY",
+      "sourceRefs": ["SRC-SPATIAL-01", "PHASE2-SRC-YELLOW-FLOW-01"],
+      "reviewRefs": ["geography-yellow-river", "claim-geography-yellow-river-background-01", "CIT-NE50-RIVERS-MVP", "PHASE2-SRC-YELLOW-FLOW-01", "PHASE2-CIT-YELLOW-FLOW-01", "PHASE2-CLAIM-YELLOW-FLOW-01"],
+      "coverage": "Approved Natural Earth modern overview line and approved modern general flow near Tongguan.",
+      "crs": "OGC:CRS84 coordinates inherited from the formal Geography.",
+      "processing": ["Copy the formal Geography line; use coordinate order only for the approved modern flow arrow overlay."],
+      "license": {"sourceRefs": ["SRC-SPATIAL-01", "PHASE2-SRC-YELLOW-FLOW-01"], "redistribution": "Natural Earth formal geometry is Public Domain; no government webpage asset is redistributed.", "attribution": "Made with Natural Earth · 自然资源部", "restrictions": "Only short reviewed facts and links are used from the government webpage."},
+      "runtimeDependencies": {"networkRequired": false, "tokenRequired": false, "externalServices": [], "localPaths": ["data/anshi/mvp-v1.json"]},
+      "semantics": {"scope": "Modern overview hydrography and display-only general flow arrows.", "certainty": "DISPLAY_ONLY_INFERENCE", "displayOnly": true, "prohibitedInterpretations": ["Tang-dynasty river channel", "historical river width", "military effect"]},
+      "review": {"status": "APPROVED", "reviewer": "banq", "reviewDate": "2026-08-16"},
+      "releaseMappings": [
+        {"type": "FORMAL_ENTITY", "id": "geography-yellow-river"},
+        {"type": "MAP_SOURCE", "id": "mvp-geography"},
+        {"type": "MAP_SOURCE", "id": "phase2-military-geography-guides"},
+        {"type": "MAP_LAYER", "id": "mvp-geography-river-casing"},
+        {"type": "MAP_LAYER", "id": "mvp-geography-river"},
+        {"type": "MAP_LAYER", "id": "mvp-geography-river-label"},
+        {"type": "FEATURE", "id": "flow-geography-yellow-river"},
+        {"type": "MAP_LAYER", "id": "phase2-river-flow-arrows"}
+      ]
+    },
+    {
+      "id": "P2R-HYDROGRAPHY-WEI-RIVER-01",
+      "kind": "HYDROGRAPHY",
+      "sourceRefs": ["SRC-SPATIAL-01", "PHASE2-SRC-WEI-FLOW-01"],
+      "reviewRefs": ["geography-wei-river", "claim-geography-wei-river-background-01", "CIT-NE50-RIVERS-MVP", "PHASE2-SRC-WEI-FLOW-01", "PHASE2-CIT-WEI-FLOW-01", "PHASE2-CLAIM-WEI-FLOW-01"],
+      "coverage": "Approved Natural Earth modern overview line and approved modern west-to-east general flow into the Yellow River.",
+      "crs": "OGC:CRS84 coordinates inherited from the formal Geography.",
+      "processing": ["Copy the formal Geography line; use coordinate order only for the approved modern flow arrow overlay."],
+      "license": {"sourceRefs": ["SRC-SPATIAL-01", "PHASE2-SRC-WEI-FLOW-01"], "redistribution": "Natural Earth formal geometry is Public Domain; no government webpage asset is redistributed.", "attribution": "Made with Natural Earth · 武山县人民政府", "restrictions": "Only short reviewed facts and links are used from the government webpage."},
+      "runtimeDependencies": {"networkRequired": false, "tokenRequired": false, "externalServices": [], "localPaths": ["data/anshi/mvp-v1.json"]},
+      "semantics": {"scope": "Modern overview hydrography and display-only general flow arrows.", "certainty": "DISPLAY_ONLY_INFERENCE", "displayOnly": true, "prohibitedInterpretations": ["Tang-dynasty river channel", "historical navigation", "military effect"]},
+      "review": {"status": "APPROVED", "reviewer": "banq", "reviewDate": "2026-08-16"},
+      "releaseMappings": [
+        {"type": "FORMAL_ENTITY", "id": "geography-wei-river"},
+        {"type": "MAP_SOURCE", "id": "mvp-geography"},
+        {"type": "MAP_SOURCE", "id": "phase2-military-geography-guides"},
+        {"type": "MAP_LAYER", "id": "mvp-geography-river-casing"},
+        {"type": "MAP_LAYER", "id": "mvp-geography-river"},
+        {"type": "MAP_LAYER", "id": "mvp-geography-river-label"},
+        {"type": "FEATURE", "id": "flow-geography-wei-river"},
+        {"type": "MAP_LAYER", "id": "phase2-river-flow-arrows"}
+      ]
+    },
+    {
+      "id": "P2R-LANDFORM-QINLING-01",
+      "kind": "LANDFORM",
+      "sourceRefs": ["SRC-SPATIAL-01"],
+      "reviewRefs": ["geography-qinling", "claim-geography-qinling-background-01", "CIT-NE50-QINLING-MVP"],
+      "coverage": "Approved generalized Natural Earth Qinling polygon and display-only label anchor.",
+      "crs": "OGC:CRS84 coordinates inherited from the formal Geography.",
+      "processing": ["Render the approved generalized polygon and its existing display-only label without changing geometry."],
+      "license": {"sourceRefs": ["SRC-SPATIAL-01"], "redistribution": "Public Domain", "attribution": "Made with Natural Earth", "restrictions": "Generalized region only; not an exact mountain or historical boundary."},
+      "runtimeDependencies": {"networkRequired": false, "tokenRequired": false, "externalServices": [], "localPaths": ["data/anshi/mvp-v1.json"]},
+      "semantics": {"scope": "Formal modern generalized mountain background with UNKNOWN certainty.", "certainty": "FORMAL_UNCERTAIN", "displayOnly": false, "prohibitedInterpretations": ["precise mountain boundary", "Tang-dynasty passability area"]},
+      "review": {"status": "APPROVED", "reviewer": "banq", "reviewDate": "2026-08-16"},
+      "releaseMappings": [
+        {"type": "FORMAL_ENTITY", "id": "geography-qinling"},
+        {"type": "MAP_SOURCE", "id": "mvp-geography"},
+        {"type": "MAP_SOURCE", "id": "mvp-geography-display-labels"},
+        {"type": "MAP_LAYER", "id": "mvp-geography-area"},
+        {"type": "MAP_LAYER", "id": "mvp-geography-area-outline"},
+        {"type": "MAP_LAYER", "id": "mvp-geography-mountain-label"}
+      ]
+    },
+    {
+      "id": "P2R-LANDFORM-GUANZHONG-LOWLAND-01",
+      "kind": "LANDFORM",
+      "sourceRefs": ["PHASE2-SRC-GUANZHONG-LOWLAND-01"],
+      "reviewRefs": ["PHASE2-SRC-GUANZHONG-LOWLAND-01", "PHASE2-CIT-GUANZHONG-LOWLAND-01", "PHASE2-CLAIM-GUANZHONG-LOWLAND-01"],
+      "coverage": "A single approved display label anchor [109.68,34.40], not a polygon.",
+      "crs": "OGC:CRS84 display coordinate.",
+      "processing": ["Use the fixed approved label anchor without deriving a historical lowland polygon."],
+      "license": {"sourceRefs": ["PHASE2-SRC-GUANZHONG-LOWLAND-01"], "redistribution": "No source webpage asset is redistributed.", "attribution": "陕西省人民政府", "restrictions": "Only the reviewed modern landform summary and source link are used."},
+      "runtimeDependencies": {"networkRequired": false, "tokenRequired": false, "externalServices": [], "localPaths": []},
+      "semantics": {"scope": "Modern landform overview label only.", "certainty": "MODERN_REFERENCE", "displayOnly": true, "prohibitedInterpretations": ["historical plain polygon", "passability area"]},
+      "review": {"status": "APPROVED", "reviewer": "banq", "reviewDate": "2026-08-16"},
+      "releaseMappings": [
+        {"type": "CONSTANT", "id": "GUANZHONG_LOWLAND_LABEL_ANCHOR"},
+        {"type": "FEATURE", "id": "display-guanzhong-east-lowland-label"},
+        {"type": "MAP_SOURCE", "id": "phase2-military-geography-guides"},
+        {"type": "MAP_LAYER", "id": "phase2-guanzhong-lowland-label"},
+        {"type": "UI_COPY", "id": "关中东部低地\\n（现代地貌概览）"}
+      ]
+    },
+    {
+      "id": "P2R-CORRIDOR-EAST-GUANZHONG-DISPLAY-01",
+      "kind": "CORRIDOR",
+      "sourceRefs": ["SRC-SPATIAL-01"],
+      "reviewRefs": ["route-tang-advance-01", "claim-route-tang-advance-segment-01-inference-01", "PHASE2-GEOMETRY-EAST-GUANZHONG-01", "PHASE2-CLAIM-EAST-GUANZHONG-01"],
+      "coverage": "Exactly the reversed two-point route-tang-advance-01 geometry from Lingbao to Tongguan.",
+      "crs": "OGC:CRS84 coordinates inherited from the formal RouteSegment.",
+      "processing": ["Reverse the existing two-point coordinate order and render a fixed 22px screen band with no arrow."],
+      "license": {"sourceRefs": ["SRC-SPATIAL-01"], "redistribution": "Inherit the approved formal RouteSegment source chain; no new source asset is redistributed.", "attribution": "Existing approved source and citation entries", "restrictions": "The pending formal corridor Geography and Claim remain excluded."},
+      "runtimeDependencies": {"networkRequired": false, "tokenRequired": false, "externalServices": [], "localPaths": ["data/anshi/mvp-v1.json"]},
+      "semantics": {"scope": "Display-only east-Guanzhong explanatory band.", "certainty": "DISPLAY_ONLY_INFERENCE", "displayOnly": true, "prohibitedInterpretations": ["historical road", "army route", "historical corridor width", "formal corridor boundary"]},
+      "review": {"status": "APPROVED", "reviewer": "banq", "reviewDate": "2026-08-16"},
+      "releaseMappings": [
+        {"type": "FORMAL_ENTITY", "id": "route-tang-advance-01"},
+        {"type": "CONSTANT", "id": "EAST_GUANZHONG_CORRIDOR_SCREEN_WIDTH_PX"},
+        {"type": "FEATURE", "id": "display-east-guanzhong-corridor"},
+        {"type": "MAP_SOURCE", "id": "phase2-military-geography-guides"},
+        {"type": "MAP_LAYER", "id": "phase2-east-guanzhong-corridor-band"},
+        {"type": "MAP_LAYER", "id": "phase2-east-guanzhong-corridor-edge"},
+        {"type": "MAP_LAYER", "id": "phase2-east-guanzhong-corridor-label"}
+      ]
+    },
+    {
+      "id": "P2R-DISTANCE-HAVERSINE-MODERN-01",
+      "kind": "DISTANCE_METHOD",
+      "sourceRefs": ["SRC-SPATIAL-02", "SRC-SPATIAL-04", "SRC-SPATIAL-05", "SRC-SPATIAL-07"],
+      "reviewRefs": ["PHASE2-04-METHOD-DISTANCE-01", "PHASE2-04-DISTANCE-YAN-01", "PHASE2-04-DISTANCE-YAN-02", "PHASE2-04-DISTANCE-TANG-01", "route-yan-westward-01", "route-yan-westward-02", "route-tang-advance-01"],
+      "coverage": "Three existing RouteSegments between five DISPUTED modern representative points.",
+      "crs": "Input longitudes and latitudes in OGC:CRS84; spherical great-circle calculation.",
+      "processing": ["Haversine with mean Earth radius 6371.0088 km; round to nearest 5 km; prefix every displayed result with modern representative-point straight-line distance and 约."],
+      "license": {"sourceRefs": ["SRC-SPATIAL-02", "SRC-SPATIAL-04", "SRC-SPATIAL-05", "SRC-SPATIAL-07"], "redistribution": "No new coordinates or assets; calculations use the already approved formal representative points.", "attribution": "Existing formal Place and RouteSegment source chain", "restrictions": "Not a Tang road or historical march distance."},
+      "runtimeDependencies": {"networkRequired": false, "tokenRequired": false, "externalServices": [], "localPaths": ["data/anshi/mvp-v1.json"]},
+      "semantics": {"scope": "Approximate modern representative-point straight-line distances.", "certainty": "DISPLAY_ONLY_INFERENCE", "displayOnly": true, "prohibitedInterpretations": ["historical road distance", "historical march distance", "route length"]},
+      "method": {"name": "HAVERSINE", "earthRadiusKm": 6371.0088, "roundingKm": 5, "unit": "km", "approximateLabelRequired": true, "disclaimer": "按两个现代争议代表点的大圆距离计算，取整到最近 5 公里；不等于唐代道路或历史行军里程。"},
+      "outputs": [
+        {"formalEntityId": "route-yan-westward-01", "label": "现代代表点间直线距离约 120 公里"},
+        {"formalEntityId": "route-yan-westward-02", "label": "现代代表点间直线距离约 80 公里"},
+        {"formalEntityId": "route-tang-advance-01", "label": "现代代表点间直线距离约 55 公里"}
+      ],
+      "review": {"status": "APPROVED", "reviewer": "banq", "reviewDate": "2026-08-16"},
+      "releaseMappings": [
+        {"type": "METHOD", "id": "haversineDistanceKm"},
+        {"type": "CONSTANT", "id": "EARTH_MEAN_RADIUS_KM"},
+        {"type": "CONSTANT", "id": "ROUTE_DISTANCE_ROUNDING_KM"},
+        {"type": "CONSTANT", "id": "ROUTE_DISTANCE_METHOD_NOTE"},
+        {"type": "FORMAL_ENTITY", "id": "route-yan-westward-01"},
+        {"type": "FORMAL_ENTITY", "id": "route-yan-westward-02"},
+        {"type": "FORMAL_ENTITY", "id": "route-tang-advance-01"},
+        {"type": "UI_COPY", "id": "现代代表点间直线距离约 120 公里"},
+        {"type": "UI_COPY", "id": "现代代表点间直线距离约 80 公里"},
+        {"type": "UI_COPY", "id": "现代代表点间直线距离约 55 公里"}
+      ]
+    },
+    {
+      "id": "P2R-PRESENTATION-ROUTE-YAN-01",
+      "kind": "PRESENTATION",
+      "sourceRefs": ["PHASE2-04-SRC-XIAOHAN-SCOPE-01", "PHASE2-04-SRC-XIAOHAN-WEST-TERRAIN-01", "PHASE2-04-SRC-XIAOHAN-TANG-CONTEXT-01"],
+      "reviewRefs": ["PHASE2-04-DIRECTION-YAN-01", "PHASE2-04-PRESENTATION-DIRECTION-SEMANTICS-01", "PHASE2-04-PRESENTATION-YAN-01", "PHASE2-04-PRESENTATION-YAN-CONSTRAINT-01", "route-yan-westward-01", "route-yan-westward-02"],
+      "coverage": "The existing Luoyang-Shanzhou-Tongguan two-segment Yan presentation.",
+      "crs": "No new geometry; inherit the two formal RouteSegments.",
+      "processing": ["Derive westward direction from approved endpoint order; show one route arrow, approximate distance labels and four approved notes."],
+      "license": {"sourceRefs": ["PHASE2-04-SRC-XIAOHAN-SCOPE-01", "PHASE2-04-SRC-XIAOHAN-WEST-TERRAIN-01", "PHASE2-04-SRC-XIAOHAN-TANG-CONTEXT-01"], "redistribution": "No source webpage asset is redistributed; only reviewed summaries and links are shown.", "attribution": "三门峡市人民政府 · 灵宝市人民政府 · 《光明日报》", "restrictions": "Regional terrain context does not prove a specific ancient road or Yan march path."},
+      "runtimeDependencies": {"networkRequired": false, "tokenRequired": false, "externalServices": [], "localPaths": ["data/anshi/mvp-v1.json"]},
+      "semantics": {"scope": "Display-only westward route direction, distances and four-note explanation.", "certainty": "DISPLAY_ONLY_INFERENCE", "displayOnly": true, "prohibitedInterpretations": ["historical road centreline", "march trajectory", "speed", "ford or attack point"]},
+      "review": {"status": "APPROVED", "reviewer": "banq", "reviewDate": "2026-08-16"},
+      "releaseMappings": [
+        {"type": "METHOD", "id": "getRoutePresentation"},
+        {"type": "FORMAL_ENTITY", "id": "route-yan-westward-01"},
+        {"type": "FORMAL_ENTITY", "id": "route-yan-westward-02"},
+        {"type": "MAP_SOURCE", "id": "mvp-route-segments"},
+        {"type": "MAP_LAYER", "id": "mvp-routes-yan"},
+        {"type": "MAP_LAYER", "id": "mvp-routes-yan-active"},
+        {"type": "MAP_LAYER", "id": "mvp-routes-hit-area"},
+        {"type": "MAP_LAYER", "id": "mvp-routes-selected"},
+        {"type": "MAP_LAYER", "id": "mvp-route-direction-arrows"},
+        {"type": "MAP_LAYER", "id": "mvp-route-direction-labels"},
+        {"type": "UI_COPY", "id": "燕军 · 向西"},
+        {"type": "UI_COPY", "id": "主体与方向：燕军由洛阳经陕州向潼关方向西进。"},
+        {"type": "UI_COPY", "id": "相关关隘：潼关是陕郡以西、进入关中的关键防御节点。"},
+        {"type": "UI_COPY", "id": "不确定性：两段只连接现代争议代表点，表达宏观节点顺序，不是唐代道路或行军轨迹。"},
+        {"type": "UI_COPY", "id": "地形约束：洛阳—潼关的崤函区域受山地与黄河影响，沿线因地理形成多处隘口；其中陕州—潼关西段南依崤山、北临黄河。"}
+      ]
+    },
+    {
+      "id": "P2R-PRESENTATION-ROUTE-TANG-01",
+      "kind": "PRESENTATION",
+      "sourceRefs": ["SRC-SPATIAL-01"],
+      "reviewRefs": ["PHASE2-04-DIRECTION-TANG-01", "PHASE2-04-PRESENTATION-DIRECTION-SEMANTICS-01", "PHASE2-04-PRESENTATION-TANG-01", "route-tang-advance-01", "PHASE2-CLAIM-EAST-GUANZHONG-01"],
+      "coverage": "The existing Tongguan-Lingbao one-segment Tang presentation.",
+      "crs": "No new geometry; inherit the formal RouteSegment.",
+      "processing": ["Derive eastward direction from approved endpoint order; show one route arrow, approximate distance label and four approved notes."],
+      "license": {"sourceRefs": ["SRC-SPATIAL-01"], "redistribution": "No new source asset is redistributed; reuse approved formal and PHASE2-03 source chains.", "attribution": "Existing formal citations and approved military-geography sources", "restrictions": "No road, battlefield centre or retreat line is inferred."},
+      "runtimeDependencies": {"networkRequired": false, "tokenRequired": false, "externalServices": [], "localPaths": ["data/anshi/mvp-v1.json"]},
+      "semantics": {"scope": "Display-only eastward route direction, distance and four-note explanation.", "certainty": "DISPLAY_ONLY_INFERENCE", "displayOnly": true, "prohibitedInterpretations": ["historical road centreline", "battlefield coordinate", "march or retreat trajectory"]},
+      "review": {"status": "APPROVED", "reviewer": "banq", "reviewDate": "2026-08-16"},
+      "releaseMappings": [
+        {"type": "METHOD", "id": "getRoutePresentation"},
+        {"type": "FORMAL_ENTITY", "id": "route-tang-advance-01"},
+        {"type": "MAP_SOURCE", "id": "mvp-route-segments"},
+        {"type": "MAP_LAYER", "id": "mvp-routes-tang"},
+        {"type": "MAP_LAYER", "id": "mvp-routes-tang-active"},
+        {"type": "MAP_LAYER", "id": "mvp-routes-hit-area"},
+        {"type": "MAP_LAYER", "id": "mvp-routes-selected"},
+        {"type": "MAP_LAYER", "id": "mvp-route-direction-arrows"},
+        {"type": "MAP_LAYER", "id": "mvp-route-direction-labels"},
+        {"type": "UI_COPY", "id": "唐军 · 向东"},
+        {"type": "UI_COPY", "id": "主体与方向：唐军由潼关出关，向东推进至灵宝西原方向。"},
+        {"type": "UI_COPY", "id": "地形约束：灵宝西原方向现有材料只支持南近山、北临黄河的狭窄通道这一相对关系。"},
+        {"type": "UI_COPY", "id": "相关关隘：潼关是本路线出发关隘；当前点只是现代旧城遗址代表点，唐代关城位置仍有争议。"},
+        {"type": "UI_COPY", "id": "不确定性：直线只连接两个现代争议代表点，不是唐代道路、战场坐标或撤退线。"}
+      ]
+    }
+  ]
+}

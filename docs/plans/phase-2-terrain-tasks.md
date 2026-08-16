@@ -150,6 +150,8 @@
 
 ## PHASE2-06：二期内容与空间发布门禁
 
+实施状态（2026-08-16）：`ENGINEERING_COMPLETE_PENDING_COMMIT`。用户已批准方案 A；2 条空间来源、10 条发布记录和 86 项运行时映射已纳入独立登记簿，F01—F14、正式集合/审核状态/hash、许可/署名/秘密、地形/worker 与根/非根静态闭包门禁已实现。完整 `check` 为 22 个测试文件、148 项测试通过。正式 JSON、lockfile、既有资料笔记/审核表、manifest/资产和 UI 未改；未运行 PHASE2-07 浏览器/性能矩阵，最终三方签字留空，commit/push 仍待用户确认。详细记录见 [PHASE2-06 门禁评审](../reviews/phase2-06-release-gate-review.md)。
+
 ### 目标
 
 把新增地形、定位、通道、距离和解释逐项纳入可复核发布流程。

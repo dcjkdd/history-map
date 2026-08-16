@@ -1,15 +1,16 @@
 # 安史之乱二维交互地图：MVP 实施进度
 
 - 状态：执行进度索引
-- 更新日期：2026-08-12
+- 更新日期：2026-08-16
 - `PHASE2-02` Git 起点：`a88fbd287422321c5f082df9410bd43b5112d591`（已推送的 `PHASE2-01` 提交）
 - `PHASE2-02` 实施提交：`ab3ac2dbc84b23e66bc4266ad4fdd7bcfd7b791e`（已推送至 GitHub `master`）
 - `PHASE2-03` 实施提交：`fd8aa92f698e14180b15d727dc7533e9898c81a7`（已推送至 GitHub `master`）
 - `PHASE2-04` 实施提交：`0210e6592ddd4d3984b3098dcc12019f055d2303`（已推送至 GitHub `master`）
-- 最近完成并推送阶段：`PHASE2-04` 地形约束路线、方向与距离（实施提交 `0210e65`）
+- `PHASE2-05` 实施提交：`32a6acd1d3be27fa0313cccbb0a31b753938a85d`（已推送至 GitHub `master`）
+- 最近完成并推送阶段：`PHASE2-05` 地图优先页面重排（实施提交 `32a6acd`）
 - MVP-11 结论：内容映射、工程门禁和浏览器回归已完成并提交；2026-08-02 产品复核确认当前二维原型缺少地形解释力，因此产品最终签字暂停，不得标为整期产品完成
-- 当前阶段：`PHASE2-05` 已按用户批准的方案 A 完成实现、自动门禁、双尺寸/双 base 浏览器复验和受控 `style.load` 恢复；用户已确认本次提交与推送
-- 下一动作：完成 PHASE2-05 中文提交和 SSH 推送后停止；不得进入 PHASE2-06
+- 当前阶段：`PHASE2-06` 方案 A 已完成工程实现与验证，尚未 commit/push；不代表 PHASE2-07 或第二期最终验收完成
+- 下一动作：汇报真实 diff、22/148 测试、双 base/资产/许可/秘密/hash 证据，等待用户明确确认后才可中文提交并 SSH 推送；不得进入 PHASE2-07
 
 ## 1. 文档定位
 
@@ -42,7 +43,8 @@
 | `PHASE2-02` | `COMPLETED` | `ab3ac2d` | 默认俯视地形、现代豫陕定位、署名、降级/恢复、资产闭包、自动测试和双尺寸/双 base 浏览器复验完成；产品视觉确认及 GitHub `master` 推送完成 |
 | `PHASE2-03` | `COMPLETED` | `fd8aa92` | 四组候选获批；现代流向、现代低地概览、解释性通道和潼关关隘语义已实现，自动门禁及双尺寸/双 base 浏览器复验完成；用户确认并推送，PHASE2-04 未启动 |
 | `PHASE2-04` | `COMPLETED` | `0210e65` | 两轮候选获批；路线方向、现代代表点间距离、四句点击说明、事件回退、四组开关与 `style.load` 恢复已完成自动及真实浏览器验证；用户确认并推送，PHASE2-05 未启动 |
-| `PHASE2-05` | `COMPLETED` | 本次提交 | 方案 A 已实现；地图优先网格、右侧 2—4 条短解释、按需引用和紧凑底部时间轴完成，自动门禁及双尺寸/双 base 浏览器矩阵通过；P-007 工程验证通过，最终三方签字与 PHASE2-06 未启动 |
+| `PHASE2-05` | `COMPLETED` | `32a6acd` | 方案 A 已实现并推送；地图优先网格、右侧 2—4 条短解释、按需引用和紧凑底部时间轴完成，自动门禁及双尺寸/双 base 浏览器矩阵通过；P-007 工程验证通过 |
+| `PHASE2-06` | `ENGINEERING_COMPLETE_PENDING_COMMIT` | 未提交 | 方案 A 的 2 条来源、10 条发布记录、86 项映射与 F01—F14 已实现；完整 `check`、根/非根静态闭包、许可/秘密/hash 门禁通过，正式数据与 UI 未改，PHASE2-07 未启动 |
 
 提交 `0394d7e` 只删除旧版文档归档 `history-map-docs.zip`，不代表新的 MVP 阶段。
 
@@ -634,9 +636,18 @@ Codex 随后独立对照当前源码、构建产物、服务请求日志、浏�
 - 浏览器另验证键盘方向键与修饰键边界、路线/地点选择、引用展开、事件回退、四组图层、图层/图例互斥，以及停止本地服务触发 DEM 失败、恢复服务后经同一 Map `style.load` 回到 ready。详细实测表和截图文件名见 [PHASE2-05 布局评审记录](../reviews/phase2-05-layout-review.md)。
 - 正式 JSON、lockfile、资料笔记与审核表 SHA-256 均保持不变；5 个 `DISPUTED` 代表点、3 个 Geography、3 个两点 `INFERENCE / LOW` RouteSegment、6 个 `APPROXIMATE` 事件及全部既有审核状态保持不变。
 
-## 19. 下一步边界
+## 19. PHASE2-06 实现与验证证据
 
-1. PHASE2-05 实现、工程门禁与实际浏览器验证已完成；用户于 2026-08-16 明确确认使用中文提交信息和 Git SSH 提交、推送。
-2. 当前批准只覆盖方案 A 页面重排和既有 display-only 内容的呈现；原有 `PENDING_*` / `REJECTED` 记录不得因此提升、发布或改写。
-3. P-007 只完成布局批准与工程验证；第二期最终产品/内容/开发三方签字仍未完成，不得把 PHASE2-05 工程通过写成整个第二期完成。
-4. 不安装 `gh`、不创建 PR；完成 PHASE2-05 提交和推送后立即停止，不进入 PHASE2-06。
+- 开始时现场核对 detached `HEAD`、本地 `master`、`origin/master` 与 GitHub `master` 均为 `32a6acd1d3be27fa0313cccbb0a31b753938a85d`，远端无漂移；仓库无 `.codegraph/`，按规则跳过。
+- 用户于 2026-08-16 明确批准方案 A。新增审计专用 `phase2-spatial-release-v1.json`，包含 2 条空间来源、10 条发布记录和 86 项映射；不进入运行时 `MvpDataset`，不新增正式 Terrain/Boundary/Corridor/DistanceMethod 实体。
+- `verify:phase2-06-release` 联合固定 MVP-11、PHASE2-03/04、五项 hash、地形 manifest、许可/署名/再分发、离线依赖和跟踪文件秘密；`verify:phase2-06-static` 核对根/非根 base、worker、地形资产、未知外网主机和非根站点根正式 JSON。
+- F01—F14 与成功夹具均已实现。最终 `npm --prefix frontend run check` 通过：22 个测试文件、148 项测试；两种 base 均为 87 个文件、单 worker、80 个地形文件/78 张瓦片闭包，非根输出位于 `/private/tmp` 并在验证后清理。
+- 正式 JSON、lockfile、既有资料笔记、既有内容审核表、地形 manifest/资产、地图几何、方向、距离算法、批准文案和 PHASE2-05 UI 均未改变；9/5/2 待审/拒绝边界继续保留。
+- 本任务没有运行新的浏览器、性能、请求或品牌矩阵，不把定向静态构建冒充 PHASE2-07；详细结构、失败判定和证据见 [PHASE2-06 门禁评审](../reviews/phase2-06-release-gate-review.md)。
+
+## 20. 下一步边界
+
+1. PHASE2-06 工程实现与门禁验证已完成，但尚未 commit/push；必须先向用户汇报真实 diff 与证据并等待明确确认。
+2. 当前批准只覆盖方案 A 登记簿和发布门禁；不授权新增内容、修改 UI、升级 `PENDING_*` / `REJECTED` 或进入 PHASE2-07。
+3. 第二期最终产品/内容/开发三方签字仍为空；PHASE2-06 工程通过不能写成整个第二期完成。
+4. 不安装 `gh`、不创建 PR；若用户确认，只使用中文提交信息和现有 Git SSH 提交/推送，随后停止。
